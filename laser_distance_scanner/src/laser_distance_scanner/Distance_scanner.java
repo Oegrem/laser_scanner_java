@@ -5,17 +5,15 @@ import java.util.Vector;
 
 import com.kristou.urgLibJ.Connection.EthernetConnection;
 import com.kristou.urgLibJ.RangeSensor.RangeSensorInformation;
-import com.kristou.urgLibJ.RangeSensor.RangeSensorParameter;
 import com.kristou.urgLibJ.RangeSensor.UrgDevice;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
-import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData.Step;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
-public class distance_scanner {
+public class Distance_scanner {
 
 	private UrgDevice device;
 
-	public distance_scanner() {
+	public Distance_scanner() {
 		device = new UrgDevice(new EthernetConnection());
 	}
 
@@ -65,7 +63,7 @@ public class distance_scanner {
 			data = device.capture();
 
 			if (data != null) {
-				System.out.println("Scan " + (i + 1) + ", steps " + data.steps.size());
+				//System.out.println("Scan " + (i + 1) + ", steps " + data.steps.size());
 				for (int b = 0; b < data.steps.size(); b++) {
 					double rad = device.index2rad(b);
 
@@ -78,7 +76,7 @@ public class distance_scanner {
 					p1.setLocation(x, y);
 					pointVector.addElement(p1);
 					
-					System.out.println("x:" + Long.toString(x) + " y:" + Long.toString(y));
+					//System.out.println("x:" + Long.toString(x) + " y:" + Long.toString(y));
 				}
 
 			} else {
@@ -86,7 +84,7 @@ public class distance_scanner {
 			}
 		}
 
-		System.out.println(Integer.toString(pointVector.size()));
+		//System.out.println(Integer.toString(pointVector.size()));
 
 		// Stop the capture
 		device.stopCapture();

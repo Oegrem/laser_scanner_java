@@ -11,22 +11,22 @@ import static org.lwjgl.system.MemoryUtil.*;
 import java.awt.Point;
 import java.util.Vector;
 
-public class graphics {
+public class Graphics {
 
-	private GLFWErrorCallback errorCallback;
+	//private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
 
 	// The window handle
 	private long window;
 
 	
-	private distance_scanner scn;
+	private Distance_scanner scn;
 	private Vector<Point> points;
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
-		scn = new distance_scanner();
+		scn = new Distance_scanner();
 
 		scn.connect();
 
@@ -42,15 +42,15 @@ public class graphics {
 		} finally {
 			// Terminate GLFW and release the GLFWErrorCallback
 			glfwTerminate();
-			errorCallback.release();
+			//errorCallback.release();
 		}
 	}
 
 	private void init() {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
-		//glfwSetErrorCallback(errorCallback = GLFWErrorCallback.create(System.err));
-
+		//glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
+		
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if (glfwInit() != GL11.GL_TRUE)
 			throw new IllegalStateException("Unable to initialize GLFW");
@@ -66,7 +66,7 @@ public class graphics {
 		int HEIGHT = 300;
 
 		// Create the window
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -110,12 +110,15 @@ public class graphics {
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-		
-		
+		float xm = 1.0f;
+		float c = -0.01f;
+		glPointSize(2);
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while (glfwWindowShouldClose(window) == GL_FALSE) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+			
+			//points.addAll(scn.getDistances(1));
 			
 			points = scn.getDistances(1);
 			
@@ -127,10 +130,26 @@ public class graphics {
 			glBegin(GL_POINTS);
 			glColor3f(1.0f, 0.0f, 0.0f);
 			for(Point p : points){
-				glVertex2f(((float)p.x)/100,((float)p.y)/100);
+				float x = ((float)p.x)/100;
+				float y = ((float)p.y)/100;
+				glVertex2f(x,y);
+				if(y <= 0.1 && y >= 0.0){
+					if(x>=xm && x<=xm+0.05){
+						xm = x;
+					}
+				}
 			}
 			glEnd();
 
+			glBegin(GL_TRIANGLES);
+			glColor3f(0.0f,1.0f,0.0f);
+			glVertex2f(xm,0.0f);
+			glVertex2f(xm+0.1f,0.0f);
+			glVertex2f(xm+0.05f,0.1f);
+			glEnd();
+			
+			xm+=c;
+			
 			glPopMatrix();
 
 			glfwSwapBuffers(window); // swap the color buffers
