@@ -9,13 +9,21 @@ import com.kristou.urgLibJ.RangeSensor.UrgDevice;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
+import data_processing.ClusterPoint;
+
 public class Distance_scanner implements Runnable {
 
 	private Thread t;
 	private UrgDevice device;
 
 	private Vector<Point> pointVector = new Vector<Point>();
-	private Long tmStmp = (long) 0.0;
+	
+	private Vector<Point> smoothedPoints = new Vector<Point>();
+
+	private Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
+	
+	private int readTimes = 0;
+	
 	public Distance_scanner() {
 
 	}
@@ -48,13 +56,14 @@ public class Distance_scanner implements Runnable {
 	}
 
 	public synchronized void writeData() {
+		
+		readTimes++;
+		
 		CaptureData data = null;
 		// Data reception happens when calling capture
 		data = device.capture();
 
 		pointVector.clear();
-		System.out.println(Long.toString(data.timestamp));
-		tmStmp = data.timestamp;
 		
 		if (data != null) {
 			// System.out.println("Scan " + (i + 1) + ", steps " +
@@ -70,6 +79,7 @@ public class Distance_scanner implements Runnable {
 					long y = (long) (l * Math.sin(rad));
 					Point p1 = new Point();
 
+					
 					p1.setLocation(x, y);
 					pointVector.addElement(p1);
 
@@ -138,6 +148,10 @@ public class Distance_scanner implements Runnable {
 
 	public Vector<Point> getPointVector() {
 		return pointVector;
+	}
+	
+	public int getReadTimes(){
+		return readTimes;
 	}
 
 	@Override

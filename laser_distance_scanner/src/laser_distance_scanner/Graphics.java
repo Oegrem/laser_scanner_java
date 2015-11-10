@@ -1,5 +1,6 @@
 package laser_distance_scanner;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -9,6 +10,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.nio.DoubleBuffer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graphics {
@@ -19,6 +22,10 @@ public class Graphics {
 	// The window handle
 	private long window;
 
+	private int lastRead = 0;
+	
+	private boolean clearFlag = false;
+	
 	private Distance_scanner scn;
 	// private Vector<Point> points;
 	private CopyOnWriteArrayList<Point> pointList = new CopyOnWriteArrayList<Point>();
@@ -82,9 +89,14 @@ public class Graphics {
 																// this in our
 																// rendering
 																// loop
+				if(key == GLFW_KEY_C && action == GLFW_RELEASE){
+					clearFlag = true;
+				}
 			}
 		});
-
+		
+		
+		
 		// Get the resolution of the primary monitor
 		/*
 		 * GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor()); //
@@ -123,20 +135,32 @@ public class Graphics {
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-		float xm = 0.5f;
-
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-5, 5, -5, 5, -1, 1);
+		glMatrixMode(GL_MODELVIEW);
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while (glfwWindowShouldClose(window) == GL_FALSE) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
-																// framebuffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-			pointList.clear();
-			pointList.addAll(scn.getPointVector());
+			glPointSize(2);
+			
+			if(scn.getReadTimes()!=lastRead){
+				lastRead = scn.getReadTimes();
+				if(clearFlag){
+				pointList.clear();
+				clearFlag = false;	
+				}
+				pointList.addAll(scn.getPointVector());
+				
+			}
+			
+			drawSensorPixel();
 
 			glPushMatrix();
 
-			glPointSize(2);
+			
 
 			glBegin(GL_POINTS);
 			glColor3f(0.0f, 0.0f, 1.0f);
@@ -145,15 +169,6 @@ public class Graphics {
 				float y = 0.3f * (float) Math.sin(i);
 				glVertex2f(x, y);
 			}
-			glEnd();
-
-			drawSensorPixel();
-
-			glPointSize(10);
-
-			glBegin(GL_POINTS);
-			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex2f(xm, 0.0f);
 			glEnd();
 
 			glPopMatrix();
