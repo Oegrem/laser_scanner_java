@@ -9,28 +9,29 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Point;
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graphics {
 
-	//private GLFWErrorCallback errorCallback;
+	// private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
 
 	// The window handle
 	private long window;
 
-	
 	private Distance_scanner scn;
-	private Vector<Point> points;
+	// private Vector<Point> points;
+	private CopyOnWriteArrayList<Point> pointList = new CopyOnWriteArrayList<Point>();
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
-		scn = new Distance_scanner();
-
+		scn = new Distance_scanner(); // Creating new Thread
+		// scn.disconnect();
 		scn.connect();
+		scn.start();
 
-		points = scn.getDistances(1);
+		pointList.addAll(scn.getPointVector());
 
 		try {
 			init();
@@ -42,15 +43,16 @@ public class Graphics {
 		} finally {
 			// Terminate GLFW and release the GLFWErrorCallback
 			glfwTerminate();
-			//errorCallback.release();
+			// errorCallback.release();
 		}
 	}
 
 	private void init() {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
-		//glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-		
+		// glfwSetErrorCallback(errorCallback =
+		// GLFWErrorCallback.createPrint(System.err));
+
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if (glfwInit() != GL11.GL_TRUE)
 			throw new IllegalStateException("Unable to initialize GLFW");
@@ -99,6 +101,17 @@ public class Graphics {
 		glfwShowWindow(window);
 	}
 
+	private synchronized void drawSensorPixel() {
+		glBegin(GL_POINTS);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		for (Point p : pointList) {
+			float x = ((float) p.x) / 100;
+			float y = ((float) p.y) / 100;
+			glVertex2f(x, y);
+		}
+		glEnd();
+	}
+
 	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
@@ -110,46 +123,39 @@ public class Graphics {
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-		float xm = 1.0f;
-		float c = -0.01f;
-		glPointSize(2);
+		float xm = 0.5f;
+
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while (glfwWindowShouldClose(window) == GL_FALSE) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-			
-			//points.addAll(scn.getDistances(1));
-			
-			points = scn.getDistances(1);
-			
-			glPushMatrix();
-			
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
+																// framebuffer
 
-			glTranslatef(0, 0, -1);
+			pointList.clear();
+			pointList.addAll(scn.getPointVector());
+
+			glPushMatrix();
+
+			glPointSize(2);
 
 			glBegin(GL_POINTS);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			for(Point p : points){
-				float x = ((float)p.x)/100;
-				float y = ((float)p.y)/100;
-				glVertex2f(x,y);
-				if(y <= 0.1 && y >= 0.0){
-					if(x>=xm && x<=xm+0.05){
-						xm = x;
-					}
-				}
+			glColor3f(0.0f, 0.0f, 1.0f);
+			for (int i = 0; i < 360; i += 2) {
+				float x = 0.3f * (float) Math.cos(i);
+				float y = 0.3f * (float) Math.sin(i);
+				glVertex2f(x, y);
 			}
 			glEnd();
 
-			glBegin(GL_TRIANGLES);
-			glColor3f(0.0f,1.0f,0.0f);
-			glVertex2f(xm,0.0f);
-			glVertex2f(xm+0.1f,0.0f);
-			glVertex2f(xm+0.05f,0.1f);
+			drawSensorPixel();
+
+			glPointSize(10);
+
+			glBegin(GL_POINTS);
+			glColor3f(0.0f, 1.0f, 0.0f);
+			glVertex2f(xm, 0.0f);
 			glEnd();
-			
-			xm+=c;
-			
+
 			glPopMatrix();
 
 			glfwSwapBuffers(window); // swap the color buffers
@@ -158,8 +164,8 @@ public class Graphics {
 			// invoked during this call.
 			glfwPollEvents();
 		}
-		
-		scn.disconnect();
+
+		scn.interrupt();
 	}
 
 }

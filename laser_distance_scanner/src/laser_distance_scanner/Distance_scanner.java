@@ -9,15 +9,19 @@ import com.kristou.urgLibJ.RangeSensor.UrgDevice;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
-public class Distance_scanner {
+public class Distance_scanner implements Runnable {
 
+	private Thread t;
 	private UrgDevice device;
 
+	private Vector<Point> pointVector = new Vector<Point>();
+	private Long tmStmp = (long) 0.0;
 	public Distance_scanner() {
-		device = new UrgDevice(new EthernetConnection());
+
 	}
 
 	public void connect() {
+		device = new UrgDevice(new EthernetConnection());
 		// Connect to the sensor
 		if (device.connect("192.168.0.10")) {
 			System.out.println("connected");
@@ -36,60 +40,123 @@ public class Distance_scanner {
 		}
 
 	}
-	
-	public void disconnect(){
+
+	public void disconnect() {
 
 		// Disconnect from the sensor
 		device.disconnect();
 	}
 
-	public Vector<Point> getDistances(int times) {
+	public synchronized void writeData() {
+		CaptureData data = null;
+		// Data reception happens when calling capture
+		data = device.capture();
+
+		pointVector.clear();
+		System.out.println(Long.toString(data.timestamp));
+		tmStmp = data.timestamp;
+		
+		if (data != null) {
+			// System.out.println("Scan " + (i + 1) + ", steps " +
+			// data.steps.size());
+			for (int b = 0; b < data.steps.size(); b++) {
+				long l = data.steps.elementAt(b).distances.elementAt(0);
+
+				if (l > 21 && l < 30000) {
+
+					double rad = device.index2rad(b);
+
+					long x = (long) (l * Math.cos(rad));
+					long y = (long) (l * Math.sin(rad));
+					Point p1 = new Point();
+
+					p1.setLocation(x, y);
+					pointVector.addElement(p1);
+
+					// System.out.println("x:" + Long.toString(x) + " y:" +
+					// Long.toString(y));
+				}
+			}
+
+		} else {
+			System.out.println("Sensor error:" + device.what());
+		}
+	}
+
+	public void getDistances(int times) {
 		// Set the continuous capture type, Please refer to the SCIP
 		// protocol for further details
 
 		device.setCaptureMode(CaptureSettings.CaptureMode.MD_Capture_mode);
 
-		
-		
 		// We set the capture type to a continuous mode so we have to start
 		// the capture
 		device.startCapture();
-		
-		
-		Vector<Point> pointVector = new Vector<Point>();
-		CaptureData data = null;
-		for (int i = 0; i < times; i++) {
-			// Data reception happens when calling capture
-			data = device.capture();
 
-			if (data != null) {
-				//System.out.println("Scan " + (i + 1) + ", steps " + data.steps.size());
-				for (int b = 0; b < data.steps.size(); b++) {
-					double rad = device.index2rad(b);
-
-					long l = data.steps.elementAt(b).distances.elementAt(0);
-
-					long x = (long) (l * Math.cos(rad));
-					long y = (long) (l * Math.sin(rad));
-					Point p1 = new Point();
-					
-					p1.setLocation(x, y);
-					pointVector.addElement(p1);
-					
-					//System.out.println("x:" + Long.toString(x) + " y:" + Long.toString(y));
+		if (times == -1) {
+			while (true) {
+				if(!t.isInterrupted()){
+					writeData();
+				} else {
+					device.stopCapture();
+					disconnect();
+					return;
 				}
 
-			} else {
-				System.out.println("Sensor error:" + device.what());
+			}
+		} else {
+			for (int i = 0; i < times; i++) {
+				if(!t.isInterrupted()){
+					writeData();
+				} else {
+					device.stopCapture();
+					disconnect();
+					return;
+				}
 			}
 		}
 
-		//System.out.println(Integer.toString(pointVector.size()));
+		// System.out.println(Integer.toString(pointVector.size()));
 
 		// Stop the capture
 		device.stopCapture();
-		
+	}
+
+	public static Point getNearest(Point point, Vector<Point> pointVector) {
+		Point nearest = pointVector.elementAt(0);
+		double minDistance = point.distance(pointVector.elementAt(0));
+		for (Point p : pointVector) {
+			double distance = point.distance(p);
+			if (distance != 0 && distance < minDistance) {
+				minDistance = distance;
+				nearest = p;
+			}
+		}
+
+		return nearest;
+	}
+
+	public Vector<Point> getPointVector() {
 		return pointVector;
+	}
+
+	@Override
+	public void run() {
+
+		getDistances(-1);
+
+	}
+
+	public void start() {
+		if (t == null) {
+			t = new Thread(this, "Scanner_Thread");
+			t.start();
+		}
+	}
+
+	public void interrupt() {
+		t.interrupt();
+
 	}
 
 }
