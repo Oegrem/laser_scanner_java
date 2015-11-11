@@ -19,6 +19,9 @@ public class Processing {
 	
 	// polish/straighten funktionality
 	boolean isStraightening = true;
+	// test funktionality dataStorage
+	int count = 50;
+	boolean storeData = true;
 	
 	// initialisation
 	public Processing(Distance_scanner _scanner){
@@ -26,9 +29,25 @@ public class Processing {
 	}
 	
 	/**
-	 * gets the Points, fills the pointList and starts prozessing
+	 * gehts the Points from the scanner class, fills the pointlist and starts the real start prozessing
 	 */
 	public synchronized void startProcess(){
+		if(storeData == true){
+			count --;
+			if(count < 0){
+				dataStorage storage = new dataStorage();
+				storage.storeData(scanner.getPointVector());
+				storeData = false;
+			}
+		}
+		pointList.addAll(scanner.getPointVector());
+		startProcess(pointList);
+	}
+	
+	/**
+	 * starts prozessing
+	 */
+	public synchronized void startProcess(CopyOnWriteArrayList<Point> pointList){
 		// copy the data
 		pointList.addAll(scanner.getPointVector());
 		
