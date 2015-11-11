@@ -28,7 +28,7 @@ public class dataStorage {
 			writer = new FileWriter(output, true);
 
 			for (int i = 0; i < array.size(); i++) {
-				writer.write(array.get(i).getX() + "I" + array.get(i).getY() + "-");
+				writer.write(array.get(i).getX() + "I" + array.get(i).getY() + "|");
 			}
 
 			/* Alternative zu oben:
@@ -64,7 +64,7 @@ public class dataStorage {
 			if (zeile.length() < 10)
 				return null;
 
-			String[] split = zeile.split("-");
+			String[] split = zeile.split("|");
 			String[] superSplit;
 			Point current;
 			for (int i = 0; i < split.length; i++) {
