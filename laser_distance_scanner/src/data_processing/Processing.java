@@ -31,12 +31,15 @@ public class Processing {
 	/**
 	 * gehts the Points from the scanner class, fills the pointlist and starts the real start prozessing
 	 */
-	public synchronized void startProcess(){
+	public synchronized void startProcess(){ // shall be called 50 times?
 		if(storeData == true){
 			count --;
 			if(count < 0){
 				dataStorage storage = new dataStorage();
-				storage.storeData(scanner.getPointVector());
+				Vector<Point> p = new Vector<Point>();
+				p.addAll(pointList);
+				//storage.storeData(scanner.getPointVector()); // saving all saved Data or only the last?
+				storage.storeData(p); // saving all 50 sensor Data: change storeData(Vector<Point>) to storeData(CopyOnWriteArrayList<Point>)
 				storeData = false;
 			}
 		}
@@ -46,10 +49,10 @@ public class Processing {
 	
 	/**
 	 * starts prozessing
-	 */
-	public synchronized void startProcess(CopyOnWriteArrayList<Point> pointList){
+	 */ // doesnt need to be synchronized => data copied already in startProcess()
+	public synchronized void startProcess(CopyOnWriteArrayList<Point> pointList){ 
 		// copy the data
-		pointList.addAll(scanner.getPointVector());
+		pointList.addAll(scanner.getPointVector()); // adding sensor data again 
 		
 		if(isStraightening == true){
 			// creats clustered Points List with straightened Date

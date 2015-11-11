@@ -69,7 +69,7 @@ public class Straighten {
 				y= y - point.get(i-1-k).getY();
 				count --;
 			}
-			if(i+k+1<=point.size()){
+			if(i+k+1<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
 				x= x + point.get(i+1+k).getX();
 				y= y + point.get(i+1+k).getY();
 				count++;

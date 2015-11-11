@@ -165,6 +165,11 @@ public class Distance_scanner implements Runnable {
 		if (t == null) {
 			t = new Thread(this, "Scanner_Thread");
 			t.start();
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
