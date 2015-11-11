@@ -1,6 +1,5 @@
 package laser_distance_scanner;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -10,8 +9,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.nio.DoubleBuffer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graphics {
