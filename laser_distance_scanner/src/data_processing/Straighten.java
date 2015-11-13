@@ -37,11 +37,17 @@ public class Straighten {
 	 * @param cPoint
 	 * @param point
 	 */
-	public void startStraighten(Vector<ClusterPoint> cPoint, CopyOnWriteArrayList<Point> point){
+	public void startStraighten(Vector<ClusterPoint> cPoint, Vector<Point> point){
 		double x = 0;
 		double y = 0;
 		int count =1;
 		
+		if(point.size()<1)
+			return;
+		
+		// if to less points
+		if(point.size()<k)
+			k = 1;
 		// why ever it should by k<1, WE WONT DO IT 
 		if(k<1)return;
 		

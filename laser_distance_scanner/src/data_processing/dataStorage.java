@@ -10,12 +10,22 @@ import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class dataStorage {
-
+	static dataStorage dS = null;
 	String filename = "point.data";
-
-	public dataStorage() {
+	Vector<Vector<Point>> data = new Vector<Vector<Point>>();
+	int current = 0;
+	
+	private dataStorage() {
+		readStoredData();
+		current = 0;
 	}
 
+	static public dataStorage getDataStorage(){
+		if(dS == null)
+			dS = new dataStorage();
+		return dS;
+	}
+	
 	// Alternativ kann auch mit Serializable das ganze Object gespeichert werden,jedoch nicht Menschenlesbar
 	public boolean storeData(Vector<Point> array) { 
 		File output = new File(filename);
@@ -23,8 +33,6 @@ public class dataStorage {
 		try {
 			// new FileWriter(file ,true) - falls die Datei bereits existiert
 			// werden die Bytes an das Ende der Datei geschrieben
-			if (output.exists())
-				output.delete();
 			writer = new FileWriter(output, true);
 
 			for (int i = 0; i < array.size(); i++) {
@@ -48,39 +56,70 @@ public class dataStorage {
 		return false;
 	}
 
-	public Vector<Point> readStoredData() {
+	public void readStoredData() {
 		FileReader fr;
-		Vector<Point> ret = new Vector<>();
+
 		try {
 			fr = new FileReader(filename);
 			BufferedReader br = new BufferedReader(fr);
 
-			// lese eine zeile
-			String zeile = br.readLine();
-			// wenn daten nicht in 1. zeile lese 2. zeile
-			if (zeile.length() < 10)
-				zeile = br.readLine();
-			// PA ich such doch jetzt nicht nach den scheiß daten
-			if (zeile.length() < 10)
-				return null;
-
-			String[] split = zeile.split("|");
-			String[] superSplit;
 			Point current;
-			for (int i = 0; i < split.length; i++) {
-				current = new Point(0, 0);
-				superSplit = split[1].split("I");
-				current.setLocation(Double.parseDouble(superSplit[0]), Double.parseDouble(superSplit[1]));
-				ret.add(current);
+			Vector<Point> currentList = null;
+			String row = "";
+			String[] split;
+			String[] superSplit;
+			// lese zeile vür zeile
+			while((row = br.readLine() )!= null){
+				// wenn zeile nicht lehr
+				if (row.length() > 10){
+					currentList = new Vector<Point>();
+					split= row.split("\\|");
+					// zeile auftrennen zu punkten
+					for (int i = 0; i < split.length; i++) {
+						// wenn ein punkt als inhalt
+						if(split[i].contains("I")){
+							// erstelle punkt, füge werte ein
+							current = new Point(0, 0);
+							superSplit = split[1].split("I");
+							current.setLocation(Double.parseDouble(superSplit[0]), Double.parseDouble(superSplit[1]));
+							// füge sie der momentane liste hinzu
+							currentList.add(current);
+						}
+					}
+					data.add(currentList);
+				}
 			}
-
+			
 			br.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		return ret;
 	}
 
+	/**
+	 *  liefert immer eine liste mit punkten zurück
+	 *  
+	 * @return
+	 */
+	
+	public Vector<Point> getNextPointList(){
+		Vector<Point> ret = new Vector<Point>();
+		Vector<Point> toRet = null;
+		
+		toRet = data.get(current);
+		for(int i=0;i<toRet.size();i++){
+			ret.add((Point)toRet.get(i).clone());
+		}
+		
+		if (ret.size()<1){
+			ret = new Vector<Point>();
+			ret.add(new Point(0,0));
+		}
+		current ++;
+		if(current>= data.size())
+			current = 0;
+		
+		return ret;
+	}
 }

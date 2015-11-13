@@ -10,6 +10,7 @@ import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
 import data_processing.ClusterPoint;
+import data_processing.dataStorage;
 
 public class Distance_scanner implements Runnable {
 
@@ -62,7 +63,7 @@ public class Distance_scanner implements Runnable {
 		CaptureData data = null;
 		// Data reception happens when calling capture
 		data = device.capture();
-
+		
 		pointVector.clear();
 		
 		if (data != null) {
@@ -90,6 +91,12 @@ public class Distance_scanner implements Runnable {
 
 		} else {
 			System.out.println("Sensor error:" + device.what());
+			// potentiell könnte man hier zu testzwecken gespeicherte sensordaten in den vector packen, Gruß Jakob
+			// TODO ACHTUNG TEST
+			dataStorage dS = dataStorage.getDataStorage();
+			pointVector = dS.getNextPointList();
+			// das war irgendwie ungünstig readTimes++;
+			// TODO ACHTUNG TEST
 		}
 	}
 

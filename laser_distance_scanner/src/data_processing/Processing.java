@@ -9,7 +9,7 @@ import laser_distance_scanner.Distance_scanner;
 public class Processing {
 
 	// list with the unchanged raw point data
-	private CopyOnWriteArrayList<Point> pointList = new CopyOnWriteArrayList<Point>();
+	private  Vector<Point> pointList = new Vector<Point>();
 	// list with points assigned to a cluster
 	private Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
 	// data encoder	and likely receiver
@@ -20,8 +20,10 @@ public class Processing {
 	// polish/straighten funktionality
 	boolean isStraightening = true;
 	// test funktionality dataStorage
-	int count = 50;
-	boolean storeData = true;
+	int count = 200;
+	int eachTimes = 8; 
+	int times = 0;
+	boolean storeData = false;
 	
 	// initialisation
 	public Processing(Distance_scanner _scanner){
@@ -31,29 +33,44 @@ public class Processing {
 	/**
 	 * gehts the Points from the scanner class, fills the pointlist and starts the real start prozessing
 	 */
-	public synchronized void startProcess(){ // shall be called 50 times?
+	public synchronized void startProcess(){ 
+		pointList.clear();
+		CopyOnWriteArrayList<Point> currentPoints = new CopyOnWriteArrayList<>();
+		currentPoints.addAll(scanner.getPointVector());
+		//test
+		dataStorage storage2 = dataStorage.getDataStorage();
+		currentPoints.addAll(storage2.getNextPointList());
+		//test
+		for(int i=0;i<currentPoints.size();i++){
+			pointList.add((Point)currentPoints.get(i).clone());
+		}
+
+		
+		
 		if(storeData == true){
-			count --;
-			if(count < 0){
-				dataStorage storage = new dataStorage();
-				Vector<Point> p = new Vector<Point>();
-				p.addAll(pointList);
-				//storage.storeData(scanner.getPointVector()); // saving all saved Data or only the last?
-				storage.storeData(p); // saving all 50 sensor Data: change storeData(Vector<Point>) to storeData(CopyOnWriteArrayList<Point>)
-				storeData = false;
+			times ++;
+			if(times == eachTimes){
+				times = 0;
+				count --;
+				if(count > 0){
+					dataStorage storage = dataStorage.getDataStorage();
+					Vector<Point> p = new Vector<Point>();
+					p.addAll(pointList);
+					//storage.storeData(scanner.getPointVector()); // saving all saved Data or only the last?
+					storage.storeData(p); // saving all 50 sensor Data: change storeData(Vector<Point>) to storeData(CopyOnWriteArrayList<Point>)
+				}
+				else
+					storeData = false;
 			}
 		}
-		pointList.addAll(scanner.getPointVector());
 		startProcess(pointList);
 	}
 	
 	/**
 	 * starts prozessing
 	 */ // doesnt need to be synchronized => data copied already in startProcess()
-	public synchronized void startProcess(CopyOnWriteArrayList<Point> pointList){ 
-		// copy the data
-		pointList.addAll(scanner.getPointVector()); // adding sensor data again 
-		
+	public synchronized void startProcess(Vector<Point> pointList){ 
+
 		if(isStraightening == true){
 			// creats clustered Points List with straightened Date
 			straighten.startStraighten(clusteredPoints,pointList);
@@ -64,8 +81,7 @@ public class Processing {
 			}
 		}
 		
-		
-		
+				
 		// TODO clustern
 		
 		// TODO cluster bekannten klustern zuordnen

@@ -146,8 +146,8 @@ public class Graphics {
 			if(scn.getReadTimes()!=lastRead){
 				lastRead = scn.getReadTimes();
 				if(clearFlag){
-				pointList.clear();
-				clearFlag = false;	
+					pointList.clear();
+					clearFlag = false;	
 				}
 				pointList.addAll(scn.getPointVector());
 				
