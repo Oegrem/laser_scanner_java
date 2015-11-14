@@ -28,6 +28,7 @@ public class Processing {
 	// initialisation
 	public Processing(Distance_scanner _scanner){
 		scanner = _scanner;
+		scanner.start();
 	}
 	
 	/**
@@ -41,6 +42,7 @@ public class Processing {
 		dataStorage storage2 = dataStorage.getDataStorage();
 		currentPoints.addAll(storage2.getNextPointList());
 		//test
+
 		for(int i=0;i<currentPoints.size();i++){
 			pointList.add((Point)currentPoints.get(i).clone());
 		}

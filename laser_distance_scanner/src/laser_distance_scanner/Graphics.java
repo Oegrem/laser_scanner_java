@@ -28,9 +28,9 @@ public class Graphics {
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
-		scn = new Distance_scanner("sim1"); // Creating new Thread
+		scn = Distance_scanner.getDistanceScanner("sim1"); // Getting/Creating Distance_scanner
 
-		scn.start();
+		scn.start(); // starting Thread with connecting and starting Measurement
 
 		pointList.addAll(scn.getPointVector());
 

@@ -39,7 +39,7 @@ public class SimFileHandler {
 
 	public Vector<SData> readObject() { // Reading existing File
 		try {
-			FileInputStream fis = new FileInputStream(fileName); // FileInput
+			FileInputStream fis = new FileInputStream("../"+fileName); // FileInput
 			BufferedInputStream bis = new BufferedInputStream(fis); // BufferedInput
 			ObjectInputStream ois = new ObjectInputStream(bis); // ObjectInput
 
@@ -47,6 +47,7 @@ public class SimFileHandler {
 
 			ois.close(); // Close Stream
 
+			@SuppressWarnings("unchecked")
 			Vector<SData> obj = (Vector<SData>) dObj; // Cast Object to original Object: Vector<SData>
 
 			return obj;

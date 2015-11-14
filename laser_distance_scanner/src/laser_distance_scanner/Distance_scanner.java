@@ -14,6 +14,8 @@ import scanner_simulator.SimFileHandler;
 
 // Framework for URG Laser Distance Scanner; Multithreaded
 public class Distance_scanner implements Runnable {
+	
+	private static Distance_scanner scn; // Singleton Object
 
 	private Thread t; // Thread for running passive
 
@@ -46,6 +48,26 @@ public class Distance_scanner implements Runnable {
 	 */
 	public Distance_scanner(String _alternativeSimFile) {
 		alternativeSimFile = _alternativeSimFile;
+	}
+	
+	/*
+	 * Singleton Constructor with alternativ SimFile Name
+	 */
+	public static Distance_scanner getDistanceScanner(String _altSimFile){
+		if(scn==null){
+			scn = new Distance_scanner(_altSimFile);
+		}
+		return scn;
+	}
+	
+	/*
+	 * Singleton Constructor with default SimFile Name; to be called when scn exists
+	 */
+	public static Distance_scanner getDistanceScanner(){
+		if(scn==null){
+			scn = new Distance_scanner("sim1");
+		}
+		return scn;
 	}
 
 	/*
