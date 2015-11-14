@@ -9,6 +9,8 @@ import com.kristou.urgLibJ.RangeSensor.UrgDevice;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
+import data_processing.Cluster;
+import data_processing.Processing;
 import scanner_simulator.SData;
 import scanner_simulator.SimFileHandler;
 
@@ -25,6 +27,8 @@ public class Distance_scanner implements Runnable {
 																// to Write and
 																// Read
 
+	Vector<Cluster> clusterVector = new Vector<Cluster>();
+	
 	private Vector<SData> sVect = new Vector<SData>(); // SData Vector for
 														// Recording
 
@@ -160,15 +164,6 @@ public class Distance_scanner implements Runnable {
 			}
 		} else {
 			System.out.println("Sensor error:" + device.what());
-			// potentiell könnte man hier zu testzwecken gespeicherte //
-			// sensordaten in den vector packen, Gruß Jakob
-			// TODO ACHTUNG TEST
-			// dataStorage dS = dataStorage.getDataStorage();
-			// pointVector = dS.getNextPointList();
-			// das war irgendwie ungünstig
-			// readTimes++;
-			// TODO ACHTUNG TEST
-
 		}
 	}
 
@@ -238,6 +233,9 @@ public class Distance_scanner implements Runnable {
 
 				if (!t.isInterrupted()) { // exiting at interrupt
 					pointVector = sD.pVector;
+					Processing p = new Processing(this);
+					p.startProcess();
+					clusterVector = p.getCluster();
 					try {
 						Thread.sleep(sD.timestamp); // sleeping timestamp in
 													// millis (timestamp in
@@ -270,6 +268,10 @@ public class Distance_scanner implements Runnable {
 		return nearest;
 	}
 
+	public Vector<Cluster> getClusterVector(){
+		return clusterVector;
+	}
+	
 	public Vector<Point> getPointVector() {
 		return pointVector;
 	}

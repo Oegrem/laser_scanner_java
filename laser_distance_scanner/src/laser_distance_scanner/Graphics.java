@@ -4,6 +4,8 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import data_processing.Cluster;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -24,7 +26,8 @@ public class Graphics {
 	private Distance_scanner scn;
 	// private Vector<Point> points;
 	private CopyOnWriteArrayList<Point> pointList = new CopyOnWriteArrayList<Point>();
-
+	private CopyOnWriteArrayList<Cluster> clusterList = new CopyOnWriteArrayList<Cluster>();
+	
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
@@ -33,7 +36,9 @@ public class Graphics {
 		scn.start(); // starting Thread with connecting and starting Measurement
 
 		pointList.addAll(scn.getPointVector());
-
+		
+		clusterList.addAll(scn.getClusterVector());
+		
 		try {
 			init();
 			loop();
@@ -65,8 +70,8 @@ public class Graphics {
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		int WIDTH = 300;
-		int HEIGHT = 300;
+		int WIDTH = 500;
+		int HEIGHT = 500;
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
@@ -92,7 +97,7 @@ public class Graphics {
 		 * Center our window glfwSetWindowPos( window, (vidmode.getWidth() -
 		 * WIDTH) / 2, (vidmode.getHeight() - HEIGHT) / 2 );
 		 */
-		glfwSetWindowPos(window, (500 - WIDTH) / 2, (500 - HEIGHT) / 2);
+		glfwSetWindowPos(window, (900 - WIDTH) / 2, (900 - HEIGHT) / 2);
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
 		// Enable v-sync
@@ -104,11 +109,20 @@ public class Graphics {
 
 	private synchronized void drawSensorPixel() {
 		glBegin(GL_POINTS);
+		// rot
 		glColor3f(1.0f, 0.0f, 0.0f);
 		for (Point p : pointList) {
-			float x = ((float) p.x) / 100;
-			float y = ((float) p.y) / 100;
+			float x = ((float) p.x) / 300;
+			float y = ((float) p.y) / 300;
 			glVertex2f(x, y);
+		}
+		// irgendwas anderes
+		glColor3f(0.0f, 1.0f, 0.0f);
+		for (Cluster c : clusterList) {
+			float x = ((float) c.getCenter().x) / 300;
+			float y = ((float) c.getCenter().y) / 300;
+			glVertex2f(x, y);
+			// wenn möglich noch rechteck mit den cluster ecken zeichnen (c.getMinCorner() (min x und min y) c.getMaxCorner() (max x und max y))
 		}
 		glEnd();
 	}
