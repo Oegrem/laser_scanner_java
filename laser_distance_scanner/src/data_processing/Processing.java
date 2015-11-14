@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import laser_distance_scanner.Distance_scanner;
+import laser_distance_scanner.SynchronListHandler;
 
 public class Processing {
 
@@ -31,7 +32,7 @@ public class Processing {
 	// initialisation
 	public Processing(Distance_scanner _scanner){
 		scanner = _scanner;
-		scanner.start();
+	//	scanner.start(); // wird in bereits laufendem Thread aufgerufen => rekursion
 	}
 	
 	/**
@@ -40,14 +41,17 @@ public class Processing {
 	public synchronized void startProcess(){ 
 		pointList.clear();
 		CopyOnWriteArrayList<Point> currentPoints = new CopyOnWriteArrayList<>();
-		currentPoints.addAll(scanner.getPointVector());
+		
+		//currentPoints.addAll(scanner.getPointVector()); // Vereinfacht Datentransfer über SynchronListHandler Klasse
+		currentPoints.addAll(SynchronListHandler.getPointVector());
+		
 		//test
 		dataStorage storage2 = dataStorage.getDataStorage();
 		currentPoints.addAll(storage2.getNextPointList());
 		//test
 
 		for(int i=0;i<currentPoints.size();i++){
-			pointList.add((Point)currentPoints.get(i).clone());
+			pointList.add((Point)currentPoints.get(i).clone());  // recht rechenaufwendig
 		}
 
 		

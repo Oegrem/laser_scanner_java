@@ -19,6 +19,9 @@ public class SimFileHandler {
 
 	public void writeObject(Vector<SData> _data) { // Writing/Creating an Object
 		try {
+			
+			// TODO better file path for .jar
+			
 			FileOutputStream fos = new FileOutputStream(fileName); // FileOutput
 			BufferedOutputStream bos = new BufferedOutputStream(fos); // BufferedOutput
 			ObjectOutputStream oos = new ObjectOutputStream(bos); // ObjectOutput
@@ -39,7 +42,10 @@ public class SimFileHandler {
 
 	public Vector<SData> readObject() { // Reading existing File
 		try {
-			FileInputStream fis = new FileInputStream("../"+fileName); // FileInput
+			
+			// TODO better file path for .jar
+			
+			FileInputStream fis = new FileInputStream(fileName); // FileInput
 			BufferedInputStream bis = new BufferedInputStream(fis); // BufferedInput
 			ObjectInputStream ois = new ObjectInputStream(bis); // ObjectInput
 

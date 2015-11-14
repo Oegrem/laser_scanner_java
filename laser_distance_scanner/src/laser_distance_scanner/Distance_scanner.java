@@ -18,21 +18,17 @@ import scanner_simulator.SimFileHandler;
 public class Distance_scanner implements Runnable {
 	
 	private static Distance_scanner scn; // Singleton Object
+	
+	private static boolean instantSimulation = false;
 
 	private Thread t; // Thread for running passive
 
 	private UrgDevice device; // The LaserScanner
 
-	private Vector<Point> pointVector = new Vector<Point>(); // Synchron Object
-																// to Write and
-																// Read
-
 	Vector<Cluster> clusterVector = new Vector<Cluster>();
 	
 	private Vector<SData> sVect = new Vector<SData>(); // SData Vector for
 														// Recording
-
-	private int readTimes = 0; // Read times to save drawing-time in Graphics
 
 	private boolean isRecorded = false; // When true the data will be recorded
 
@@ -73,6 +69,14 @@ public class Distance_scanner implements Runnable {
 		}
 		return scn;
 	}
+	
+	/*
+	 * Enables the instantly starting of the simulation instead of
+	 * waiting for the connection to fail
+	 */
+	public static void setInstantSimulation(boolean _instantSimul){
+		instantSimulation = _instantSimul;
+	}
 
 	/*
 	 * Connect to Device (when not successful enable
@@ -80,6 +84,15 @@ public class Distance_scanner implements Runnable {
 	 * Threads
 	 */
 	public void connect() { 
+		
+		if(instantSimulation){
+			System.out.println("Connect now to Dummy-Plug-System");
+
+			usingSimFile = true; // Enabling Recorded File as Sensor Data Input
+			
+			return;
+		}
+		
 		device = new UrgDevice(new EthernetConnection());
 		// Connect to the sensor
 		if (device.connect("192.168.0.10")) { // Connection to IP of Sensor
@@ -118,14 +131,11 @@ public class Distance_scanner implements Runnable {
 	 */
 	public synchronized void writeData() {
 
-		readTimes++; // Increment readTimes to be compared to avoid calculations
-						// of the same data
-
+		Vector<Point> pVect = new Vector<Point>();
+		
 		CaptureData data = null;
 		// Data reception happens when calling capture
 		data = device.capture();
-
-		pointVector.clear(); // empty vector
 
 		if (data != null) {
 			for (int b = 0; b < data.steps.size(); b++) { // read all steps
@@ -150,21 +160,23 @@ public class Distance_scanner implements Runnable {
 					Point p1 = new Point(); // Use Point object
 					p1.setLocation(x, y);
 
-					pointVector.addElement(p1); // Add to Vector
+					pVect.addElement(p1); // Add to Vector
 
 				}
 			}
-
+			
+			SynchronListHandler.setPointList(pVect);
+			
 			if (isRecorded) { // for recording of sensor data
 				SData nD = new SData(); // sData combines x/y Point Vector and
 										// Timestamp
-				nD.pVector.addAll(pointVector);
+				nD.pVector.addAll(pVect);
 				nD.timestamp = data.timestamp;
 				sVect.add(nD);
 			}
 		} else {
 			System.out.println("Sensor error:" + device.what());
-		}
+		}		
 	}
 
 	/*
@@ -229,10 +241,10 @@ public class Distance_scanner implements Runnable {
 			for (SData sD : dataVector) { // each Sensor Data Vector will be
 											// written in pointVector
 
-				readTimes++; // avoiding more calculation than needed
-
 				if (!t.isInterrupted()) { // exiting at interrupt
-					pointVector = sD.pVector;
+
+					SynchronListHandler.setPointList(sD.pVector);
+					
 					Processing p = new Processing(this);
 					p.startProcess();
 					clusterVector = p.getCluster();
@@ -270,14 +282,6 @@ public class Distance_scanner implements Runnable {
 
 	public Vector<Cluster> getClusterVector(){
 		return clusterVector;
-	}
-	
-	public Vector<Point> getPointVector() {
-		return pointVector;
-	}
-
-	public int getReadTimes() {
-		return readTimes;
 	}
 
 	/*

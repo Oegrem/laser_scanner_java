@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Point;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graphics {
@@ -21,13 +22,10 @@ public class Graphics {
 	// The window handle
 	private long window;
 
-	private int lastRead = 0;
-
 	private Distance_scanner scn;
-	// private Vector<Point> points;
-	private CopyOnWriteArrayList<Point> pointList = new CopyOnWriteArrayList<Point>();
+
 	private CopyOnWriteArrayList<Cluster> clusterList = new CopyOnWriteArrayList<Cluster>();
-	
+
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
@@ -35,8 +33,6 @@ public class Graphics {
 
 		scn.start(); // starting Thread with connecting and starting Measurement
 
-		pointList.addAll(scn.getPointVector());
-		
 		clusterList.addAll(scn.getClusterVector());
 		
 		try {
@@ -62,7 +58,7 @@ public class Graphics {
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if (glfwInit() != GL11.GL_TRUE)
 			throw new IllegalStateException("Unable to initialize GLFW");
-
+		
 		// Configure our window
 		glfwDefaultWindowHints(); // optional, the current window hints are
 									// already the default
@@ -111,20 +107,30 @@ public class Graphics {
 		glBegin(GL_POINTS);
 		// rot
 		glColor3f(1.0f, 0.0f, 0.0f);
-		for (Point p : pointList) {
-			float x = ((float) p.x) / 300;
-			float y = ((float) p.y) / 300;
+		for (Point p : SynchronListHandler.getPointVector()) {
+			float x = ((float)p.x) / 300;
+			float y = ((float)p.y) / 300;
 			glVertex2f(x, y);
 		}
 		// irgendwas anderes
 		glColor3f(0.0f, 1.0f, 0.0f);
 		for (Cluster c : clusterList) {
-			float x = ((float) c.getCenter().x) / 300;
-			float y = ((float) c.getCenter().y) / 300;
+			float x = ((float)c.getCenter().x) / 300;
+			float y = ((float)c.getCenter().y) / 300;
 			glVertex2f(x, y);
 			// wenn möglich noch rechteck mit den cluster ecken zeichnen (c.getMinCorner() (min x und min y) c.getMaxCorner() (max x und max y))
 		}
 		glEnd();
+		glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is opacity (transparenz): lower = more opacity
+		glBegin(GL_QUADS);
+		for (Cluster c : clusterList) {
+			glVertex2f(((float)c.getMinCorner().getX())/300,((float)c.getMinCorner().getY())/300);
+			glVertex2f(((float)c.getMaxCorner().getX())/300,((float)c.getMinCorner().getY())/300);
+			glVertex2f(((float)c.getMaxCorner().getX())/300,((float)c.getMaxCorner().getY())/300);
+			glVertex2f(((float)c.getMinCorner().getX())/300,((float)c.getMaxCorner().getY())/300);
+		}
+		glEnd();
+		
 	}
 
 	private void loop() {
@@ -135,12 +141,15 @@ public class Graphics {
 		// bindings available for use.
 		GL.createCapabilities();
 
+		glEnable(GL_BLEND); // enable blending (opacity)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-6, 6, -6, 6, -1, 1);
+		glOrtho(-6, 6, -6, 6, -1, 1); // To change the resolution of coord.system; change -6 & +6 to range (default: -1 & +1)
 		glMatrixMode(GL_MODELVIEW);
 
 		// Run the rendering loop until the user has attempted to close
@@ -150,12 +159,6 @@ public class Graphics {
 																// framebuffer
 
 			glPointSize(2);
-
-			if (scn.getReadTimes() != lastRead) {
-				lastRead = scn.getReadTimes();
-				pointList.clear();
-				pointList.addAll(scn.getPointVector());
-			}
 
 			drawSensorPixel();
 
