@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class dataStorage {
 	static dataStorage dS = null;
 	String filename = "point.data";
-	Vector<Vector<Point>> data = new Vector<Vector<Point>>();
+	public Vector<Vector<Point>> data = new Vector<Vector<Point>>();
 	int current = 0;
 	
 	private dataStorage() {

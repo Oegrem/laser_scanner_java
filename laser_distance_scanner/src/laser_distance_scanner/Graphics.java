@@ -20,9 +20,7 @@ public class Graphics {
 	private long window;
 
 	private int lastRead = 0;
-	
-	private boolean clearFlag = false;
-	
+
 	private Distance_scanner scn;
 	// private Vector<Point> points;
 	private CopyOnWriteArrayList<Point> pointList = new CopyOnWriteArrayList<Point>();
@@ -30,9 +28,8 @@ public class Graphics {
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
-		scn = new Distance_scanner(); // Creating new Thread
-		// scn.disconnect();
-		scn.connect();
+		scn = new Distance_scanner("sim1"); // Creating new Thread
+
 		scn.start();
 
 		pointList.addAll(scn.getPointVector());
@@ -86,14 +83,9 @@ public class Graphics {
 																// this in our
 																// rendering
 																// loop
-				if(key == GLFW_KEY_C && action == GLFW_RELEASE){
-					clearFlag = true;
-				}
 			}
 		});
-		
-		
-		
+
 		// Get the resolution of the primary monitor
 		/*
 		 * GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor()); //
@@ -134,30 +126,26 @@ public class Graphics {
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-5, 5, -5, 5, -1, 1);
+		glOrtho(-6, 6, -6, 6, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
+
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while (glfwWindowShouldClose(window) == GL_FALSE) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
+																// framebuffer
 
 			glPointSize(2);
-			
-			if(scn.getReadTimes()!=lastRead){
+
+			if (scn.getReadTimes() != lastRead) {
 				lastRead = scn.getReadTimes();
-				if(clearFlag){
-					pointList.clear();
-					clearFlag = false;	
-				}
+				pointList.clear();
 				pointList.addAll(scn.getPointVector());
-				
 			}
-			
+
 			drawSensorPixel();
 
 			glPushMatrix();
-
-			
 
 			glBegin(GL_POINTS);
 			glColor3f(0.0f, 0.0f, 1.0f);
