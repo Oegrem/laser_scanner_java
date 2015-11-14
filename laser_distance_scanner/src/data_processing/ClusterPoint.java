@@ -7,10 +7,10 @@ public class ClusterPoint extends Point{
 	int clusterID = -1;
 	
 	public ClusterPoint(){
-		int clusterID = -1;
+		clusterID = -1;
 	}
 	public ClusterPoint(Point p){
 		this.setLocation(p);
-		int clusterID = -1;
+		clusterID = -1;
 	}
 }

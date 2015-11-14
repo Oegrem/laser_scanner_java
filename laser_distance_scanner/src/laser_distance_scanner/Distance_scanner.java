@@ -9,6 +9,7 @@ import com.kristou.urgLibJ.RangeSensor.UrgDevice;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
+import data_processing.Processing;
 import scanner_simulator.SData;
 import scanner_simulator.SimFileHandler;
 
@@ -216,6 +217,8 @@ public class Distance_scanner implements Runnable {
 
 				if (!t.isInterrupted()) { // exiting at interrupt
 					pointVector = sD.pVector;
+					Processing p = new Processing(this);
+					p.startProcess();
 					try {
 						Thread.sleep(sD.timestamp); // sleeping timestamp in
 													// millis (timestamp in

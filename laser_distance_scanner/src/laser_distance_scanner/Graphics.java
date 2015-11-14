@@ -65,8 +65,8 @@ public class Graphics {
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		int WIDTH = 300;
-		int HEIGHT = 300;
+		int WIDTH = 500;
+		int HEIGHT = 500;
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
@@ -106,8 +106,8 @@ public class Graphics {
 		glBegin(GL_POINTS);
 		glColor3f(1.0f, 0.0f, 0.0f);
 		for (Point p : pointList) {
-			float x = ((float) p.x) / 100;
-			float y = ((float) p.y) / 100;
+			float x = ((float) p.x) / 300;
+			float y = ((float) p.y) / 300;
 			glVertex2f(x, y);
 		}
 		glEnd();

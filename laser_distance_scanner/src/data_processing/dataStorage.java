@@ -3,11 +3,9 @@ package data_processing;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Vector;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class dataStorage {
 	static dataStorage dS = null;

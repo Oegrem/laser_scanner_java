@@ -25,6 +25,9 @@ public class Processing {
 	int times = 0;
 	boolean storeData = false;
 	
+	private Clustering clustering = new Clustering();
+	private Vector<Cluster> cluster= null;
+	
 	// initialisation
 	public Processing(Distance_scanner _scanner){
 		scanner = _scanner;
@@ -83,6 +86,7 @@ public class Processing {
 		
 				
 		// TODO clustern
+		cluster = clustering.cluster(pointList, clusteredPoints);
 		
 		// TODO cluster bekannten klustern zuordnen
 		
@@ -103,5 +107,13 @@ public class Processing {
 	 */
 	public Vector<ClusterPoint> getClusterPoints(){
 		return clusteredPoints;
+	}
+	
+	/**
+	 * provides the clusterlist
+	 * @return
+	 */
+	public Vector<Cluster> getCluster(){
+		return cluster;
 	}
 }
