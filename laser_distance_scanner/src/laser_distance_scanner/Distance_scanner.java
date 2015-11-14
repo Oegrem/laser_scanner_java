@@ -203,7 +203,7 @@ public class Distance_scanner implements Runnable {
 
 		long tStmp = System.currentTimeMillis(); // TimeStamp to see loop time
 
-		while (true) {
+		while (true) { // Looping until interrupted => recorded File starts from Beginning after its over
 			System.out.println(Long.toString(System.currentTimeMillis() - tStmp) + " ms"); // calculating
 																							// loop
 																							// time
