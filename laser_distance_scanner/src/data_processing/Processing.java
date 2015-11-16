@@ -115,6 +115,10 @@ public class Processing {
 		return clusteredPoints;
 	}
 	
+	public Vector<Point> getRawPoints(){
+		return pointList;
+	}
+	
 	/**
 	 * provides the clusterlist
 	 * @return

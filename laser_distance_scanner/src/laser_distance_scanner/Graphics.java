@@ -15,13 +15,14 @@ import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graphics {
-
+	
 	// private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
 
 	// The window handle
 	private long window;
-
+	private int zoomFactor = 600; // 600 ca gesamtes zimmer sichtbar, sollte auf sichtbarkeit der maximalen 10 meter gesetzt werden
+	
 	private Distance_scanner scn;
 
 	private CopyOnWriteArrayList<Cluster> clusterList = new CopyOnWriteArrayList<Cluster>();
@@ -66,8 +67,8 @@ public class Graphics {
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		int WIDTH = 500;
-		int HEIGHT = 500;
+		int WIDTH = 700;
+		int HEIGHT = 700;
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
@@ -105,29 +106,32 @@ public class Graphics {
 
 	private synchronized void drawSensorPixel() {
 		glBegin(GL_POINTS);
+		
 		// rot
 		glColor3f(1.0f, 0.0f, 0.0f);
 		for (Point p : SynchronListHandler.getPointVector()) {
-			float x = ((float)p.x) / 300;
-			float y = ((float)p.y) / 300;
+			float x = ((float)p.x) / zoomFactor;
+			float y = ((float)p.y) / zoomFactor;
 			glVertex2f(x, y);
 		}
-		// irgendwas anderes
+		
+		// irgendwas anderes farbiges
 		glColor3f(0.0f, 1.0f, 0.0f);
 		for (Cluster c : clusterList) {
-			float x = ((float)c.getCenter().x) / 300;
-			float y = ((float)c.getCenter().y) / 300;
+			float x = ((float)c.getCenter().x) / zoomFactor;
+			float y = ((float)c.getCenter().y) / zoomFactor;
 			glVertex2f(x, y);
 			// wenn möglich noch rechteck mit den cluster ecken zeichnen (c.getMinCorner() (min x und min y) c.getMaxCorner() (max x und max y))
 		}
+		
 		glEnd();
 		glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is opacity (transparenz): lower = more opacity
 		glBegin(GL_QUADS);
 		for (Cluster c : clusterList) {
-			glVertex2f(((float)c.getMinCorner().getX())/300,((float)c.getMinCorner().getY())/300);
-			glVertex2f(((float)c.getMaxCorner().getX())/300,((float)c.getMinCorner().getY())/300);
-			glVertex2f(((float)c.getMaxCorner().getX())/300,((float)c.getMaxCorner().getY())/300);
-			glVertex2f(((float)c.getMinCorner().getX())/300,((float)c.getMaxCorner().getY())/300);
+			glVertex2f(((float)c.getMinCorner().getX())/zoomFactor,((float)c.getMinCorner().getY())/zoomFactor);
+			glVertex2f(((float)c.getMaxCorner().getX())/zoomFactor,((float)c.getMinCorner().getY())/zoomFactor);
+			glVertex2f(((float)c.getMaxCorner().getX())/zoomFactor,((float)c.getMaxCorner().getY())/zoomFactor);
+			glVertex2f(((float)c.getMinCorner().getX())/zoomFactor,((float)c.getMaxCorner().getY())/zoomFactor);
 		}
 		glEnd();
 		

@@ -243,11 +243,13 @@ public class Distance_scanner implements Runnable {
 
 				if (!t.isInterrupted()) { // exiting at interrupt
 
-					SynchronListHandler.setPointList(sD.pVector);
-					
 					Processing p = new Processing(this);
 					p.startProcess();
 					clusterVector = p.getCluster();
+					
+					//SynchronListHandler.setPointList(p.getRawPoints());
+					SynchronListHandler.setPointList(sD.pVector);
+					
 					try {
 						Thread.sleep(sD.timestamp); // sleeping timestamp in
 													// millis (timestamp in
