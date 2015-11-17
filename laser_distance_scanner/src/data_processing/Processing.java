@@ -29,6 +29,10 @@ public class Processing {
 	private Clustering clustering = new Clustering();
 	private Vector<Cluster> cluster= null;
 	
+	public Processing(){
+		
+	}
+	
 	// initialisation
 	public Processing(Distance_scanner _scanner){
 		scanner = _scanner;

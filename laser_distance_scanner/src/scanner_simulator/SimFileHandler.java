@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Vector;
@@ -19,8 +20,6 @@ public class SimFileHandler {
 
 	public void writeObject(Vector<SData> _data) { // Writing/Creating an Object
 		try {
-			
-			// TODO better file path for .jar
 			
 			FileOutputStream fos = new FileOutputStream(fileName); // FileOutput
 			BufferedOutputStream bos = new BufferedOutputStream(fos); // BufferedOutput
@@ -42,12 +41,8 @@ public class SimFileHandler {
 
 	public Vector<SData> readObject() { // Reading existing File
 		try {
-			
-			// TODO better file path for .jar
-			
-			FileInputStream fis = new FileInputStream(fileName); // FileInput
-			BufferedInputStream bis = new BufferedInputStream(fis); // BufferedInput
-			ObjectInputStream ois = new ObjectInputStream(bis); // ObjectInput
+
+			ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/"+fileName)); // ObjectInput
 
 			Object dObj = ois.readObject(); // Reading File into an Object
 

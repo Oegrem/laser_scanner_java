@@ -43,6 +43,8 @@ public class Distance_scanner implements Runnable {
 	private boolean usingSimFile = false; // Dummy-Plug-System; set to true when
 											// connection not successful
 
+	public static long slomo = (long)1.0;
+	
 	/*
 	 * Constructor with name of alternative SimFile (SIMulated FILE)
 	 */
@@ -233,7 +235,7 @@ public class Distance_scanner implements Runnable {
 		long tStmp = System.currentTimeMillis(); // TimeStamp to see loop time
 
 		while (true) { // Looping until interrupted => recorded File starts from Beginning after its over
-			System.out.println(Long.toString(System.currentTimeMillis() - tStmp) + " ms"); // calculating
+			//System.out.println(Long.toString(System.currentTimeMillis() - tStmp) + " ms"); // calculating
 																							// loop
 																							// time
 			tStmp = System.currentTimeMillis();
@@ -245,11 +247,8 @@ public class Distance_scanner implements Runnable {
 
 					SynchronListHandler.setPointList(sD.pVector);
 					
-					Processing p = new Processing(this);
-					p.startProcess();
-					clusterVector = p.getCluster();
 					try {
-						Thread.sleep(sD.timestamp); // sleeping timestamp in
+						Thread.sleep(sD.timestamp*slomo); // sleeping timestamp in
 													// millis (timestamp in
 													// millis between sensor
 													// data)

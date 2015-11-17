@@ -78,12 +78,12 @@ class HelpCluster{
 			if(current.x<minX)
 				minX = current.x;
 			if(current.y<minY)
-				minY = current.x;
+				minY = current.y;
 			// maximum
 			if(current.x>maxX)
 				maxX = current.x;
 			if(current.y>maxY)
-				maxY = current.x;
+				maxY = current.y;
 		}
 		// center
 		Point center = new Point();

@@ -4,7 +4,13 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import code_snippets.clusterPoint;
+import code_snippets.dbscan;
+import code_snippets.line_extraction;
+import code_snippets.Line;
 import data_processing.Cluster;
+import data_processing.ClusterPoint;
+import data_processing.Clustering;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -13,6 +19,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.swing.plaf.synth.SynthSpinnerUI;
 
 public class Graphics {
 
@@ -24,17 +32,26 @@ public class Graphics {
 
 	private Distance_scanner scn;
 
-	private CopyOnWriteArrayList<Cluster> clusterList = new CopyOnWriteArrayList<Cluster>();
+	private boolean drawPoints = true;
+
+	private boolean drawLines = true;
+
+	private int toChange = 0;
+
+	// private dbscan dbscn = new dbscan(10, 5); // DBSCAN clustering
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
-		scn = Distance_scanner.getDistanceScanner("sim1"); // Getting/Creating Distance_scanner
+		scn = Distance_scanner.getDistanceScanner("sim1"); // Getting/Creating
+															// Distance_scanner
 
 		scn.start(); // starting Thread with connecting and starting Measurement
 
-		clusterList.addAll(scn.getClusterVector());
-		
+		// clusterList.addAll(scn.getClusterVector());
+
+		// dbscn.cluster(SynchronListHandler.getPointVector());
+
 		try {
 			init();
 			loop();
@@ -58,7 +75,7 @@ public class Graphics {
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if (glfwInit() != GL11.GL_TRUE)
 			throw new IllegalStateException("Unable to initialize GLFW");
-		
+
 		// Configure our window
 		glfwDefaultWindowHints(); // optional, the current window hints are
 									// already the default
@@ -66,8 +83,8 @@ public class Graphics {
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		int WIDTH = 500;
-		int HEIGHT = 500;
+		int WIDTH = 700;
+		int HEIGHT = 700;
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
@@ -84,6 +101,65 @@ public class Graphics {
 																// this in our
 																// rendering
 																// loop
+
+				if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+					if (drawPoints) {
+						drawPoints = false;
+					} else {
+						drawPoints = true;
+					}
+				}
+
+				if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+					if (drawLines) {
+						drawLines = false;
+					} else {
+						drawLines = true;
+					}
+				}
+
+				if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
+					switch (toChange) {
+					case 0:
+						Clustering.threshold += 10;
+						System.out.println(Integer.toString(Clustering.threshold));
+						break;
+					case 1:
+						Clustering.minClusterSize++;
+						System.out.println(Integer.toString(Clustering.minClusterSize));
+						break;
+					case 2:
+						Distance_scanner.slomo+=1;
+						System.out.println(""+Distance_scanner.slomo);
+						break;
+					}
+				}
+
+				if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
+					switch (toChange) {
+					case 0:
+						Clustering.threshold -= 10;
+						System.out.println(Integer.toString(Clustering.threshold));
+						break;
+					case 1:
+						Clustering.minClusterSize--;
+						System.out.println(Integer.toString(Clustering.minClusterSize));
+						break;
+					case 2:
+						Distance_scanner.slomo-=1;
+
+						System.out.println(""+Distance_scanner.slomo);
+						break;
+					}
+				}
+
+				if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+					toChange++;
+					if (toChange > 2) {
+						toChange = 0;
+					}
+				}
+
 			}
 		});
 
@@ -104,33 +180,75 @@ public class Graphics {
 	}
 
 	private synchronized void drawSensorPixel() {
-		glBegin(GL_POINTS);
-		// rot
-		glColor3f(1.0f, 0.0f, 0.0f);
-		for (Point p : SynchronListHandler.getPointVector()) {
-			float x = ((float)p.x) / 300;
-			float y = ((float)p.y) / 300;
-			glVertex2f(x, y);
-		}
+		if (drawPoints) {
+			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			glBegin(GL_POINTS);
+			// rot
+
+			for (Point p : SynchronListHandler.getPointVector()) {
+				float x = ((float) p.x);
+				float y = ((float) p.y);
+				glVertex2f(x, y);
+			}
+
+			glEnd();
+		} /*
+			 * if(drawLines){ glColor3f(0.0f, 1.0f, 0.0f); glBegin(GL_LINES);
+			 * 
+			 * for (Line line : SynchronListHandler.getLineList()) {
+			 * glVertex2f((float) line.getP1().getX() / 300, (float)
+			 * line.getP1().getY() / 300);
+			 * 
+			 * glVertex2f((float) line.getP2().getX() / 300, (float)
+			 * line.getP2().getY() / 300); } glEnd(); }
+			 * 
+			 * dbscn.cluster(SynchronListHandler.getPointVector()); // Drawing
+			 * the clustered Points
+			 * 
+			 * 
+			 * for(Vector<clusterPoint> cluster : dbscn.getClusters()){
+			 * 
+			 * glColor3f(0.0f,0.0f,1.0f); glBegin(GL_POINTS); for(Point p :
+			 * cluster){ float x = ((float)p.x) / 300; float y = ((float)p.y) /
+			 * 300; glVertex2f(x, y); }
+			 * 
+			 * } glEnd();
+			 */
+
 		// irgendwas anderes
-		glColor3f(0.0f, 1.0f, 0.0f);
-		for (Cluster c : clusterList) {
-			float x = ((float)c.getCenter().x) / 300;
-			float y = ((float)c.getCenter().y) / 300;
+		glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+		glBegin(GL_POINTS);
+		for (Cluster c : SynchronListHandler.getClusterVector()) {
+			float x = ((float) c.getCenter().x);
+			float y = ((float) c.getCenter().y);
+			glVertex2f(x, y); // wenn möglich noch rechteck mit den cluster
+								// ecken zeichnen (c.getMinCorner() (min x und
+								// min y) c.getMaxCorner() (max x und max y))
+		}
+		glEnd();
+
+		glColor3f(1.0f, 0.0f, 1.0f);
+
+		glBegin(GL_POINTS);
+		for (ClusterPoint c : SynchronListHandler.getClusteredPoints()) {
+			float x = ((float) c.x);
+			float y = ((float) c.y);
 			glVertex2f(x, y);
-			// wenn möglich noch rechteck mit den cluster ecken zeichnen (c.getMinCorner() (min x und min y) c.getMaxCorner() (max x und max y))
 		}
 		glEnd();
-		glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is opacity (transparenz): lower = more opacity
-		glBegin(GL_QUADS);
-		for (Cluster c : clusterList) {
-			glVertex2f(((float)c.getMinCorner().getX())/300,((float)c.getMinCorner().getY())/300);
-			glVertex2f(((float)c.getMaxCorner().getX())/300,((float)c.getMinCorner().getY())/300);
-			glVertex2f(((float)c.getMaxCorner().getX())/300,((float)c.getMaxCorner().getY())/300);
-			glVertex2f(((float)c.getMinCorner().getX())/300,((float)c.getMaxCorner().getY())/300);
+		if (drawLines) {
+			glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is
+												// opacity(transparenz): lower =
+												// more opacity
+			glBegin(GL_QUADS);
+			for (Cluster c : SynchronListHandler.getClusterVector()) {
+				glVertex2f(((float) c.getMinCorner().getX()), ((float) c.getMinCorner().getY()));
+				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c.getMinCorner().getY()));
+				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c.getMaxCorner().getY()));
+				glVertex2f(((float) c.getMinCorner().getX()), ((float) c.getMaxCorner().getY()));
+			}
+			glEnd();
 		}
-		glEnd();
-		
 	}
 
 	private void loop() {
@@ -143,13 +261,17 @@ public class Graphics {
 
 		glEnable(GL_BLEND); // enable blending (opacity)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
+		glLineWidth(3);
+
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-6, 6, -6, 6, -1, 1); // To change the resolution of coord.system; change -6 & +6 to range (default: -1 & +1)
+		glOrtho(-3000, 3000, -3000, 3000, -1, 1); // To change the resolution of
+		// coord.system; change -6 & +6 to range
+		// (default: -1 & +1)
 		glMatrixMode(GL_MODELVIEW);
 
 		// Run the rendering loop until the user has attempted to close
@@ -167,8 +289,8 @@ public class Graphics {
 			glBegin(GL_POINTS);
 			glColor3f(0.0f, 0.0f, 1.0f);
 			for (int i = 0; i < 360; i += 2) {
-				float x = 0.3f * (float) Math.cos(i);
-				float y = 0.3f * (float) Math.sin(i);
+				float x = 80 * (float) Math.cos(i);
+				float y = 80 * (float) Math.sin(i);
 				glVertex2f(x, y);
 			}
 			glEnd();

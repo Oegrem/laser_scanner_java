@@ -4,10 +4,10 @@ import java.awt.Point;
 import java.util.Vector;
 
 public class Clustering {
-	private int threshold = 100;
+	public static int threshold = 100;
 	// min 2, to skip single error values
 	private int searchRange = 5;
-	private int minClusterSize = 5;
+	public static int minClusterSize = 5;
 	
 	public Clustering(){
 		
