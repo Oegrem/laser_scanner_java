@@ -13,13 +13,12 @@ public class Processing {
 	private  Vector<Point> pointList = new Vector<Point>();
 	// list with points assigned to a cluster
 	private Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
-	// data encoder	and likely receiver
-	private Distance_scanner scanner;
+
 	// the straighting/smothing class
-	private Straighten straighten = new Straighten(3);
+	private Straighten straighten = new Straighten(2);
 	
 	// polish/straighten funktionality
-	boolean isStraightening = true;
+	public static boolean isStraightening = false;
 	// test funktionality dataStorage
 	int count = 200;
 	int eachTimes = 8; 
@@ -35,8 +34,6 @@ public class Processing {
 	
 	// initialisation
 	public Processing(Distance_scanner _scanner){
-		scanner = _scanner;
-	//	scanner.start(); // wird in bereits laufendem Thread aufgerufen => rekursion
 	}
 	
 	/**
@@ -53,13 +50,15 @@ public class Processing {
 		dataStorage storage2 = dataStorage.getDataStorage();
 		currentPoints.addAll(storage2.getNextPointList());
 		//test
-
+		
+		
+		/*
 		for(int i=0;i<currentPoints.size();i++){
 			pointList.add((Point)currentPoints.get(i).clone());  // recht rechenaufwendig
 		}
-
-		
-		
+ 		*/
+		pointList.addAll(currentPoints);
+		/*
 		if(storeData == true){
 			times ++;
 			if(times == eachTimes){
@@ -75,7 +74,7 @@ public class Processing {
 				else
 					storeData = false;
 			}
-		}
+		}*/
 		startProcess(pointList);
 	}
 	
