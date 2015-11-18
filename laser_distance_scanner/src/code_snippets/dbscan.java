@@ -10,18 +10,18 @@ import static code_snippets.clusterPoint.NOISE;
 
 public class dbscan {
 
-	private int densitySize = 3;
+	private static int densitySize = 10;
 
-	private double densityRange = 10;
+	private static double densityRange = 5;
 
-	private Vector<Vector<clusterPoint>> clusters = new Vector<Vector<clusterPoint>>();
+	private static Vector<Vector<clusterPoint>> clusters = new Vector<Vector<clusterPoint>>();
 
 	public dbscan(int _densitySize, double _densityRange) {
 		densityRange = _densityRange;
 		densitySize = _densitySize;
 	}
 
-	public void cluster(CopyOnWriteArrayList<Point> _pVector) {
+	public static Vector<Vector<clusterPoint>> cluster(CopyOnWriteArrayList<Point> _pVector) {
 		Vector<clusterPoint> cluster = new Vector<clusterPoint>();
 		
 		clusters.clear();
@@ -53,10 +53,12 @@ public class dbscan {
 				}
 			}
 		}
+		
+		return clusters;
 
 	}
 
-	public void expandCluster(clusterPoint cp, Vector<clusterPoint> neighbours, Vector<clusterPoint> cluster) {
+	public static void expandCluster(clusterPoint cp, Vector<clusterPoint> neighbours, Vector<clusterPoint> cluster) {
 		cluster.addElement(cp);
 		cp.setToCluster();
 
@@ -86,7 +88,7 @@ public class dbscan {
 		}
 	}
 	
-	public Vector<clusterPoint> mergeVector(Vector<clusterPoint> vc1, Vector<clusterPoint> vc2){
+	public static Vector<clusterPoint> mergeVector(Vector<clusterPoint> vc1, Vector<clusterPoint> vc2){
 		Vector<clusterPoint> clustVect = new Vector<clusterPoint>();
 		clustVect.addAll(vc1);
 		for(clusterPoint p : vc2){

@@ -286,18 +286,22 @@ public class Distance_scanner implements Runnable {
 	/*
 	 * Called for recording Sensor Data in SimFile "FileName", for milliseconds time
 	 */
-	public void recordSimFile(String FileName, int milliseconds) {
+	public void recordSimFile(String FileName) {
+		
+		sVect.clear();
+		
 		isRecorded = true;
 		recordName = FileName;
 
 		start(); // Start Recording
-		try {
-			Thread.sleep(milliseconds); // wait Time while recording
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		interrupt(); // interrupt recording
+	}
+	
+	public void stopRecording(){
+		interrupt();
+		
+		isRecorded = false;
+		
+		start();
 	}
 
 	/*

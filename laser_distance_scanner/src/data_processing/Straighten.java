@@ -2,7 +2,6 @@ package data_processing;
 
 import java.awt.Point;
 import java.util.Vector;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Straighten {
 	int k = 1;
@@ -40,7 +39,7 @@ public class Straighten {
 	public void startStraighten(Vector<ClusterPoint> cPoint, Vector<Point> point){
 		double x = 0;
 		double y = 0;
-		int count =1;
+		int count =0;
 		
 		if(point.size()<1)
 			return;
@@ -49,7 +48,7 @@ public class Straighten {
 		if(point.size()<k)
 			k = 1;
 		// why ever it should by k<1, WE WONT DO IT 
-		if(k<1)return;
+		//if(k<1)return;
 		
 		// if cPoint to small, expand
 		if(cPoint.size()<point.size()){
@@ -59,28 +58,38 @@ public class Straighten {
 		}
 			
 		// add the x and y of the next k elements
-		for(int i=1;i<=k;i++){
-			x= x + point.get(i+k).getX();
-			y= y + point.get(i+k).getY();
+		for(int i=0;i<=k;i++){
+			x= x + point.get(i).getX();
+			y= y + point.get(i).getY();
 			count ++;
 		}
+		// add element 0 again
+		x= x + point.get(0).getX();
+		y= y + point.get(0).getY();
+		count ++;
+		
 		// element 0 average 
 		cPoint.get(0).setLocation(x/count, y/count);
 		
 		// remove the k+1 point value from behind, add the k+1 point value from the front
 		// start with 1
 		for(int i=1;i<point.size();i++){
-			if(i-k-1>=0){
+			if((i-1-k)>=0){
 				x= x - point.get(i-1-k).getX();
 				y= y - point.get(i-1-k).getY();
 				count --;
 			}
-			if(i+k+1<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
-				x= x + point.get(i+1+k).getX();
-				y= y + point.get(i+1+k).getY();
+			if(i+k<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
+				x= x + point.get(i+k).getX();
+				y= y + point.get(i+k).getY();
 				count++;
 			}
+			x= x + point.get(i).getX();
+			y= y + point.get(i).getY();
+			x= x - point.get(i-1).getX();
+			y= y - point.get(i-1).getY();
 			cPoint.get(i).setLocation(x/count, y/count);
 		}
+		return;
 	}
 }

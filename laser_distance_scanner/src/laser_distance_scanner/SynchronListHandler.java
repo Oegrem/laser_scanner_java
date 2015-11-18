@@ -7,6 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import code_snippets.dbscan;
 import code_snippets.line_extraction;
 import code_snippets.Line;
+import code_snippets.clusterPoint;
 import data_processing.Cluster;
 import data_processing.ClusterPoint;
 import data_processing.Processing;
@@ -33,12 +34,12 @@ public class SynchronListHandler {
 		CopyOnWriteArrayList<Point> ppp = new CopyOnWriteArrayList<Point>();
 		
 		copyLineVector.clear();
-		copyLineVector.addAll(line_extraction.calcLine(copyPointVector));
+		copyLineVector.addAll(line_extraction.calcLine(copyPointVector));		
 		
-		Processing p = new Processing();
-		p.startProcess();
-		clusterVector = p.getCluster();
-		clusteredPoints = p.getClusterPoints();
+		//Processing p = new Processing();
+		//p.startProcess();
+		//clusterVector = p.getCluster();
+		//clusteredPoints = p.getClusterPoints();
 		
 	
 	}

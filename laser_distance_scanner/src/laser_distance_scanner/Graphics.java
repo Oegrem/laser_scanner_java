@@ -23,13 +23,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.plaf.synth.SynthSpinnerUI;
 
 public class Graphics {
-
+	
 	// private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
 
 	// The window handle
 	private long window;
-
+	private int zoomFactor = 600; // 600 ca gesamtes zimmer sichtbar, sollte auf sichtbarkeit der maximalen 10 meter gesetzt werden
+	
 	private Distance_scanner scn;
 
 	private boolean drawPoints = true;
@@ -233,9 +234,12 @@ public class Graphics {
 		for (ClusterPoint c : SynchronListHandler.getClusteredPoints()) {
 			float x = ((float) c.x);
 			float y = ((float) c.y);
+
 			glVertex2f(x, y);
 		}
+		
 		glEnd();
+
 		if (drawLines) {
 			glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is
 												// opacity(transparenz): lower =
