@@ -11,6 +11,7 @@ import code_snippets.Line;
 import data_processing.Cluster;
 import data_processing.ClusterPoint;
 import data_processing.Clustering;
+import data_processing.Processing;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -109,6 +110,7 @@ public class Graphics {
 					} else {
 						drawPoints = true;
 					}
+					System.out.println("drawPoints ON/OF");
 				}
 
 				if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
@@ -117,21 +119,35 @@ public class Graphics {
 					} else {
 						drawLines = true;
 					}
+					System.out.println("drawLines ON/OF");
 				}
+				if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
+					if (Processing.isStraightening) {
+						Processing.isStraightening = false;
+					} else {
+						Processing.isStraightening = true;
+					}
+					System.out.println("Glätten ON/OF");
+				}
+
 
 				if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Clustering.threshold += 10;
-						System.out.println(Integer.toString(Clustering.threshold));
+						Clustering.threshold += 0.1;
+						System.out.println("threshold: "+Clustering.threshold);
 						break;
 					case 1:
-						Clustering.minClusterSize++;
-						System.out.println(Integer.toString(Clustering.minClusterSize));
+						Clustering.leapFactor = Clustering.leapFactor + 0.1;
+						System.out.println("leapFactor: "+Clustering.leapFactor);
 						break;
 					case 2:
 						Distance_scanner.slomo+=1;
-						System.out.println(""+Distance_scanner.slomo);
+						System.out.println("slomo: "+Distance_scanner.slomo);
+						break;
+					case 3:
+						Clustering.searchRange++;
+						System.out.println("searchRange: "+Clustering.searchRange);
 						break;
 					}
 				}
@@ -139,25 +155,42 @@ public class Graphics {
 				if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Clustering.threshold -= 10;
-						System.out.println(Integer.toString(Clustering.threshold));
+						Clustering.threshold -= 0.1;
+						System.out.println("threshold: "+Clustering.threshold);
 						break;
 					case 1:
-						Clustering.minClusterSize--;
-						System.out.println(Integer.toString(Clustering.minClusterSize));
+						Clustering.leapFactor = Clustering.leapFactor - 0.1;
+						System.out.println("leapFactor: "+Clustering.leapFactor);
 						break;
 					case 2:
 						Distance_scanner.slomo-=1;
-
-						System.out.println(""+Distance_scanner.slomo);
+						System.out.println("slomo: "+Distance_scanner.slomo);
+						break;
+					case 3:
+						Clustering.searchRange--;
+						System.out.println("searchRange: "+Clustering.searchRange);
 						break;
 					}
 				}
 
 				if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
 					toChange++;
-					if (toChange > 2) {
+					if (toChange > 3) {
 						toChange = 0;
+					}
+					switch(toChange){
+					case 0:
+						System.out.println("threshold");
+						break;
+					case 1:
+						System.out.println("leapFactor");
+						break;
+					case 2:
+						System.out.println("slomo");
+						break;
+					case 3:
+						System.out.println("searchRange");
+						break;
 					}
 				}
 
@@ -244,6 +277,7 @@ public class Graphics {
 			glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is
 												// opacity(transparenz): lower =
 												// more opacity
+			
 			glBegin(GL_QUADS);
 			for (Cluster c : SynchronListHandler.getClusterVector()) {
 				glVertex2f(((float) c.getMinCorner().getX()), ((float) c.getMinCorner().getY()));
@@ -273,7 +307,7 @@ public class Graphics {
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-3000, 3000, -3000, 3000, -1, 1); // To change the resolution of
+		glOrtho(-3500, 3500, -3500, 3500, -1, 1); // To change the resolution of
 		// coord.system; change -6 & +6 to range
 		// (default: -1 & +1)
 		glMatrixMode(GL_MODELVIEW);
