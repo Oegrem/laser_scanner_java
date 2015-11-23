@@ -36,10 +36,10 @@ public class SynchronListHandler {
 		copyLineVector.clear();
 		copyLineVector.addAll(line_extraction.calcLine(copyPointVector));		
 		
-		//Processing p = new Processing();
-		//p.startProcess();
-		//clusterVector = p.getCluster();
-		//clusteredPoints = p.getClusterPoints();
+		Processing p = new Processing();
+		p.startProcess();
+		clusterVector = p.getCluster();
+		clusteredPoints = p.getClusterPoints();
 		
 	
 	}

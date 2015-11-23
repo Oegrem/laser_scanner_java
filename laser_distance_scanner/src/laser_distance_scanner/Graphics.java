@@ -107,27 +107,30 @@ public class Graphics {
 				if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
 					if (drawPoints) {
 						drawPoints = false;
+						System.out.println("drawPoints OF");
 					} else {
 						drawPoints = true;
+						System.out.println("drawPoints ON");
 					}
-					System.out.println("drawPoints ON/OF");
 				}
 
 				if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
 					if (drawLines) {
 						drawLines = false;
+						System.out.println("drawLines OF");
 					} else {
 						drawLines = true;
+						System.out.println("drawLines ON");
 					}
-					System.out.println("drawLines ON/OF");
 				}
 				if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
 					if (Processing.isStraightening) {
 						Processing.isStraightening = false;
+						System.out.println("Glätten OF");
 					} else {
 						Processing.isStraightening = true;
+						System.out.println("Glätten ON");
 					}
-					System.out.println("Glätten ON/OF");
 				}
 
 

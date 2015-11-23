@@ -44,6 +44,10 @@ public class Cluster {
 	public int getID(){
 		return clusterID;
 	}
+	
+	public String toString(){
+		return clusterID+" <"+elements+">("+center.x+"|"+center.y+")";
+	}
 }
 
 /**
@@ -57,7 +61,8 @@ public class Cluster {
  */
 class HelpCluster{
 	Cluster cluster = new Cluster();
-	Vector<ClusterPoint> pointList = new Vector<ClusterPoint>();
+	Vector<ClusterPoint> cPointList = new Vector<ClusterPoint>();
+	Vector<Point> pointList = new Vector<Point>();
 	
 	public HelpCluster(){}
 	
@@ -69,8 +74,8 @@ class HelpCluster{
 	public boolean computeData(){
 		double minX=3000000,minY=3000000,maxX=-3000000,maxY=-3000000,sumX=0,sumY=0;
 		ClusterPoint current = null;
-		for(int i=0;i<pointList.size();i++){
-			current = pointList.get(i);
+		for(int i=0;i<cPointList.size();i++){
+			current = cPointList.get(i);
 			// summe
 			sumX = sumX + current.x;
 			sumY = sumY + current.y;
@@ -87,7 +92,7 @@ class HelpCluster{
 		}
 		// center
 		Point center = new Point();
-		center.setLocation(sumX/pointList.size(),sumY/pointList.size());
+		center.setLocation(sumX/cPointList.size(),sumY/cPointList.size());
 		cluster.setCenter(center);
 		// minCorner
 		Point min = new Point();
@@ -101,8 +106,9 @@ class HelpCluster{
 		return true;
 	}
 	
-	public void addPoint(ClusterPoint p){
+	public void addPoint(ClusterPoint cP, Point p){
 		pointList.add(p);
+		cPointList.add(cP);
 	}
 	public Cluster getCluster(){
 		return cluster;
@@ -138,5 +144,9 @@ class HelpCluster{
 	}
 	public int getID(){
 		return cluster.getID();
+	}
+	
+	public String toString(){
+		return cluster.toString();
 	}
 }

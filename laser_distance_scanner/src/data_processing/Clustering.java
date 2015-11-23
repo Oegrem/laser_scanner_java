@@ -21,8 +21,7 @@ public class Clustering {
 		
 	}
 	
-	public Vector<Cluster> cluster(Vector<Point> points, Vector<ClusterPoint> cPoints){
-		Vector<Cluster> ret = new Vector<Cluster>();
+	public Vector<HelpCluster> cluster(Vector<Point> points, Vector<ClusterPoint> cPoints){
 		Vector<HelpCluster> hCluster = new Vector<>();
 		Point currentPoint = null;
 		int cCount = -1;
@@ -41,8 +40,8 @@ public class Clustering {
 					if(insideThreshold(currentPoint,cPoints.get(i-j),j)){
 						// current Point gehts the same cluster ID
 						cPoints.get(i).clusterID = cPoints.get(i-j).clusterID;
-						hCluster.get(cPoints.get(i).clusterID).addPoint(cPoints.get(i));
-						ret.get(cPoints.get(i).clusterID).increaseElements();
+						hCluster.get(cPoints.get(i).clusterID).addPoint(cPoints.get(i),points.get(i));
+						//ret.get(cPoints.get(i).clusterID).increaseElements();
 						j=searchRange;
 					}
 				}
@@ -52,25 +51,40 @@ public class Clustering {
 				// if not already assignet, create new cluster
 				cCount++;
 				hCluster.add(new HelpCluster());
-				hCluster.get(cCount).addPoint(cPoints.get(i));
-				ret.add(hCluster.get(cCount).getCluster());
-				ret.get(cCount).setID(cCount);
-				ret.get(cCount).increaseElements();
+				hCluster.get(cCount).addPoint(cPoints.get(i),points.get(i));
+				//ret.add(hCluster.get(cCount).getCluster());
+				hCluster.get(cCount).setID(cCount);
+				hCluster.get(cCount).increaseElements();
 				cPoints.get(i).clusterID = cCount;
 			}
 		}
 		
-		// zu kleine Kluster entfernen
-		for(int i=0;i<ret.size();i++){
-			if(ret.get(i).getElementCount()<minClusterSize)
-				ret.remove(i);
-		}
-		
+		// cluster werte berechnen
 		for(int i=0;i<hCluster.size();i++){
 			hCluster.get(i).computeData();
 		}
 		
-		return ret;
+		/*
+		Point center = null;
+		Point maxCorner = null;
+		Point minCorner = null;
+		for(int i=0;i<hCluster.size();i++){
+			center= hCluster.get(i).getCenter();
+			maxCorner = hCluster.get(i).getMaxCorner();
+			minCorner = hCluster.get(i).getMinCorner();
+			for(int j=0;i+j<hCluster.size();i++){
+				
+			}
+		}*/
+		
+		
+		// zu kleine Kluster entfernen
+		for(int i=0;i<hCluster.size();i++){
+			if(hCluster.get(i).getElementCount()<minClusterSize)
+				hCluster.remove(i);
+		}
+
+		return hCluster;
 	}
 	
 	/**
