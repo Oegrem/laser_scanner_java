@@ -31,13 +31,13 @@ public class SynchronListHandler {
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
 
-		copyLineVector.clear();
-		copyLineVector.addAll(line_extraction.calcLine(copyPointVector));		
+		//copyLineVector.clear();
+		//copyLineVector.addAll(line_extraction.calcLine(copyPointVector));		
 		
 		Processing p = new Processing();
 		p.startProcess();
 		clusterVector = p.getCluster();
-		clusteredPoints = p.getClusterPoints();	
+		clusteredPoints = p.getClusterPoints();
 	}
 	
 	public static CopyOnWriteArrayList<Line> getLineList(){

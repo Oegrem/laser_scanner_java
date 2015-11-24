@@ -95,7 +95,9 @@ public class Processing {
 		
 				
 		// TODO clustern
-		cluster = clustering.cluster(pointList, clusteredPoints);
+		Vector<HelpCluster> hCluster = clustering.cluster(pointList, clusteredPoints);
+		for(int i=0;i<hCluster.size();i++)
+			cluster.add(hCluster.get(i).getCluster());
 		
 		// TODO cluster bekannten klustern zuordnen
 		
