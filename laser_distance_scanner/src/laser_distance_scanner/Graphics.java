@@ -23,25 +23,26 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.plaf.synth.SynthSpinnerUI;
 
 public class Graphics {
-	
+
 	// private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
-	
+
 	private GLFWScrollCallback scrollCallback;
-	
+
 	private GLFWCursorPosCallback cursorPosCallback;
-	
+
 	private GLFWMouseButtonCallback mouseButtonCallback;
-	
+
 	private double xold = 0;
-	
+
 	private double yold = 0;
 
-	private boolean buttonPressed = false;
-	
+	private boolean leftButtonPressed = false;
+
 	private float xMove = 1;
-	
+
 	private float yMove = 1;
+
 	// The window handle
 	private long window;
 
@@ -52,8 +53,10 @@ public class Graphics {
 	private boolean drawLines = true;
 
 	private int toChange = 0;
-	
+
 	private float zoom = 1;
+	
+	private boolean clusterColors = false;
 
 	// private dbscan dbscn = new dbscan(10, 5); // DBSCAN clustering
 
@@ -104,53 +107,60 @@ public class Graphics {
 		int HEIGHT = 700;
 
 		// Create the window
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner",
+				NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Setup a key callback. It will be called every time a key is pressed,
 		// repeated or released.
-		
-		glfwSetScrollCallback(window, scrollCallback = new GLFWScrollCallback() {
-			
-			@Override
-			public void invoke(long window, double xoffset, double yoffset) {
-				zoom += yoffset/5;
-			}
-		});
-		
-		glfwSetMouseButtonCallback(window, mouseButtonCallback = new GLFWMouseButtonCallback(){
 
+		glfwSetScrollCallback(window,
+				scrollCallback = new GLFWScrollCallback() {
 
-			@Override
-			public void invoke(long window, int button, int action, int mods) {
-				if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
-					buttonPressed = true;
-				}
-				
-				if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
-					buttonPressed = false;
-				}
-			}
+					@Override
+					public void invoke(long window, double xoffset,
+							double yoffset) {
+						zoom += yoffset / 5;
+					}
+				});
 
-			
-		});
-		
-		glfwSetCursorPosCallback(window, cursorPosCallback = new GLFWCursorPosCallback(){
-			@Override
-			public void invoke(long window, double xpos, double ypos) {
-				if(buttonPressed){
-				xMove += (float)(xpos-xold)*10;
-				yMove += (float)(yold-ypos)*10;
-				}
-				xold = xpos;
-				yold = ypos;
-			}
-		});
-		
+		glfwSetMouseButtonCallback(window,
+				mouseButtonCallback = new GLFWMouseButtonCallback() {
+
+					@Override
+					public void invoke(long window, int button, int action,
+							int mods) {
+						if (button == GLFW_MOUSE_BUTTON_LEFT
+								&& action == GLFW_PRESS) {
+							leftButtonPressed = true;
+						}
+
+						if (button == GLFW_MOUSE_BUTTON_LEFT
+								&& action == GLFW_RELEASE) {
+							leftButtonPressed = false;
+						}
+					}
+
+				});
+
+		glfwSetCursorPosCallback(window,
+				cursorPosCallback = new GLFWCursorPosCallback() {
+					@Override
+					public void invoke(long window, double xpos, double ypos) {
+						if (leftButtonPressed) {
+							xMove += (float) (xpos - xold) * 10;
+							yMove += (float) (yold - ypos) * 10;
+						}
+						xold = xpos;
+						yold = ypos;
+					}
+				});
+
 		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
 			@Override
-			public void invoke(long window, int key, int scancode, int action, int mods) {
+			public void invoke(long window, int key, int scancode, int action,
+					int mods) {
 				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 					glfwSetWindowShouldClose(window, GL_TRUE); // We will detect
 																// this in our
@@ -164,6 +174,16 @@ public class Graphics {
 					} else {
 						drawPoints = true;
 						System.out.println("drawPoints ON");
+					}
+				}
+				
+				if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
+					if (clusterColors) {
+						clusterColors = false;
+						System.out.println("clusterColors OFF");
+					} else {
+						clusterColors = true;
+						System.out.println("clusterColors ON");
 					}
 				}
 
@@ -186,24 +206,26 @@ public class Graphics {
 					}
 				}
 
-
 				if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
 						Clustering.threshold += 0.1;
-						System.out.println("threshold: "+Clustering.threshold);
+						System.out
+								.println("threshold: " + Clustering.threshold);
 						break;
 					case 1:
 						Clustering.leapFactor = Clustering.leapFactor + 0.1;
-						System.out.println("leapFactor: "+Clustering.leapFactor);
+						System.out.println("leapFactor: "
+								+ Clustering.leapFactor);
 						break;
 					case 2:
-						Distance_scanner.slomo+=1;
-						System.out.println("slomo: "+Distance_scanner.slomo);
+						Distance_scanner.slomo += 1;
+						System.out.println("slomo: " + Distance_scanner.slomo);
 						break;
 					case 3:
 						Clustering.searchRange++;
-						System.out.println("searchRange: "+Clustering.searchRange);
+						System.out.println("searchRange: "
+								+ Clustering.searchRange);
 						break;
 					}
 				}
@@ -212,19 +234,24 @@ public class Graphics {
 					switch (toChange) {
 					case 0:
 						Clustering.threshold -= 0.1;
-						System.out.println("threshold: "+Clustering.threshold);
+						System.out
+								.println("threshold: " + Clustering.threshold);
 						break;
 					case 1:
 						Clustering.leapFactor = Clustering.leapFactor - 0.1;
-						System.out.println("leapFactor: "+Clustering.leapFactor);
+						System.out.println("leapFactor: "
+								+ Clustering.leapFactor);
 						break;
 					case 2:
-						Distance_scanner.slomo-=1;
-						System.out.println("slomo: "+Distance_scanner.slomo);
+						if(Distance_scanner.slomo>1){
+						Distance_scanner.slomo -= 1;
+						System.out.println("slomo: " + Distance_scanner.slomo);
+						}
 						break;
 					case 3:
 						Clustering.searchRange--;
-						System.out.println("searchRange: "+Clustering.searchRange);
+						System.out.println("searchRange: "
+								+ Clustering.searchRange);
 						break;
 					}
 				}
@@ -234,7 +261,7 @@ public class Graphics {
 					if (toChange > 3) {
 						toChange = 0;
 					}
-					switch(toChange){
+					switch (toChange) {
 					case 0:
 						System.out.println("threshold");
 						break;
@@ -274,7 +301,7 @@ public class Graphics {
 			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 			glBegin(GL_POINTS);
 			// rot
-			
+
 			for (Point p : SynchronListHandler.getPointVector()) {
 				float x = ((float) p.x);
 				float y = ((float) p.y);
@@ -282,7 +309,7 @@ public class Graphics {
 			}
 
 			glEnd();
-		} /*
+			/*
 			 * if(drawLines){ glColor3f(0.0f, 1.0f, 0.0f); glBegin(GL_LINES);
 			 * 
 			 * for (Line line : SynchronListHandler.getLineList()) {
@@ -305,41 +332,73 @@ public class Graphics {
 			 * } glEnd();
 			 */
 
-		// irgendwas anderes
-		glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-		glBegin(GL_POINTS);
-		for (Cluster c : SynchronListHandler.getClusterVector()) {
-			float x = ((float) c.getCenter().x);
-			float y = ((float) c.getCenter().y);
-			glVertex2f(x, y); // wenn möglich noch rechteck mit den cluster
-								// ecken zeichnen (c.getMinCorner() (min x und
-								// min y) c.getMaxCorner() (max x und max y))
+			// irgendwas anderes
+			glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+			glBegin(GL_POINTS);
+			for (Cluster c : SynchronListHandler.getClusterVector()) {
+				float x = ((float) c.getCenter().x);
+				float y = ((float) c.getCenter().y);
+				glVertex2f(x, y); // wenn möglich noch rechteck mit den cluster
+									// ecken zeichnen (c.getMinCorner() (min x
+									// und
+									// min y) c.getMaxCorner() (max x und max
+									// y))
+			}
+			glEnd();
+
+			glColor3f(1.0f, 0.0f, 1.0f);
+
+			glBegin(GL_POINTS);
+			for (ClusterPoint c : SynchronListHandler.getClusteredPoints()) {
+				float x = ((float) c.x);
+				float y = ((float) c.y);
+
+				glVertex2f(x, y);
+			}
+
+			glEnd();
+
 		}
-		glEnd();
-
-		glColor3f(1.0f, 0.0f, 1.0f);
-		
-		glBegin(GL_POINTS);
-		for (ClusterPoint c : SynchronListHandler.getClusteredPoints()) {
-			float x = ((float) c.x);
-			float y = ((float) c.y);
-
-			glVertex2f(x, y);
-		}
-		
-		glEnd();
-
 		if (drawLines) {
-			glColor4f(0.0f, 0.0f, 1.0f, 0.3f); // last value is
+			glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is
 												// opacity(transparenz): lower =
 												// more opacity
-			
+
 			glBegin(GL_QUADS);
 			for (Cluster c : SynchronListHandler.getClusterVector()) {
-				glVertex2f(((float) c.getMinCorner().getX()), ((float) c.getMinCorner().getY()));
-				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c.getMinCorner().getY()));
-				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c.getMaxCorner().getY()));
-				glVertex2f(((float) c.getMinCorner().getX()), ((float) c.getMaxCorner().getY()));
+				if(clusterColors){
+				switch (c.getID() % 7) {
+				case 0:
+					glColor3f(1.0f,0.0f,0.0f);
+					break;
+				case 1:
+					glColor3f(0.0f,0.0f,1.0f);
+					break;
+				case 2:
+					glColor3f(0.0f,1.0f,0.0f);
+					break;
+				case 3:
+					glColor3f(1.0f,1.0f,0.0f);
+					break;
+				case 4:
+					glColor3f(1.0f,0.0f,1.0f);
+					break;
+				case 5:
+					glColor3f(0.0f,0.0f,0.0f);
+					break;
+				case 6:
+					glColor3f(0.0f,1.0f,1.0f);
+					break;
+				}
+				}
+				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
+						.getMinCorner().getY()));
+				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
+						.getMinCorner().getY()));
+				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
+						.getMaxCorner().getY()));
+				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
+						.getMaxCorner().getY()));
 			}
 			glEnd();
 		}
@@ -377,20 +436,22 @@ public class Graphics {
 			glPointSize(2);
 
 			glPushMatrix();
-
+		
 			glTranslatef(xMove, yMove, 1);
-			
+
 			glScalef(zoom, zoom, 1);
-			
-			
+
 			drawSensorPixel();
-			
+
 			glBegin(GL_POINTS);
 			glColor3f(0.0f, 0.0f, 1.0f);
 			for (int i = 0; i < 360; i += 2) {
 				float x = 80 * (float) Math.cos(i);
 				float y = 80 * (float) Math.sin(i);
 				glVertex2f(x, y);
+				float xM = 10000 * (float) Math.cos(i);
+				float yM = 10000 * (float) Math.sin(i);
+				glVertex2f(xM, yM);
 			}
 			glEnd();
 
