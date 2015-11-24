@@ -196,7 +196,7 @@ public class Distance_scanner implements Runnable {
 		// We set the capture type to a continuous mode so we have to start
 		// the capture
 		device.startCapture(); // starting to capture
-
+		
 		while (true) { // Running until Thread gets interrupted
 			if (!t.isInterrupted()) {
 				writeData();

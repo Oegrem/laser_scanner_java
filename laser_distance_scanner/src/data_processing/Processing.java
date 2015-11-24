@@ -26,7 +26,7 @@ public class Processing {
 	boolean storeData = false;
 	
 	private Clustering clustering = new Clustering();
-	private Vector<Cluster> cluster= null;
+	private Vector<Cluster> cluster= new Vector<Cluster>();
 	
 	public Processing(){
 		

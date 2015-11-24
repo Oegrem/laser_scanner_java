@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.lwjgl.Sys;
+
 import code_snippets.dbscan;
 import code_snippets.line_extraction;
 import code_snippets.Line;
@@ -38,6 +40,7 @@ public class SynchronListHandler {
 		p.startProcess();
 		clusterVector = p.getCluster();
 		clusteredPoints = p.getClusterPoints();
+
 	}
 	
 	public static CopyOnWriteArrayList<Line> getLineList(){

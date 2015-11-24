@@ -12,7 +12,6 @@ import data_processing.Cluster;
 import data_processing.ClusterPoint;
 import data_processing.Clustering;
 import data_processing.Processing;
-
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -27,7 +26,22 @@ public class Graphics {
 	
 	// private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
+	
+	private GLFWScrollCallback scrollCallback;
+	
+	private GLFWCursorPosCallback cursorPosCallback;
+	
+	private GLFWMouseButtonCallback mouseButtonCallback;
+	
+	private double xold = 0;
+	
+	private double yold = 0;
 
+	private boolean buttonPressed = false;
+	
+	private float xMove = 1;
+	
+	private float yMove = 1;
 	// The window handle
 	private long window;
 
@@ -38,6 +52,8 @@ public class Graphics {
 	private boolean drawLines = true;
 
 	private int toChange = 0;
+	
+	private float zoom = 1;
 
 	// private dbscan dbscn = new dbscan(10, 5); // DBSCAN clustering
 
@@ -94,6 +110,44 @@ public class Graphics {
 
 		// Setup a key callback. It will be called every time a key is pressed,
 		// repeated or released.
+		
+		glfwSetScrollCallback(window, scrollCallback = new GLFWScrollCallback() {
+			
+			@Override
+			public void invoke(long window, double xoffset, double yoffset) {
+				zoom += yoffset/5;
+			}
+		});
+		
+		glfwSetMouseButtonCallback(window, mouseButtonCallback = new GLFWMouseButtonCallback(){
+
+
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+				if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+					buttonPressed = true;
+				}
+				
+				if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
+					buttonPressed = false;
+				}
+			}
+
+			
+		});
+		
+		glfwSetCursorPosCallback(window, cursorPosCallback = new GLFWCursorPosCallback(){
+			@Override
+			public void invoke(long window, double xpos, double ypos) {
+				if(buttonPressed){
+				xMove += (float)(xpos-xold)*10;
+				yMove += (float)(yold-ypos)*10;
+				}
+				xold = xpos;
+				yold = ypos;
+			}
+		});
+		
 		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
 			@Override
 			public void invoke(long window, int key, int scancode, int action, int mods) {
@@ -220,7 +274,7 @@ public class Graphics {
 			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 			glBegin(GL_POINTS);
 			// rot
-
+			
 			for (Point p : SynchronListHandler.getPointVector()) {
 				float x = ((float) p.x);
 				float y = ((float) p.y);
@@ -322,10 +376,15 @@ public class Graphics {
 
 			glPointSize(2);
 
-			drawSensorPixel();
-
 			glPushMatrix();
 
+			glTranslatef(xMove, yMove, 1);
+			
+			glScalef(zoom, zoom, 1);
+			
+			
+			drawSensorPixel();
+			
 			glBegin(GL_POINTS);
 			glColor3f(0.0f, 0.0f, 1.0f);
 			for (int i = 0; i < 360; i += 2) {
