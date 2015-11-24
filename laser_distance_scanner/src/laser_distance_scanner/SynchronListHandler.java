@@ -30,18 +30,14 @@ public class SynchronListHandler {
 	public static void setPointList(Vector<Point> _pointList) {
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
-		
-		CopyOnWriteArrayList<Point> ppp = new CopyOnWriteArrayList<Point>();
-		
+
 		copyLineVector.clear();
 		copyLineVector.addAll(line_extraction.calcLine(copyPointVector));		
 		
-		//Processing p = new Processing();
-		//p.startProcess();
-		//clusterVector = p.getCluster();
-		//clusteredPoints = p.getClusterPoints();
-		
-	
+		Processing p = new Processing();
+		p.startProcess();
+		clusterVector = p.getCluster();
+		clusteredPoints = p.getClusterPoints();	
 	}
 	
 	public static CopyOnWriteArrayList<Line> getLineList(){

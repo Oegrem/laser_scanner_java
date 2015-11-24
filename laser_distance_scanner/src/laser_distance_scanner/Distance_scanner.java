@@ -246,7 +246,6 @@ public class Distance_scanner implements Runnable {
 				if (!t.isInterrupted()) { // exiting at interrupt
 
 					SynchronListHandler.setPointList(sD.pVector);
-					
 					try {
 						Thread.sleep(sD.timestamp*slomo); // sleeping timestamp in
 													// millis (timestamp in
@@ -299,6 +298,13 @@ public class Distance_scanner implements Runnable {
 	public void stopRecording(){
 		interrupt();
 		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		isRecorded = false;
 		
 		start();
@@ -344,7 +350,6 @@ public class Distance_scanner implements Runnable {
 	 */
 	public void interrupt() {
 		t.interrupt();
-
 	}
 
 }

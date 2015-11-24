@@ -30,8 +30,7 @@ public class Graphics {
 
 	// The window handle
 	private long window;
-	private int zoomFactor = 600; // 600 ca gesamtes zimmer sichtbar, sollte auf sichtbarkeit der maximalen 10 meter gesetzt werden
-	
+
 	private Distance_scanner scn;
 
 	private boolean drawPoints = true;
@@ -262,7 +261,7 @@ public class Graphics {
 		glEnd();
 
 		glColor3f(1.0f, 0.0f, 1.0f);
-
+		
 		glBegin(GL_POINTS);
 		for (ClusterPoint c : SynchronListHandler.getClusteredPoints()) {
 			float x = ((float) c.x);

@@ -47,8 +47,8 @@ public class Processing {
 		currentPoints.addAll(SynchronListHandler.getPointVector());
 		
 		//test
-		dataStorage storage2 = dataStorage.getDataStorage();
-		currentPoints.addAll(storage2.getNextPointList());
+		//dataStorage storage2 = dataStorage.getDataStorage();
+		//currentPoints.addAll(storage2.getNextPointList());
 		//test
 		
 		

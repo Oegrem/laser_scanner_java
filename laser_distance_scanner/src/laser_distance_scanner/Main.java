@@ -8,10 +8,10 @@ public class Main {
 
 		Distance_scanner.setInstantSimulation(true); // call and set to true when simulation shall be started instantly
 		
-		 new Graphics().run();
+		new Graphics().run();
 
 		
-		//scn.recordSimFile("sim_2", 3000);
+		
 
 	}
 }
