@@ -25,21 +25,31 @@ public class SynchronListHandler {
 
 	private static CopyOnWriteArrayList<Line> copyLineVector = new CopyOnWriteArrayList<Line>();
 	
-	private static Vector<Cluster> clusterVector = new Vector<Cluster>();
+	private static CopyOnWriteArrayList<Cluster> clusterVector = new CopyOnWriteArrayList<Cluster>();
 	
-	private static Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
+	private static CopyOnWriteArrayList<ClusterPoint> clusteredPoints = new CopyOnWriteArrayList<ClusterPoint>();
+	
+	private static Processing p;
+	
+	private static Boolean sP = false;
 	
 	public static void setPointList(Vector<Point> _pointList) {
+
+		
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
 
-		//copyLineVector.clear();
-		//copyLineVector.addAll(line_extraction.calcLine(copyPointVector));		
 		
-		Processing p = new Processing();
-		p.startProcess();
-		clusterVector = p.getCluster();
-		clusteredPoints = p.getClusterPoints();
+		
+
+		//clusterVector.clear();
+		
+		//clusterVector.addAll(Accessor.getCluster());
+		
+		//clusterVector.addAll(p.getCluster());
+		
+		//clusteredPoints.clear();
+		//clusteredPoints.addAll(p.getClusterPoints());
 
 	}
 	
@@ -47,11 +57,11 @@ public class SynchronListHandler {
 		return copyLineVector;
 	}
 	
-	public static Vector<Cluster> getClusterVector(){
+	public static CopyOnWriteArrayList<Cluster> getClusterVector(){
 		return clusterVector;
 	}
 	
-	public static Vector<ClusterPoint> getClusteredPoints(){
+	public static CopyOnWriteArrayList<ClusterPoint> getClusteredPoints(){
 		return clusteredPoints;
 	}
 	

@@ -6,8 +6,6 @@ import org.lwjgl.opengl.*;
 
 import code_snippets.clusterPoint;
 import code_snippets.dbscan;
-import code_snippets.line_extraction;
-import code_snippets.Line;
 import data_processing.Cluster;
 import data_processing.ClusterPoint;
 import data_processing.Clustering;
@@ -17,10 +15,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.swing.plaf.synth.SynthSpinnerUI;
 
 public class Graphics {
 
@@ -43,6 +40,8 @@ public class Graphics {
 
 	private float yMove = 1;
 
+	private static int SCANNER_SIZE = 45;
+
 	// The window handle
 	private long window;
 
@@ -51,26 +50,33 @@ public class Graphics {
 	private boolean drawPoints = true;
 
 	private boolean drawLines = true;
+	
+	private boolean drawDbscan = true;
 
 	private int toChange = 0;
 
 	private float zoom = 1;
-	
+
 	private boolean clusterColors = false;
+
+	private ArrayList<DSButton> buttonList = new ArrayList<DSButton>();
 
 	// private dbscan dbscn = new dbscan(10, 5); // DBSCAN clustering
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
-		scn = Distance_scanner.getDistanceScanner("sim1"); // Getting/Creating
-															// Distance_scanner
+		scn = Distance_scanner.getDistanceScanner(); // Getting/Creating
+														// Distance_scanner
 
 		scn.start(); // starting Thread with connecting and starting Measurement
 
 		// clusterList.addAll(scn.getClusterVector());
 
 		// dbscn.cluster(SynchronListHandler.getPointVector());
+
+		buttonList.add(new DSButton(new Point(1000, 1000),
+				new Point(2000, 2000), 1, 255, 0, 0, 100));
 
 		try {
 			init();
@@ -149,8 +155,15 @@ public class Graphics {
 					@Override
 					public void invoke(long window, double xpos, double ypos) {
 						if (leftButtonPressed) {
-							xMove += (float) (xpos - xold) * 10;
-							yMove += (float) (yold - ypos) * 10;
+							int id = DSButton.isButtonClicked(xpos, ypos,
+									buttonList);
+							System.out.println(xpos);
+							if (id == -1) {
+								xMove += (float) (xpos - xold) * 10;
+								yMove += (float) (yold - ypos) * 10;
+							} else {
+								buttonAction(id);
+							}
 						}
 						xold = xpos;
 						yold = ypos;
@@ -167,7 +180,7 @@ public class Graphics {
 																// rendering
 																// loop
 
-				if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+				if (key == GLFW_KEY_1 && action == GLFW_RELEASE) {
 					if (drawPoints) {
 						drawPoints = false;
 						System.out.println("drawPoints OF");
@@ -177,6 +190,16 @@ public class Graphics {
 					}
 				}
 				
+				if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
+					if (drawDbscan) {
+						drawDbscan = false;
+						System.out.println("drawDbscan OF");
+					} else {
+						drawDbscan = true;
+						System.out.println("drawDbscan ON");
+					}
+				}
+
 				if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
 					if (clusterColors) {
 						clusterColors = false;
@@ -227,6 +250,12 @@ public class Graphics {
 						System.out.println("searchRange: "
 								+ Clustering.searchRange);
 						break;
+					case 4:
+						System.out.println(dbscan.incRange(1));
+						break;
+					case 5:
+						System.out.println(dbscan.incSize(1));
+						break;
 					}
 				}
 
@@ -243,9 +272,10 @@ public class Graphics {
 								+ Clustering.leapFactor);
 						break;
 					case 2:
-						if(Distance_scanner.slomo>1){
-						Distance_scanner.slomo -= 1;
-						System.out.println("slomo: " + Distance_scanner.slomo);
+						if (Distance_scanner.slomo > 1) {
+							Distance_scanner.slomo -= 1;
+							System.out.println("slomo: "
+									+ Distance_scanner.slomo);
 						}
 						break;
 					case 3:
@@ -253,12 +283,19 @@ public class Graphics {
 						System.out.println("searchRange: "
 								+ Clustering.searchRange);
 						break;
+					case 4:
+						System.out.println(dbscan.incRange(-1));
+						
+						break;
+					case 5:
+						System.out.println(dbscan.incSize(-1));
+						break;
 					}
 				}
 
 				if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
 					toChange++;
-					if (toChange > 3) {
+					if (toChange > 5) {
 						toChange = 0;
 					}
 					switch (toChange) {
@@ -274,6 +311,13 @@ public class Graphics {
 					case 3:
 						System.out.println("searchRange");
 						break;
+					case 4:
+						System.out.println("Range");
+						break;
+					case 5:
+						System.out.println("Size");
+						break;
+						
 					}
 				}
 
@@ -296,6 +340,14 @@ public class Graphics {
 		glfwShowWindow(window);
 	}
 
+	private void buttonAction(int id) {
+		switch (id) {
+		default:
+			System.out.println(id);
+			break;
+		}
+	}
+
 	private synchronized void drawSensorPixel() {
 		if (drawPoints) {
 			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
@@ -309,99 +361,60 @@ public class Graphics {
 			}
 
 			glEnd();
-			/*
-			 * if(drawLines){ glColor3f(0.0f, 1.0f, 0.0f); glBegin(GL_LINES);
-			 * 
-			 * for (Line line : SynchronListHandler.getLineList()) {
-			 * glVertex2f((float) line.getP1().getX() / 300, (float)
-			 * line.getP1().getY() / 300);
-			 * 
-			 * glVertex2f((float) line.getP2().getX() / 300, (float)
-			 * line.getP2().getY() / 300); } glEnd(); }
-			 * 
-			 * dbscn.cluster(SynchronListHandler.getPointVector()); // Drawing
-			 * the clustered Points
-			 * 
-			 * 
-			 * for(Vector<clusterPoint> cluster : dbscn.getClusters()){
-			 * 
-			 * glColor3f(0.0f,0.0f,1.0f); glBegin(GL_POINTS); for(Point p :
-			 * cluster){ float x = ((float)p.x) / 300; float y = ((float)p.y) /
-			 * 300; glVertex2f(x, y); }
-			 * 
-			 * } glEnd();
-			 */
-
-			// irgendwas anderes
-			glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-			glBegin(GL_POINTS);
-			for (Cluster c : SynchronListHandler.getClusterVector()) {
-				float x = ((float) c.getCenter().x);
-				float y = ((float) c.getCenter().y);
-				glVertex2f(x, y); // wenn möglich noch rechteck mit den cluster
-									// ecken zeichnen (c.getMinCorner() (min x
-									// und
-									// min y) c.getMaxCorner() (max x und max
-									// y))
-			}
-			glEnd();
-
-			glColor3f(1.0f, 0.0f, 1.0f);
-
-			glBegin(GL_POINTS);
-			for (ClusterPoint c : SynchronListHandler.getClusteredPoints()) {
-				float x = ((float) c.x);
-				float y = ((float) c.y);
-
-				glVertex2f(x, y);
-			}
-
-			glEnd();
 
 		}
-		if (drawLines) {
-			glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is
-												// opacity(transparenz): lower =
-												// more opacity
+		if (drawDbscan) {
+			Vector<Vector<clusterPoint>> vvcp = dbscan
+					.cluster(SynchronListHandler.getPointVector());
 
-			glBegin(GL_QUADS);
-			for (Cluster c : SynchronListHandler.getClusterVector()) {
-				if(clusterColors){
-				switch (c.getID() % 7) {
-				case 0:
-					glColor3f(1.0f,0.0f,0.0f);
-					break;
-				case 1:
-					glColor3f(0.0f,0.0f,1.0f);
-					break;
-				case 2:
-					glColor3f(0.0f,1.0f,0.0f);
-					break;
-				case 3:
-					glColor3f(1.0f,1.0f,0.0f);
-					break;
-				case 4:
-					glColor3f(1.0f,0.0f,1.0f);
-					break;
-				case 5:
-					glColor3f(0.0f,0.0f,0.0f);
-					break;
-				case 6:
-					glColor3f(0.0f,1.0f,1.0f);
-					break;
+			glColor3f(0.0f, 1.0f, 0.0f);
+
+			glBegin(GL_POINTS);
+
+			for (Vector<clusterPoint> vCP : vvcp) {
+				for (clusterPoint cP : vCP) {
+					glVertex2f((float) cP.x, (float) cP.y);
 				}
-				}
-				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-						.getMinCorner().getY()));
-				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-						.getMinCorner().getY()));
-				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-						.getMaxCorner().getY()));
-				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-						.getMaxCorner().getY()));
 			}
 			glEnd();
 		}
+		/*
+		 * // irgendwas anderes glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+		 * glBegin(GL_POINTS); for (Cluster c :
+		 * SynchronListHandler.getClusterVector()) { float x = ((float)
+		 * c.getCenter().x); float y = ((float) c.getCenter().y); glVertex2f(x,
+		 * y); // wenn möglich noch rechteck mit den cluster // ecken zeichnen
+		 * (c.getMinCorner() (min x // und // min y) c.getMaxCorner() (max x und
+		 * max // y)) } glEnd();
+		 * 
+		 * glColor3f(1.0f, 0.0f, 1.0f);
+		 * 
+		 * glBegin(GL_POINTS); for (ClusterPoint c :
+		 * SynchronListHandler.getClusteredPoints()) { float x = ((float) c.x);
+		 * float y = ((float) c.y);
+		 * 
+		 * glVertex2f(x, y); }
+		 * 
+		 * glEnd();
+		 * 
+		 * } if (drawLines) { glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value
+		 * is // opacity(transparenz): lower = // more opacity
+		 * 
+		 * glBegin(GL_QUADS); for (Cluster c :
+		 * SynchronListHandler.getClusterVector()) { if(clusterColors){ switch
+		 * (c.getID() % 7) { case 0: glColor3f(1.0f,0.0f,0.0f); break; case 1:
+		 * glColor3f(0.0f,0.0f,1.0f); break; case 2: glColor3f(0.0f,1.0f,0.0f);
+		 * break; case 3: glColor3f(1.0f,1.0f,0.0f); break; case 4:
+		 * glColor3f(1.0f,0.0f,1.0f); break; case 5: glColor3f(0.0f,0.0f,0.0f);
+		 * break; case 6: glColor3f(0.0f,1.0f,1.0f); break; } }
+		 * glVertex2f(((float) c.getMinCorner().getX()), ((float) c
+		 * .getMinCorner().getY())); glVertex2f(((float)
+		 * c.getMaxCorner().getX()), ((float) c .getMinCorner().getY()));
+		 * glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
+		 * .getMaxCorner().getY())); glVertex2f(((float)
+		 * c.getMinCorner().getX()), ((float) c .getMaxCorner().getY())); }
+		 * glEnd();
+		 */
 	}
 
 	private void loop() {
@@ -436,7 +449,7 @@ public class Graphics {
 			glPointSize(2);
 
 			glPushMatrix();
-		
+
 			glTranslatef(xMove, yMove, 1);
 
 			glScalef(zoom, zoom, 1);
@@ -444,18 +457,26 @@ public class Graphics {
 			drawSensorPixel();
 
 			glBegin(GL_POINTS);
-			glColor3f(0.0f, 0.0f, 1.0f);
-			for (int i = 0; i < 360; i += 2) {
-				float x = 80 * (float) Math.cos(i);
-				float y = 80 * (float) Math.sin(i);
-				glVertex2f(x, y);
-				float xM = 10000 * (float) Math.cos(i);
-				float yM = 10000 * (float) Math.sin(i);
-				glVertex2f(xM, yM);
+
+			for (float g = 0; g < 10000; g += 100) {
+				glColor4f(1 - (g / 10000), (g / 10000), 0.0f, 0.3f);
+				for (int i = 0; i < 360; i += 1) {
+
+					float x = (SCANNER_SIZE + g) * (float) Math.cos(i);
+					float y = (SCANNER_SIZE + g) * (float) Math.sin(i);
+
+					glVertex2f(x, y);
+
+				}
 			}
+
 			glEnd();
 
 			glPopMatrix();
+
+			for (DSButton dsb : buttonList) {
+				// dsb.drawButton();
+			}
 
 			glfwSwapBuffers(window); // swap the color buffers
 

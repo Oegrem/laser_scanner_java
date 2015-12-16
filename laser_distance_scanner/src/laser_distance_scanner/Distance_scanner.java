@@ -27,6 +27,8 @@ public class Distance_scanner implements Runnable {
 
 	Vector<Cluster> clusterVector = new Vector<Cluster>();
 	
+	private int currFreq = 25;
+	
 	private Vector<SData> sVect = new Vector<SData>(); // SData Vector for
 														// Recording
 
@@ -37,7 +39,7 @@ public class Distance_scanner implements Runnable {
 	private boolean isConnected = false; // set to true when Thread more than
 											// one times started
 
-	private String alternativeSimFile = "sim1"; // name of recorded File when
+	public static String alternativeSimFile = "sim1"; // name of recorded File when
 												// connection not successful
 
 	private boolean usingSimFile = false; // Dummy-Plug-System; set to true when
@@ -46,11 +48,19 @@ public class Distance_scanner implements Runnable {
 	public static long slomo = (long)1.0;
 	
 	/*
+	 * Constructor using static SimFileName
+	 */
+	public Distance_scanner() {
+	}
+	
+	/*
 	 * Constructor with name of alternative SimFile (SIMulated FILE)
 	 */
 	public Distance_scanner(String _alternativeSimFile) {
 		alternativeSimFile = _alternativeSimFile;
 	}
+	
+	
 	
 	/*
 	 * Singleton Constructor with alternativ SimFile Name
@@ -67,7 +77,7 @@ public class Distance_scanner implements Runnable {
 	 */
 	public static Distance_scanner getDistanceScanner(){
 		if(scn==null){
-			scn = new Distance_scanner("sim1");
+			scn = new Distance_scanner();
 		}
 		return scn;
 	}
@@ -146,6 +156,8 @@ public class Distance_scanner implements Runnable {
 																			// of
 																			// step
 
+				
+				
 				if (l > 21 && l < 30000) { // avoid adding error-values to
 											// vector
 
@@ -173,7 +185,10 @@ public class Distance_scanner implements Runnable {
 				SData nD = new SData(); // sData combines x/y Point Vector and
 										// Timestamp
 				nD.pVector.addAll(pVect);
-				nD.timestamp = data.timestamp;
+				nD.freq = currFreq;
+
+				
+				
 				sVect.add(nD);
 			}
 		} else {
@@ -222,7 +237,6 @@ public class Distance_scanner implements Runnable {
 	 * started
 	 */
 	public void getRecordedDistances() { 
-
 		SimFileHandler sFH = new SimFileHandler(alternativeSimFile); // SimFileHandler
 																		// for
 																		// writing
@@ -247,7 +261,7 @@ public class Distance_scanner implements Runnable {
 
 					SynchronListHandler.setPointList(sD.pVector);
 					try {
-						Thread.sleep(sD.timestamp*slomo); // sleeping timestamp in
+						Thread.sleep(sD.freq*slomo); // sleeping timestamp in
 													// millis (timestamp in
 													// millis between sensor
 													// data)

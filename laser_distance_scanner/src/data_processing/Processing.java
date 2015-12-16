@@ -96,6 +96,7 @@ public class Processing {
 				
 		// TODO clustern
 		Vector<HelpCluster> hCluster = clustering.cluster(pointList, clusteredPoints);
+		
 		for(int i=0;i<hCluster.size();i++)
 			cluster.add(hCluster.get(i).getCluster());
 		

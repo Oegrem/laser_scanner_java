@@ -15,7 +15,7 @@ public class SData implements Serializable{
 	
 	
 	public Vector<Point> pVector;
-	public Long timestamp = 0l;
+	public int freq = 25;
 	
 	public SData(){
 		pVector = new Vector<Point>();

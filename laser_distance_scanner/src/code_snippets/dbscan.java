@@ -4,31 +4,33 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.lwjgl.opencl.CLSVMFreeCallback;
+
 import static code_snippets.clusterPoint.NOTVISITED;
 import static code_snippets.clusterPoint.VISITED;
 import static code_snippets.clusterPoint.NOISE;
 
 public class dbscan {
 
-	private static int densitySize = 10;
+	private static int densitySize = 6;
 
-	private static double densityRange = 5;
+	private static int densityRange = 15;
 
 	private static Vector<Vector<clusterPoint>> clusters = new Vector<Vector<clusterPoint>>();
 
-	public dbscan(int _densitySize, double _densityRange) {
+	public dbscan(int _densitySize, int _densityRange) {
 		densityRange = _densityRange;
 		densitySize = _densitySize;
 	}
 
 	public static Vector<Vector<clusterPoint>> cluster(CopyOnWriteArrayList<Point> _pVector) {
+			
 		Vector<clusterPoint> cluster = new Vector<clusterPoint>();
 		
 		clusters.clear();
 
 		clusterPoint cP;
 
-		
 		for (Point p : _pVector) {
 			cP = new clusterPoint(p.getX(), p.getY());
 
@@ -40,6 +42,7 @@ public class dbscan {
 		for (clusterPoint cp : cluster) {
 			if (cp.getStatus() == NOTVISITED) {
 				cp.setStatus(VISITED);
+				neighbours.clear();
 				neighbours = cp.getNeighbours(cluster, densityRange);
 				if (neighbours.size() >= densitySize) {
 					Vector<clusterPoint> nextCl = new Vector<clusterPoint>();
@@ -59,6 +62,8 @@ public class dbscan {
 	}
 
 	public static void expandCluster(clusterPoint cp, Vector<clusterPoint> neighbours, Vector<clusterPoint> cluster) {
+		int distanceRelRange = (int) (densityRange*Math.sqrt(Math.pow(cp.x/50,2)+Math.pow(cp.y/50,2)));
+		
 		cluster.addElement(cp);
 		cp.setToCluster();
 
@@ -71,7 +76,7 @@ public class dbscan {
 			
 			if (nP.getStatus() == NOTVISITED) {
 				nP.setStatus(VISITED);
-				neighbourCluster = nP.getNeighbours(neighbours, densityRange);
+				neighbourCluster = nP.getNeighbours(neighbours, distanceRelRange);
 				if (neighbourCluster.size() >= densitySize) {
 				neighbours = mergeVector(neighbours, neighbourCluster);
 				
@@ -86,6 +91,41 @@ public class dbscan {
 			}
 			
 		}
+	}
+	
+	public static Vector<Vector<Point>> getClusters(CopyOnWriteArrayList<Point> _pVector){
+		Vector<Vector<clusterPoint>> vvCP = cluster(_pVector);
+		
+		Vector<Point> pVector = new Vector<Point>();
+ 		
+		for(Vector<clusterPoint> vP : vvCP){
+			for(clusterPoint p : vP){
+				pVector.add(p);
+			}
+		}
+		
+		for(int i=0;i<pVector.size();i++){
+			
+		}
+		
+		Vector<Vector<Point>> cluster = new Vector<Vector<Point>>();
+		
+		for(Point p : pVector){
+			
+		}
+		
+		return null;
+		
+	}
+	
+	public static int incSize(int inc){
+		densitySize+=inc;
+		return densitySize;
+	}
+
+	public static int incRange(int inc){
+		densityRange+=inc;
+		return densityRange;
 	}
 	
 	public static Vector<clusterPoint> mergeVector(Vector<clusterPoint> vc1, Vector<clusterPoint> vc2){
