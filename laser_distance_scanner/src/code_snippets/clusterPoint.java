@@ -1,7 +1,6 @@
 package code_snippets;
 
 import java.awt.Point;
-import java.lang.invoke.ConstantCallSite;
 import java.util.Vector;
 
 public class clusterPoint extends Point {
@@ -21,11 +20,21 @@ public class clusterPoint extends Point {
 	
 	private boolean belongToCluster = false;
 	
+	public clusterPoint(){
+		super();
+	}
+	
 	public clusterPoint(double _x, double _y){
 		super();
 		setLocation(_x, _y);
 		
 		status = NOTVISITED;
+	}
+	
+	public clusterPoint(Point p1){
+		super();
+		
+		setLocation(p1);
 	}
 	
 	public Vector<clusterPoint> getNeighbours(Vector<clusterPoint> _cluster, double _densityRange){

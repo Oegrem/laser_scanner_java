@@ -3,8 +3,6 @@ package data_processing;
 import java.awt.Point;
 import java.util.Vector;
 
-import code_snippets.clusterPoint;
-
 public class Straighten {
 	int k = 1;
 	

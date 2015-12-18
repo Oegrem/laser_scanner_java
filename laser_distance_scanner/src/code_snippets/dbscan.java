@@ -4,19 +4,17 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.lwjgl.opencl.CLSVMFreeCallback;
-
 import static code_snippets.clusterPoint.NOTVISITED;
 import static code_snippets.clusterPoint.VISITED;
 import static code_snippets.clusterPoint.NOISE;
 
 public class dbscan {
 
-	private static int densitySize = 6;
+	private static int densitySize = 10;
 
-	private static int densityRange = 15;
-
-	private static Vector<Vector<clusterPoint>> clusters = new Vector<Vector<clusterPoint>>();
+	private static int densityRange = 60;
+	
+	private static Vector<clusterLineStrip> lastLineStrip = new Vector<clusterLineStrip>();
 
 	public dbscan(int _densitySize, int _densityRange) {
 		densityRange = _densityRange;
@@ -24,11 +22,11 @@ public class dbscan {
 	}
 
 	public static Vector<Vector<clusterPoint>> cluster(CopyOnWriteArrayList<Point> _pVector) {
-			
+		Vector<Vector<clusterPoint>> clusters = new Vector<Vector<clusterPoint>>();
+
 		Vector<clusterPoint> cluster = new Vector<clusterPoint>();
 		
-		clusters.clear();
-
+		
 		clusterPoint cP;
 
 		for (Point p : _pVector) {
@@ -44,15 +42,22 @@ public class dbscan {
 				cp.setStatus(VISITED);
 				neighbours.clear();
 				neighbours = cp.getNeighbours(cluster, densityRange);
-				if (neighbours.size() >= densitySize) {
-					Vector<clusterPoint> nextCl = new Vector<clusterPoint>();
-
-					expandCluster(cp, neighbours, nextCl);
-
-					clusters.add(nextCl);
-
-				} else {
+				if (neighbours.size() < densitySize) {
 					cp.setStatus(NOISE);
+				} else {
+					Vector<clusterPoint> nextCl = new Vector<clusterPoint>();
+					
+					nextCl.addElement(cp);
+					cp.setToCluster();
+					
+					for(clusterPoint nP : neighbours){
+						if(!nP.isInCluster()){
+							expandCluster(nP, nextCl, cluster);
+						}
+					}
+					
+					clusters.add(nextCl);
+					
 				}
 			}
 		}
@@ -61,61 +66,70 @@ public class dbscan {
 
 	}
 
-	public static void expandCluster(clusterPoint cp, Vector<clusterPoint> neighbours, Vector<clusterPoint> cluster) {
-		int distanceRelRange = (int) (densityRange*Math.sqrt(Math.pow(cp.x/50,2)+Math.pow(cp.y/50,2)));
-		
+	public static void expandCluster(clusterPoint cp, Vector<clusterPoint> cluster, Vector<clusterPoint> allPoints) {
+
 		cluster.addElement(cp);
 		cp.setToCluster();
 
-		Vector<clusterPoint> neighbourCluster = new Vector<clusterPoint>();
-		
-		int maxSize = neighbours.size();
-		
-		for(int i=0; i<maxSize;i++){
-			clusterPoint nP = neighbours.elementAt(i);
-			
-			if (nP.getStatus() == NOTVISITED) {
-				nP.setStatus(VISITED);
-				neighbourCluster = nP.getNeighbours(neighbours, distanceRelRange);
-				if (neighbourCluster.size() >= densitySize) {
-				neighbours = mergeVector(neighbours, neighbourCluster);
-				
-				maxSize = neighbours.size();
-				i=0;
+		if(cp.getStatus() == NOTVISITED){
+			cp.setStatus(VISITED);
+			Vector<clusterPoint> neighbours = new Vector<clusterPoint>();
+			neighbours = cp.getNeighbours(allPoints, densityRange);
+			if(neighbours.size() >= densitySize){
+				for(clusterPoint nP : neighbours){
+					if(!nP.isInCluster()){
+						expandCluster(nP, cluster, allPoints);
+					}
 				}
 			}
-			
-			if(!nP.isInCluster()){
-				cluster.addElement(nP);
-				nP.setToCluster();
-			}
-			
 		}
 	}
 	
-	public static Vector<Vector<Point>> getClusters(CopyOnWriteArrayList<Point> _pVector){
-		Vector<Vector<clusterPoint>> vvCP = cluster(_pVector);
+	public static Vector<clusterLineStrip> getClustersAsLines(CopyOnWriteArrayList<Point> _pVector, int precision){
+		Vector<Vector<clusterPoint>> vvcp = cluster(_pVector);
+		Vector<clusterLineStrip> vvL = new Vector<clusterLineStrip>();
 		
-		Vector<Point> pVector = new Vector<Point>();
- 		
-		for(Vector<clusterPoint> vP : vvCP){
-			for(clusterPoint p : vP){
-				pVector.add(p);
+		for(Vector<clusterPoint> vCP : vvcp){
+			
+			vvL.add(Line.getClusterLineVectors(vCP, precision));
+			
+			
+			
+		}
+		
+		if(lastLineStrip.size()<=0){
+			for(int i=0;i<vvL.size();i++){
+				vvL.get(i).setClusterId(i);
 			}
-		}
-		
-		for(int i=0;i<pVector.size();i++){
+			lastLineStrip.addAll(vvL);
+		}else{
+			for(clusterLineStrip clS : vvL){
+				for(clusterLineStrip lLS : lastLineStrip){
+					if(clS.isSimiliar(lLS)){
+						clS.setClusterId(lLS);
+					}
+				}
+			}
+			int id = 0;
+			for(clusterLineStrip c : vvL){
+				if(c.getClusterId()==-1){
+					for(clusterLineStrip lLs : lastLineStrip){
+						if(lLs.getClusterId()==id){
+							id++;
+						}
+					}
+					c.setClusterId(id);
+					id++;
+				}
+			}
 			
-		}
-		
-		Vector<Vector<Point>> cluster = new Vector<Vector<Point>>();
-		
-		for(Point p : pVector){
 			
+			
+			lastLineStrip.clear();
+			lastLineStrip.addAll(vvL);
 		}
-		
-		return null;
-		
+
+		return vvL;
 	}
 	
 	public static int incSize(int inc){
@@ -144,10 +158,6 @@ public class dbscan {
 		}
 		
 		return clustVect;
-	}
-	
-	public Vector<Vector<clusterPoint>> getClusters(){
-		return clusters;
 	}
 
 }
