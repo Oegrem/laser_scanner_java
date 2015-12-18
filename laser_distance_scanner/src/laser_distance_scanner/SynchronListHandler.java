@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData.Step;
+
 import code_snippets.clusterLineStrip;
 import code_snippets.dbscan;
 import code_snippets.Line;
@@ -28,7 +30,14 @@ public class SynchronListHandler {
 
 	private static CopyOnWriteArrayList<clusterLineStrip> clusterLines = new CopyOnWriteArrayList<clusterLineStrip>();
 
+	private static CopyOnWriteArrayList<Step> rawSensorData = new CopyOnWriteArrayList<Step>();
+	
 	private static Processing p;
+	
+	public synchronized static void setRawData(Vector<Step> vS){
+		rawSensorData.clear();
+		rawSensorData.addAll(vS);
+	}
 
 	public synchronized static void setPointList(Vector<Point> _pointList) {
 
@@ -46,6 +55,10 @@ public class SynchronListHandler {
 
 		clusterLines.clear();
 		clusterLines.addAll(dbscan.getClustersAsLines(copyPointVector, 1));
+	}
+	
+	public synchronized static CopyOnWriteArrayList<Step> getRawData(){ // Sensor Data: data.elementAt(index).distances.elementAt(0);
+		return rawSensorData;
 	}
 
 	public synchronized static CopyOnWriteArrayList<Line> getLineList() {

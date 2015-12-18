@@ -161,7 +161,9 @@ public class Distance_scanner implements Runnable {
 																			// distance
 																			// of
 																			// step
-
+				SynchronListHandler.setRawData(data.steps);
+				
+				
 				if (l > 21 && l < 30000) { // avoid adding error-values to
 											// vector
 
