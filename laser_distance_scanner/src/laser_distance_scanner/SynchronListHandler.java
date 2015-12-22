@@ -39,7 +39,7 @@ public class SynchronListHandler {
 		rawSensorData.addAll(vS);
 	}
 
-	public static void setPointList(Vector<Point> _pointList) {
+	public synchronized static void setPointList(Vector<Point> _pointList) {
 		
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
