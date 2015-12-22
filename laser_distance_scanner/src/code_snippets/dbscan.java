@@ -20,8 +20,6 @@ public class dbscan {
 
 	private static Vector<clusterLineStrip> beforeLineStrip = new Vector<clusterLineStrip>();
 
-	private static int loops = 0;
-	
 	public dbscan(int _densitySize, int _densityRange) {
 		densityRange = _densityRange;
 		densitySize = _densitySize;
@@ -30,8 +28,6 @@ public class dbscan {
 	public static Vector<Vector<clusterPoint>> cluster(
 			CopyOnWriteArrayList<Point> _pVector) {
 
-		loops = 0;
-		
 		Vector<Vector<clusterPoint>> clusters = new Vector<Vector<clusterPoint>>();
 
 		Vector<clusterPoint> cluster = new Vector<clusterPoint>();
@@ -50,29 +46,30 @@ public class dbscan {
 
 			if (cp.getStatus() == NOTVISITED) {
 				cp.setStatus(VISITED);
+				
 				neighbours.clear();
-				neighbours = cp.getNeighbours(cluster, densityRange);
+				cp.getNeighbours(cluster, neighbours, densityRange);
+				
 				if (neighbours.size() < densitySize) {
 					cp.setStatus(NOISE);
 				} else {
 					Vector<clusterPoint> nextCl = new Vector<clusterPoint>();
-
+					
 					nextCl.addElement(cp);
 					cp.setToCluster();
-
+					
 					for (clusterPoint nP : neighbours) {
 						if (!nP.isInCluster()) {
 							expandCluster(nP, nextCl, cluster);
 						}
 					}
-
+					
 					clusters.add(nextCl);
 
 				}
 			}
 
 		}
-
 		return clusters;
 		
 	}
@@ -86,15 +83,15 @@ public class dbscan {
 		if (cp.getStatus() == NOTVISITED) {
 			cp.setStatus(VISITED);
 			Vector<clusterPoint> neighbours = new Vector<clusterPoint>();
-			neighbours = cp.getNeighbours(allPoints, densityRange);
+			cp.getNeighbours(allPoints, neighbours, densityRange);
 			if (neighbours.size() >= densitySize) {
+				
 				for (clusterPoint nP : neighbours) {
 					if (!nP.isInCluster()) {
 						expandCluster(nP, cluster, allPoints);
-						
 					}
-					loops++;
 				}
+				
 			}
 		}
 	}
@@ -157,7 +154,7 @@ public class dbscan {
 
 		lastLineStrip.clear();
 		lastLineStrip.addAll(vvL);
-		System.out.println(vvcp.size());
+
 		return vvL;
 	}
 

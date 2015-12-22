@@ -39,8 +39,8 @@ public class SynchronListHandler {
 		rawSensorData.addAll(vS);
 	}
 
-	public synchronized static void setPointList(Vector<Point> _pointList) {
-
+	public static void setPointList(Vector<Point> _pointList) {
+		
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
 
@@ -55,6 +55,7 @@ public class SynchronListHandler {
 		
 		clusterLines.clear();
 		clusterLines.addAll(dbscan.getClustersAsLines(copyPointVector, 0));
+		
 	
 	}
 	

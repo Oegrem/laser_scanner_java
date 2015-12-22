@@ -38,15 +38,15 @@ public class clusterPoint extends Point implements Serializable{
 		setLocation(p1);
 	}
 	
-	public Vector<clusterPoint> getNeighbours(Vector<clusterPoint> _cluster, double _densityRange){
-		Vector<clusterPoint> neighbours = new Vector<clusterPoint>();
+	public void getNeighbours(Vector<clusterPoint> _cluster, Vector<clusterPoint> neighbours, double _densityRange){
+
 		for(clusterPoint cp : _cluster){
 			if(cp != this && this.distance(cp) <= _densityRange){
 				neighbours.add(cp);
 			}
+
 		}
-		
-		return neighbours;
+
 	}
 	
 	public void setStatus(int _newStatus){

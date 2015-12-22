@@ -113,6 +113,7 @@ public class Distance_scanner implements Runnable {
 		}
 
 		device = new UrgDevice(new EthernetConnection());
+		
 		// Connect to the sensor
 		if (device.connect("192.168.0.10")) { // Connection to IP of Sensor
 			System.out.println("connected");
@@ -149,25 +150,30 @@ public class Distance_scanner implements Runnable {
 	 * Synchronized write Data from Sensor to exchange Vector
 	 */
 	public synchronized void writeData() {
-
+		
 		Vector<Point> pVect = new Vector<Point>();
-
+		
 		CaptureData data = null;
 		// Data reception happens when calling capture
+	
 		data = device.capture();
 
 		if (data != null) {
+			
+			Vector<Long> Vlong = new Vector<Long>();
+			for(Step p : data.steps){
+				Vlong.add(p.distances.elementAt(0));
+			}
+			
+			SynchronListHandler.setRawData(Vlong);
+			
+			
 			for (int b = 0; b < data.steps.size(); b++) { // read all steps
 				long l = data.steps.elementAt(b).distances.elementAt(0); // get
 																			// distance
 																			// of
 																			// step
-				Vector<Long> Vlong = new Vector<Long>();
-				for(Step p : data.steps){
-					Vlong.add(p.distances.elementAt(0));
-				}
-				
-				SynchronListHandler.setRawData(Vlong);
+
 				
 				
 				if (l > 21 && l < 30000) { // avoid adding error-values to
@@ -190,9 +196,10 @@ public class Distance_scanner implements Runnable {
 
 				}
 			}
-
+			
+			
 			SynchronListHandler.setPointList(pVect);
-
+			
 			if (isRecorded) { // for recording of sensor data
 				SData nD = new SData(); // sData combines x/y Point Vector and
 										// Timestamp
@@ -204,6 +211,7 @@ public class Distance_scanner implements Runnable {
 		} else {
 			System.out.println("Sensor error:" + device.what());
 		}
+		
 	}
 
 	/*
@@ -223,7 +231,9 @@ public class Distance_scanner implements Runnable {
 
 		while (true) { // Running until Thread gets interrupted
 			if (!t.isInterrupted()) {
+				
 				writeData();
+				
 			} else {
 				device.stopCapture(); // stop Caputre !!important!!
 
