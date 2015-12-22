@@ -7,7 +7,6 @@ import org.lwjgl.opengl.*;
 import code_snippets.clusterLineStrip;
 import code_snippets.dbscan;
 import data_processing.Cluster;
-import data_processing.ClusterPoint;
 import data_processing.Clustering;
 import data_processing.Processing;
 import static org.lwjgl.glfw.GLFW.*;
@@ -22,10 +21,13 @@ public class Graphics {
 	// private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
 
+	@SuppressWarnings("unused")
 	private GLFWScrollCallback scrollCallBack;
 
+	@SuppressWarnings("unused")
 	private GLFWMouseButtonCallback mouseButtonCallBack;
 
+	@SuppressWarnings("unused")
 	private GLFWCursorPosCallback cursorPosCallBack;
 
 	private double xold = 0;
@@ -219,6 +221,13 @@ public class Graphics {
 				}
 
 				if (key == GLFW_KEY_3 && action == GLFW_RELEASE) {
+					if (drawLines) {
+						drawLines = false;
+						System.out.println("drawLines OF");
+					} else {
+						drawLines = true;
+						System.out.println("drawLines ON");
+					}
 
 				}
 
@@ -386,18 +395,24 @@ public class Graphics {
 
 		}
 		if (drawDbscan) {
+			
+			int rec = 0;
+			
 			for (clusterLineStrip cLS : SynchronListHandler.getClusterLines()) {
+				if(cLS.recognised){
+					rec++;
 				setColor(cLS.getClusterId());
-
+				
 				glBegin(GL_LINE_STRIP);
 
 				for (Point p : cLS.getLineStripPoints()) {
 					glVertex2f((float) p.x, (float) p.y);
 				}
 				glEnd();
+				}
 			}
-		}
-		if (/* drawCluster */true) {
+}
+		if (drawLines) {
 
 			// irgendwas anderes glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 			glBegin(GL_POINTS);
@@ -409,35 +424,34 @@ public class Graphics {
 									// // und // min y) c.getMaxCorner() (max x
 									// und max // y)) } glEnd();
 			}
-			if (drawLines) {
-				glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is
-													// opacity(transparenz):
-													// lower =
-													// // more opacity
+			glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is
+												// opacity(transparenz):
+												// lower =
+												// // more opacity
 
-				glBegin(GL_QUADS);
-				for (Cluster c : SynchronListHandler.getClusterVector()) {
-					if (clusterColors) {
-						setColor(c.getID());
-					}
-					glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-							.getMinCorner().getY()));
-					glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-							.getMinCorner().getY()));
-					glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-							.getMaxCorner().getY()));
-					glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-							.getMaxCorner().getY()));
+			glBegin(GL_QUADS);
+			for (Cluster c : SynchronListHandler.getClusterVector()) {
+				if (clusterColors) {
+					setColor(c.getID());
 				}
-				glEnd();
+				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
+						.getMinCorner().getY()));
+				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
+						.getMinCorner().getY()));
+				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
+						.getMaxCorner().getY()));
+				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
+						.getMaxCorner().getY()));
 			}
+			glEnd();
+
 		}
 	}
 
 	private void setColor(int i) {
-		switch (i % 10) {
+		switch (i % 9) {
 		case 0:
-			glColor3f(0.0f, 0.0f, 0.0f);
+			glColor3f(0.5f, 0.5f, 1.0f);
 			break;
 		case 1:
 			glColor3f(1.0f, 0.0f, 0.0f);
@@ -462,9 +476,6 @@ public class Graphics {
 			break;
 		case 8:
 			glColor3f(1.0f, 0.5f, 0.5f);
-			break;
-		case 9:
-			glColor3f(0.5f, 0.5f, 1.0f);
 			break;
 		}
 	}

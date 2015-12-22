@@ -30,11 +30,11 @@ public class SynchronListHandler {
 
 	private static CopyOnWriteArrayList<clusterLineStrip> clusterLines = new CopyOnWriteArrayList<clusterLineStrip>();
 
-	private static CopyOnWriteArrayList<Step> rawSensorData = new CopyOnWriteArrayList<Step>();
+	private static CopyOnWriteArrayList<Long> rawSensorData = new CopyOnWriteArrayList<Long>();
 	
 	private static Processing p;
 	
-	public synchronized static void setRawData(Vector<Step> vS){
+	public synchronized static void setRawData(Vector<Long> vS){
 		rawSensorData.clear();
 		rawSensorData.addAll(vS);
 	}
@@ -52,13 +52,14 @@ public class SynchronListHandler {
 
 		// clusteredPoints.clear();
 		// clusteredPoints.addAll(p.getClusterPoints());
-
+		
 		clusterLines.clear();
-		clusterLines.addAll(dbscan.getClustersAsLines(copyPointVector, 1));
+		clusterLines.addAll(dbscan.getClustersAsLines(copyPointVector, 0));
+	
 	}
 	
-	public synchronized static CopyOnWriteArrayList<Step> getRawData(){ // Sensor Data: data.elementAt(index).distances.elementAt(0);
-		return rawSensorData;
+	public synchronized static CopyOnWriteArrayList<Long> getRawData(){ // Sensor Data: data.elementAt(index).distances.elementAt(0); 
+		return rawSensorData;											//	gibt Distanz von Step index aus: 1080 Steps auf 270 Grad
 	}
 
 	public synchronized static CopyOnWriteArrayList<Line> getLineList() {

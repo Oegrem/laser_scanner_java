@@ -1,9 +1,10 @@
 package code_snippets;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.Vector;
 
-public class clusterPoint extends Point {
+public class clusterPoint extends Point implements Serializable{
 
 	public static final int NOTVISITED = 0;
 	
@@ -19,7 +20,7 @@ public class clusterPoint extends Point {
 	private int status = NOTVISITED;
 	
 	private boolean belongToCluster = false;
-	
+
 	public clusterPoint(){
 		super();
 	}
@@ -63,6 +64,5 @@ public class clusterPoint extends Point {
 	public void setToCluster(){
 		belongToCluster = true;
 	}
-	
 	
 }

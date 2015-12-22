@@ -9,6 +9,7 @@ import com.kristou.urgLibJ.Connection.EthernetConnection;
 import com.kristou.urgLibJ.RangeSensor.RangeSensorInformation;
 import com.kristou.urgLibJ.RangeSensor.UrgDevice;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
+import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData.Step;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
 import data_processing.Cluster;
@@ -161,7 +162,12 @@ public class Distance_scanner implements Runnable {
 																			// distance
 																			// of
 																			// step
-				SynchronListHandler.setRawData(data.steps);
+				Vector<Long> Vlong = new Vector<Long>();
+				for(Step p : data.steps){
+					Vlong.add(p.distances.elementAt(0));
+				}
+				
+				SynchronListHandler.setRawData(Vlong);
 				
 				
 				if (l > 21 && l < 30000) { // avoid adding error-values to

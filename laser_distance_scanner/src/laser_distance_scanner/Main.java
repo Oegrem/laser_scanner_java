@@ -9,7 +9,9 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		startDisplay("walk", false, 5000);
+		startDisplay();
+		
+		//startDisplay("walk", false, 5000);
 
 		// runSimFileTest("ex1");
 	}
@@ -30,6 +32,9 @@ public class Main {
 	}
 
 	public static void startDisplay() {
+		
+		Distance_scanner.getDistanceScanner().start();
+		
 		new Graphics().run();
 	}
 	
@@ -38,7 +43,7 @@ public class Main {
 		// when simulation
 		// shall be started
 		// instantly
-
+		
 		Distance_scanner.alternativeSimFile = name;
 	}
 

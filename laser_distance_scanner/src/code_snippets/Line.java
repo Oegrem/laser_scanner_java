@@ -163,8 +163,12 @@ public class Line {
 		
 		Line baseLine = getLineFromPoints(cP);
 		
+		lV.addLineStripPoint(baseLine.p1);
+		
 		baseLine.getEdgedLine(cP, lV,precision, 0);
 
+		lV.addLineStripPoint(baseLine.p2);
+		
 		return lV;
 	}
 	
