@@ -5,8 +5,6 @@ import static org.lwjgl.opengl.GL11.*;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import javafx.scene.paint.Color;
-
 public class DSButton {
 
 	private Point minXY;

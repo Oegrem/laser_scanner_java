@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+
 import laser_distance_scanner.Distance_scanner;
 import laser_distance_scanner.SynchronListHandler;
 
@@ -42,40 +43,21 @@ public class Processing {
 	public synchronized void startProcess(){ 
 		pointList.clear();
 		CopyOnWriteArrayList<Point> currentPoints = new CopyOnWriteArrayList<>();
-		
-		//currentPoints.addAll(scanner.getPointVector()); // Vereinfacht Datentransfer über SynchronListHandler Klasse
+
 		currentPoints.addAll(SynchronListHandler.getPointVector());
 		
-		//test
-		//dataStorage storage2 = dataStorage.getDataStorage();
-		//currentPoints.addAll(storage2.getNextPointList());
-		//test
-		
-		
-		/*
-		for(int i=0;i<currentPoints.size();i++){
-			pointList.add((Point)currentPoints.get(i).clone());  // recht rechenaufwendig
-		}
- 		*/
 		pointList.addAll(currentPoints);
-		/*
-		if(storeData == true){
-			times ++;
-			if(times == eachTimes){
-				times = 0;
-				count --;
-				if(count > 0){
-					dataStorage storage = dataStorage.getDataStorage();
-					Vector<Point> p = new Vector<Point>();
-					p.addAll(pointList);
-					//storage.storeData(scanner.getPointVector()); // saving all saved Data or only the last?
-					storage.storeData(p); // saving all 50 sensor Data: change storeData(Vector<Point>) to storeData(CopyOnWriteArrayList<Point>)
-				}
-				else
-					storeData = false;
-			}
-		}*/
+
 		startProcess(pointList);
+	}
+	
+	private Vector<Long> calcDistances(Vector<Point> pointList){
+		Vector<Long> step = new Vector<Long>();
+		Point center = new Point(0, 0);
+		for(int i=0;i<pointList.size();i++){
+			step.add((long) center.distance(pointList.get(i)));
+		}
+		return step;
 	}
 	
 	/**
@@ -83,6 +65,24 @@ public class Processing {
 	 */ // doesnt need to be synchronized => data copied already in startProcess()
 	public synchronized void startProcess(Vector<Point> pointList){ 
 
+		Graymap map = Graymap.getGraymap();
+		Vector<Long> current = new Vector<Long>();
+		//current.addAll(SynchronListHandler.getRawData());
+		// berechnet die polarcoordinaten falls noch nicht forhanden
+		if(current.size()<2){
+			current = calcDistances(pointList);
+		}
+		// übergibt polarkoordinaten,
+		// das ergebnis ist eine liste mit punkten die sich laut graymap bewegt haben
+		current = map.addNewData(current);
+		Vector<Point> newPointList = new Vector<>();
+		for(int i=0;i<current.size();i++){
+			newPointList.add(pointList.get(Integer.parseInt(current.get(i)+"")));
+		}
+		pointList = newPointList;
+		System.out.println("pointlist size "+pointList.size() + " (nur als sich bewegend erkannte punkte)");
+		
+		
 		if(isStraightening == true){
 			// creats clustered Points List with straightened Date
 			straighten.startStraighten(clusteredPoints,pointList);
@@ -97,9 +97,16 @@ public class Processing {
 		// TODO clustern
 		Vector<HelpCluster> hCluster = clustering.cluster(pointList, clusteredPoints);
 		
+		//testzwäcke TODO entfernen
+		Cluster testCluster = new Cluster();
+		testCluster.setID(9999);
+		testCluster.setMaxCorner(new Point(100, 100));
+		testCluster.setMinCorner(new Point(-100, -100));
+		cluster.add(testCluster);
+		
 		for(int i=0;i<hCluster.size();i++)
 			cluster.add(hCluster.get(i).getCluster());
-		
+		System.out.println("clusterlist size "+cluster.size());
 		// TODO cluster bekannten klustern zuordnen
 		
 		// TODO momentane bewegung berechnen
