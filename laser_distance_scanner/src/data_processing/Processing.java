@@ -82,7 +82,6 @@ public class Processing {
 		pointList = newPointList;
 		System.out.println("pointlist size "+pointList.size() + " (nur als sich bewegend erkannte punkte)");
 		
-		
 		if(isStraightening == true){
 			// creats clustered Points List with straightened Date
 			straighten.startStraighten(clusteredPoints,pointList);
@@ -106,7 +105,7 @@ public class Processing {
 		
 		for(int i=0;i<hCluster.size();i++)
 			cluster.add(hCluster.get(i).getCluster());
-		System.out.println("clusterlist size "+cluster.size());
+		//System.out.println("clusterlist size "+cluster.size());
 		// TODO cluster bekannten klustern zuordnen
 		
 		// TODO momentane bewegung berechnen
