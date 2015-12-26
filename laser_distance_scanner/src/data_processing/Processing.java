@@ -17,19 +17,14 @@ public class Processing {
 	private Straighten straighten = new Straighten(2);
 	
 	// polish/straighten funktionality
-	public static boolean isStraightening = true;
+	public static boolean isStraightening = false;
 	public static boolean graymapping = true;
-	// test funktionality dataStorage
-	int count = 200;
-	int eachTimes = 8; 
-	int times = 0;
-	boolean storeData = false;
-	
+
 	private Clustering clustering = new Clustering();
 	private Vector<Cluster> cluster= new Vector<Cluster>();
 	
 	public Processing(){
-		
+		Settings.updateAllValues();
 	}
 	
 	// initialisation

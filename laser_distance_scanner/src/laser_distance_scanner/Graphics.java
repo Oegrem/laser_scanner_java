@@ -9,6 +9,8 @@ import code_snippets.dbscan;
 import data_processing.Cluster;
 import data_processing.Clustering;
 import data_processing.Processing;
+import data_processing.Settings;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -263,23 +265,20 @@ public class Graphics {
 				if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Clustering.threshold += 0.1;
+						Settings.setClustering_threshold(Settings.getClustering_threshold() + 0.1);
 						System.out
-								.println("threshold: " + Clustering.threshold);
+								.println("threshold: " + Settings.getClustering_threshold());
 						break;
 					case 1:
-						Clustering.leapFactor = Clustering.leapFactor + 0.1;
-						System.out.println("leapFactor: "
-								+ Clustering.leapFactor);
 						break;
 					case 2:
 						Distance_scanner.slomo += 1;
 						System.out.println("slomo: " + Distance_scanner.slomo);
 						break;
 					case 3:
-						Clustering.searchRange++;
+						Settings.setClustering_search_range(Settings.getClustering_search_range() + 1);
 						System.out.println("searchRange: "
-								+ Clustering.searchRange);
+								+ Settings.getClustering_search_range());
 						break;
 					case 4:
 						System.out.println(dbscan.incRange(1));
@@ -293,14 +292,11 @@ public class Graphics {
 				if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Clustering.threshold -= 0.1;
+						Settings.setClustering_threshold(Settings.getClustering_threshold() - 0.1);
 						System.out
-								.println("threshold: " + Clustering.threshold);
+								.println("threshold: " + Settings.getClustering_threshold());
 						break;
 					case 1:
-						Clustering.leapFactor = Clustering.leapFactor - 0.1;
-						System.out.println("leapFactor: "
-								+ Clustering.leapFactor);
 						break;
 					case 2:
 						if (Distance_scanner.slomo > 1) {
@@ -310,9 +306,9 @@ public class Graphics {
 						}
 						break;
 					case 3:
-						Clustering.searchRange--;
+						Settings.setClustering_search_range(Settings.getClustering_search_range() - 1);
 						System.out.println("searchRange: "
-								+ Clustering.searchRange);
+								+ Settings.getClustering_search_range());
 						break;
 					case 4:
 						System.out.println(dbscan.incRange(-1));
@@ -334,7 +330,6 @@ public class Graphics {
 						System.out.println("threshold");
 						break;
 					case 1:
-						System.out.println("leapFactor");
 						break;
 					case 2:
 						System.out.println("slomo");

@@ -1,35 +1,19 @@
 package data_processing;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Vector;
-
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class Graymap {
 	private static Graymap me = null;
-	private static int size = 10000;
-	private static int stepsSize = 200;
-	private static int steps = size / stepsSize;
-	private static int vektorSize = 270*4;
-	private static int vektorStepSize = 3;
-	private static int vektorSteps = vektorSize / vektorStepSize ;
-	private static int minSize = 10;
-	private static int maxGapSize = 100;
-	private static int maxGray = 255;
-	private static int maxUnknownGray = 127;
-	private static double grayStep = ((double)maxUnknownGray-1)/((double)steps);
-	private static float differentialThreshold = 128;
-	private static double updateFactor =  (double) 0.05;
-	private static int updateUnknownTreshold = 4;
-	private static boolean sharpEdge = false;
+
+
+
+
 	private static Vector<Vector<Long>> map = new Vector<Vector<Long>>();
 	private static Vector<Vector<Long>> newMap = new Vector<Vector<Long>>();
 	
@@ -55,10 +39,14 @@ public class Graymap {
 	 */
 	private Vector<Vector<Long>> createRawMap(){
 		Vector<Vector<Long>> newMap = new Vector<Vector<Long>>();
+		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
+		int angleSteps = Settings.getGraymap_angle_steps();
+		int sectionSteps = Settings.getGraymap_section_steps();
+		
 		// erstellen und nach außen hin bis zu 50% grau färben
-		for(int i=0;i<vektorSteps;i++){
+		for(int i=0;i<angleSteps;i++){
 			Vector<Long> current = new Vector<Long>();
-			for(int j=0;j<steps;j++){
+			for(int j=0;j<sectionSteps;j++){
 				//current.add((long) (j*grayStep));
 				current.add((long) (maxUnknownGray));
 			}
@@ -72,10 +60,13 @@ public class Graymap {
 	 *  je weiter vom start entfernt desto dunkler die felder, bis maxUnknownGray
 	 */
 	private void clearNewMap(){
-		for(int i=0;i<vektorSteps;i++){
+		int angleSteps = Settings.getGraymap_angle_steps();
+		int sectionSteps = Settings.getGraymap_section_steps();
+		double graystep = Settings.getGraymap_gray_Step();
+		for(int i=0;i<angleSteps;i++){
 			Vector<Long> current = newMap.get(i);
-			for(int j=0;j<steps;j++){
-				current.set(j, (long) (j*grayStep));
+			for(int j=0;j<sectionSteps;j++){
+				current.set(j, (long) (j*graystep));
 			}
 		}
 	}
@@ -94,6 +85,8 @@ public class Graymap {
 	private Vector<int[]> calcMovingAreas(Vector<Integer> movingPoints){
 		Vector<int[]> movingArea = new Vector<int[]>();
 		int start=0, stop=0;
+		int maxGapSize = Settings.getGraymap_move_area_gap_max_Size();
+		int minSize = Settings.getGraymap_move_area_min_size();
 		
 		if(movingPoints==null)
 			return movingArea;
@@ -135,12 +128,17 @@ public class Graymap {
 	private void mergeMaps(){
 		long valueOld=0, valueCurrent=0, valueNew=0;
 		double updatevalue = 0;
+		double updateFactor = Settings.getGraymap_update_factor();
+		int updateDirectionFactor = Settings.getGraymap_update_direction_factor();
+		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
+		int angleSteps = Settings.getGraymap_angle_steps();
+		int sectionSteps = Settings.getGraymap_section_steps();
 		
 		// jeden vektor absuchen (ein vektor kann mehrere sensorvektoren beinhaltet)
-		for(int i=0;i<vektorSteps;i++){
+		for(int i=0;i<angleSteps;i++){
 			// addierter grauwert aller steps als erkennung von gleichen vektoren ?
 			// vektor in einzelne abschnitte teilen
-			for(int j=0;j<steps;j++){
+			for(int j=0;j<sectionSteps;j++){
 				valueOld = map.get(i).get(j);
 				valueCurrent = newMap.get(i).get(j);
 				// nur bei unterschied
@@ -149,19 +147,19 @@ public class Graymap {
 					if(valueOld < valueCurrent){
 						// untergrund hell
 						if(valueOld < maxUnknownGray)
-							updatevalue = updateFactor * (valueCurrent - valueOld) / updateUnknownTreshold;
+							updatevalue = updateFactor * (valueCurrent - valueOld) / updateDirectionFactor;
 						// untergrund dunkel
 						else 
-							updatevalue = updateFactor * (valueCurrent - valueOld) * updateUnknownTreshold;
+							updatevalue = updateFactor * (valueCurrent - valueOld) * updateDirectionFactor;
 					}
 					// neu hell
 					else{
 						// untergrund hell
 						if(valueOld < maxUnknownGray)
-							updatevalue = updateFactor* (valueCurrent - valueOld) * updateUnknownTreshold;
+							updatevalue = updateFactor* (valueCurrent - valueOld) * updateDirectionFactor;
 						// untergrund dunkel
 						else 
-							updatevalue = updateFactor * (valueCurrent - valueOld) / updateUnknownTreshold;
+							updatevalue = updateFactor * (valueCurrent - valueOld) / updateDirectionFactor;
 					}
 					valueNew= (long) (valueOld + updatevalue);
 					map.get(i).set(j,valueNew);
@@ -193,7 +191,11 @@ public class Graymap {
 		Vector<int[]> movingArea = null;
 		int step=0, vektorStep=0;
 		long sideUpdate=0, valueOld=0;
-		
+		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
+		int maxGray = Settings.getGraymap_max_gray();
+		int angleSize = Settings.getGraymap_angle_size();
+		int sectionSteps = Settings.getGraymap_section_steps();
+		int sectionSize = Settings.getGraymap_section_size();
 		// wenn größen nicht passen
 		/*if(stepVector.size()!= vektorSteps){
 			moving.add((long) -1);
@@ -205,20 +207,20 @@ public class Graymap {
 		// neue graymap befüllen
 		for(int i=0;i<stepVector.size();i++){
 			// finde das feld der map indem der neue punkt gesetzt wird
-			vektorStep = i/vektorStepSize;
-			step = (int) (stepVector.get(i)/stepsSize);
+			vektorStep = i/angleSize;
+			step = (int) (stepVector.get(i)/sectionSize);
 			newMap.get(vektorStep).set(step,(long) maxGray);
 			valueOld = map.get(vektorStep).get(step);
 				
 			// wenn punkt im hellembereich ist, --> als bewegung erkennen 
-				if(valueOld < differentialThreshold){
+				if(valueOld < Settings.getGraymap_recognition_threshold()){
 					movingPoints.add(i);
 				}
 			
 			// sharpEdge = true -> nur das feld in dem momentaner messwert gemessen wurde
 			// sharpEge = false -> felder links rechts und vor dem momentanen feld werden ebenfalsl verdunkelt
 			
-			if(sharpEdge == false){ 
+			if(Settings.isGraymap_edge_accuracy() == false){ 
 				if(step-1 >0){
 					sideUpdate = (long) (maxGray- 0.5*( maxGray - newMap.get(vektorStep).get(step-1)));
 					newMap.get(vektorStep).set(step-1,(long) sideUpdate);
@@ -232,7 +234,7 @@ public class Graymap {
 					newMap.get(vektorStep+1).set(step,(long) sideUpdate);
 				}
 			}
-			for(int j=step+1;j<steps;j++){
+			for(int j=step+1;j<sectionSteps;j++){
 				newMap.get(vektorStep).set(j,(long) maxUnknownGray);
 			}
 		}
@@ -258,10 +260,14 @@ public class Graymap {
 	}
 	
 	public static Image getImageFromArray(Vector<Vector<Long>> input, Vector<int[]> moving) {
-        BufferedImage image = new BufferedImage(vektorSteps, steps+50, BufferedImage.TYPE_BYTE_GRAY);
+		int angleSteps = Settings.getGraymap_angle_steps();
+		int angleSize = Settings.getGraymap_angle_size();
+		int sectionSteps = Settings.getGraymap_section_steps();
+		
+        BufferedImage image = new BufferedImage(angleSteps, sectionSteps+50, BufferedImage.TYPE_BYTE_GRAY);
         int current = 0;
-        for(int i=0;i<vektorSteps;i++){
-        	for(int j=0;j<steps;j++){
+        for(int i=0;i<angleSteps;i++){
+        	for(int j=0;j<sectionSteps;j++){
         		current = Integer.parseInt( input.get(i).get(j)+"" );
         		if(current > 255) current =255;
         		if(current < 0) current =0;
@@ -281,8 +287,8 @@ public class Graymap {
         	start = moving.get(i)[0];
         	stop = moving.get(i)[1];
         	for(int j=start;j<stop;j++){
-        		for(int k=steps +5; k< steps + 25;k++){
-        			image.setRGB(j/vektorStepSize, k, current );
+        		for(int k=sectionSteps +5; k< sectionSteps + 25;k++){
+        			image.setRGB(j/angleSize, k, current );
         		}
             }
         }
