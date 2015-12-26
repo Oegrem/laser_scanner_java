@@ -12,14 +12,13 @@ public class Processing {
 
 	// list with the unchanged raw point data
 	private  Vector<Point> pointList = new Vector<Point>();
-	// list with points assigned to a cluster
-	private Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
 
 	// the straighting/smothing class
 	private Straighten straighten = new Straighten(2);
 	
 	// polish/straighten funktionality
-	public static boolean isStraightening = false;
+	public static boolean isStraightening = true;
+	public static boolean graymapping = true;
 	// test funktionality dataStorage
 	int count = 200;
 	int eachTimes = 8; 
@@ -64,48 +63,60 @@ public class Processing {
 	 * starts prozessing
 	 */ // doesnt need to be synchronized => data copied already in startProcess()
 	public synchronized void startProcess(Vector<Point> pointList){ 
-
-		Graymap map = Graymap.getGraymap();
-		Vector<Long> current = new Vector<Long>();
-		//current.addAll(SynchronListHandler.getRawData());
-		// berechnet die polarcoordinaten falls noch nicht forhanden
-		if(current.size()<2){
-			current = calcDistances(pointList);
-		}
-		// übergibt polarkoordinaten,
-		// das ergebnis ist eine liste mit punkten die sich laut graymap bewegt haben
-		current = map.addNewData(current);
-		Vector<Point> newPointList = new Vector<>();
-		for(int i=0;i<current.size();i++){
-			newPointList.add(pointList.get(Integer.parseInt(current.get(i)+"")));
-		}
-		pointList = newPointList;
-		System.out.println("pointlist size "+pointList.size() + " (nur als sich bewegend erkannte punkte)");
+		Vector<Vector<Point>> movingPointLists = new Vector<Vector<Point>>();
+		Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
+		Vector<HelpCluster> hCluster = new Vector<HelpCluster>();
 		
-		if(isStraightening == true){
-			// creats clustered Points List with straightened Date
-			straighten.startStraighten(clusteredPoints,pointList);
-		}else{
-			// creats clustered Points List with the raw Data
-			for(int i=0;i<pointList.size();i++){
-				clusteredPoints.add(new ClusterPoint(pointList.get(i)));
+		if(graymapping == true){
+			Graymap map = Graymap.getGraymap();
+			Vector<Long> polar = new Vector<Long>();
+			Vector<int[]> moving = new Vector<int[]>();
+			int start,stop;
+			
+			polar.addAll(SynchronListHandler.getRawData());
+			// berechnet die polarcoordinaten falls noch nicht forhanden
+			if(polar.size()<2){
+				polar = calcDistances(pointList);
 			}
+			
+			// übergibt polarkoordinaten,
+			// das ergebnis ist ein vektor mit bereichen die sich bewegen, [0] = start [1] ende
+			moving = map.addNewData(polar);
+			for(int i=0;i<moving.size();i++){
+				start = moving.get(i)[0];
+				stop = moving.get(i)[1];
+				Vector<Point> currentPointList = new Vector<Point>();
+				for(int j=start;j<=stop;j++){
+					currentPointList.add(pointList.get(j));
+				}
+				movingPointLists.add(currentPointList);
+			}
+		}else{
+			// ohne graymap alle punkte
+			movingPointLists.add(pointList);
 		}
 		
-				
-		// TODO clustern
-		Vector<HelpCluster> hCluster = clustering.cluster(pointList, clusteredPoints);
-		
-		//testzwäcke TODO entfernen
-		Cluster testCluster = new Cluster();
-		testCluster.setID(9999);
-		testCluster.setMaxCorner(new Point(100, 100));
-		testCluster.setMinCorner(new Point(-100, -100));
-		cluster.add(testCluster);
+		// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
+		for(int list=0;list <movingPointLists.size();list++){
+			pointList = movingPointLists.get(list);
+			
+			clusteredPoints.removeAllElements();
+			if(isStraightening == true){
+				// creats clustered Points List with straightened Date
+				straighten.startStraighten(clusteredPoints,pointList);
+			}else{
+				// creats clustered Points List with the raw Data
+				for(int i=0;i<pointList.size();i++){
+					clusteredPoints.add(new ClusterPoint(pointList.get(i)));
+				}
+			}
+			// clustern
+			hCluster.addAll(clustering.cluster(pointList, clusteredPoints));
+		}
 		
 		for(int i=0;i<hCluster.size();i++)
 			cluster.add(hCluster.get(i).getCluster());
-		//System.out.println("clusterlist size "+cluster.size());
+		
 		// TODO cluster bekannten klustern zuordnen
 		
 		// TODO momentane bewegung berechnen
@@ -117,14 +128,6 @@ public class Processing {
 		
 		
 		
-	}
-	
-	/**
-	 * provides the processed data
-	 * @return Vector<ClusterPoint> clustered Points
-	 */
-	public Vector<ClusterPoint> getClusterPoints(){
-		return clusteredPoints;
 	}
 	
 	/**

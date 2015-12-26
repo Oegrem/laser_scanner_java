@@ -16,23 +16,23 @@ import javax.swing.JLabel;
 public class Graymap {
 	private static Graymap me = null;
 	private static int size = 10000;
-	private static int stepsSize = 50;
+	private static int stepsSize = 300;
 	private static int steps = size / stepsSize;
 	private static int vektorSize = 270*4;
-	private static int vektorStepSize = 2;
+	private static int vektorStepSize = 3;
 	private static int vektorSteps = vektorSize / vektorStepSize ;
-	private static int differenzSearchSize = 5;
+	private static int minSize = 10;
+	private static int maxGapSize = 100;
 	private static int maxGray = 255;
 	private static int maxUnknownGray = 127;
 	private static double grayStep = ((double)maxUnknownGray-1)/((double)steps);
-	private static float differentialThreshold = 130;
-	private static double updateFactor =  (double) 0.05;
-	private static boolean sharpEdge = true;
+	private static float differentialThreshold = 128;
+	private static double updateFactor =  (double) 0.04;
+	private static boolean sharpEdge = false;
 	private static Vector<Vector<Long>> map = new Vector<Vector<Long>>();
 	private static Vector<Vector<Long>> newMap = new Vector<Vector<Long>>();
 	
 	
-	private BufferedImage visualMap = new BufferedImage(vektorSize, steps,  BufferedImage.TYPE_INT_ARGB);
 	JFrame frame = new JFrame();
 	JLabel label = new JLabel();
 	
@@ -55,7 +55,8 @@ public class Graymap {
 		for(int i=0;i<vektorSteps;i++){
 			Vector<Long> current = new Vector<Long>();
 			for(int j=0;j<steps;j++){
-				current.add((long) (j*grayStep));
+				//current.add((long) (j*grayStep));
+				current.add((long) (maxGray/2));
 			}
 			newMap.add(current);
 		}
@@ -92,12 +93,10 @@ public class Graymap {
 	 * @return liste mit punkten die zu einem als sich bewegenden objekt erkannt wurden
 	 * 		   fehler: ein einzelnes listenelement mit -1;
 	 */
-	public Vector<Long> addNewData(Vector<Long> stepVector){
-		Vector<Long> moving1 = new Vector<Long>();
-		Vector<Long> moving2 = new Vector<Long>();
-		//CopyOnWriteArrayList<Step> stepVector =  SynchronListHandler.getRawData();
-		// TODO daten testen
-		// step ?++--
+	public Vector<int[]> addNewData(Vector<Long> stepVector){
+		Vector<Integer> movingPoints = new Vector<Integer>();
+		Vector<int[]> movingArea = new Vector<int[]>();
+
 
 		int step=0;
 		int vektorStep = 0;
@@ -123,7 +122,7 @@ public class Graymap {
 			// wenn punkt im hellembereich ist, --> als bewegung erkennen TODO HIER DIE WIRGLICH WICHTIGE FUNKTION
 			if(valueOld < differentialThreshold){
 			//if(valueOld < 10){
-				moving1.add((long) i);
+				movingPoints.add(i);
 			}
 			if(sharpEdge == false){ 
 				if(step-1 >0){
@@ -143,63 +142,63 @@ public class Graymap {
 				newMap.get(vektorStep).set(j,(long) maxUnknownGray);
 			}
 		}
+		int start=0, stop=0;
+		for(int i=0;i<movingPoints.size();i++){
+			start = i;
+			for(int j=1;true;j++){
+				if(i+j>=movingPoints.size() || movingPoints.get(i+j)-1!=movingPoints.get(i+j-1)){
+					stop = i+j-1;
+					j=movingPoints.size();
+					break;
+				}
+			}
+			// prüft ob neues area nah genug am forherigen ist um sie zusammen zu fügen
+			if(movingArea.size()>0 && movingPoints.get(start) - movingArea.get(movingArea.size()-1)[1]< maxGapSize){
+				movingArea.get(movingArea.size()-1)[1] = movingPoints.get(stop);
+			}else if(movingPoints.get(stop)-movingPoints.get(start)>=minSize){
+				// komplett neues areal
+				int[] current = new int[2];
+				current[0]=movingPoints.get(start);
+				current[1]=movingPoints.get(stop);
+				movingArea.add(current);
+			}
+			i = stop+1;
+		}
 		
 		// graymap zusammenführen
+		double updatevalue = 0;
 		for(int i=0;i<vektorSteps;i++){
 			for(int j=0;j<steps;j++){
 				valueOld = map.get(i).get(j);
 				valueCurrent = newMap.get(i).get(j);
-				double updatevalue = updateFactor * (valueCurrent - valueOld);
+				if(valueOld < valueCurrent){
+					updatevalue = updateFactor * (valueCurrent - valueOld) /2;
+				}
+				else{
+					updatevalue = updateFactor * (valueCurrent - valueOld);
+				}
 				valueNew= (long) (valueOld + updatevalue);
-				//if(valueOld != valueCurrent)
-				//	System.out.println(i + " " + j + " " + (valueOld-valueCurrent) + " " + valueNew + " " + updatevalue);
 				map.get(i).set(j,valueNew);
 			}
 		}
-		int  count =0;
-		boolean minSize = true;
-		for(int i=0;i<moving1.size();i++){
-			minSize = true;
-			for(int j=0;j<differenzSearchSize;j++){
-				if(i+j< moving1.size()){
-					if(moving1.get(i)+j != moving1.get(i+j))
-						minSize = false;
-				}
-				if(i-j>0){
-					if(moving1.get(i)-j != moving1.get(i-j))
-						minSize = false;
-				}
-			}
-			if(minSize){
-				moving2.add(moving1.get(i));
-			}
-		}
-		showVisual(map,moving2);
-		return moving2;
+		
+		showVisual(map,movingArea);
+		return movingArea;
 	}
 	
 	public Vector<Vector<Long>> getMap(){
 		return map;
 	}
 	
-	private int showVisual(Vector<Vector<Long>> map, Vector<Long> moving){
+	private int showVisual(Vector<Vector<Long>> map, Vector<int[]> moving){
 		label.setIcon( new ImageIcon(getImageFromArray(map,moving).getScaledInstance(1000,300,Image.SCALE_DEFAULT) ) );
 
 	    return 1;
 	}
 	
-	public static Image getImageFromArray(Vector<Vector<Long>> input, Vector<Long> moving) {
+	public static Image getImageFromArray(Vector<Vector<Long>> input, Vector<int[]> moving) {
         BufferedImage image = new BufferedImage(vektorSteps, steps+50, BufferedImage.TYPE_BYTE_GRAY);
         int current = 0;
-        /*
-        for(int i=0;i<vektorSteps;i++){
-        	for(int j=0;j<steps;j++){
-        		current = Integer.parseInt( input.get(i).get(j)+"" );
-        		current = new Color(255- current,255- current,255- current).getRGB();
-        		image.setRGB(i, j, current );
-   
-            }
-        }*/
         for(int i=0;i<vektorSteps;i++){
         	for(int j=0;j<steps;j++){
         		current = Integer.parseInt( input.get(i).get(j)+"" );
@@ -214,17 +213,17 @@ public class Graymap {
    
             }
         }
-        int asdf = 0;
+        int start,stop = 0;
+        current = new Color(127,127,127).getRGB();
         for(int i=0;i<moving.size();i++){
-        	asdf = Integer.parseInt(moving.get(i)+"");
-        	for(int j=steps+5;j<steps+50;j++){
-        		current = new Color(127/vektorStepSize,127/vektorStepSize,127/vektorStepSize).getRGB();
-        		image.getRGB(asdf/vektorStepSize, j);
-        		image.setRGB(asdf/vektorStepSize, j, image.getRGB(asdf/vektorStepSize, j) + current );
-   
+        	start = moving.get(i)[0];
+        	stop = moving.get(i)[1];
+        	for(int j=start;j<stop;j++){
+        		for(int k=steps +5; k< steps + 25;k++){
+        			image.setRGB(j/vektorStepSize, k, current );
+        		}
             }
         }
         return image;
     }
-	
 }
