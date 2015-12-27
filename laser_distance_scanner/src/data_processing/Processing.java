@@ -14,7 +14,7 @@ public class Processing {
 	private  Vector<Point> pointList = new Vector<Point>();
 
 	// the straighting/smothing class
-	private Straighten straighten = new Straighten(2);
+	private Straighten straighten = new Straighten();
 	
 	// polish/straighten funktionality
 	public static boolean isStraightening = false;
@@ -91,18 +91,26 @@ public class Processing {
 			movingPointLists.add(pointList);
 		}
 		
+		
 		// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
 		for(int list=0;list <movingPointLists.size();list++){
 			pointList = movingPointLists.get(list);
 			
 			clusteredPoints.removeAllElements();
-			if(isStraightening == true){
-				// creats clustered Points List with straightened Date
-				straighten.startStraighten(clusteredPoints,pointList);
-			}else{
-				// creats clustered Points List with the raw Data
-				for(int i=0;i<pointList.size();i++){
-					clusteredPoints.add(new ClusterPoint(pointList.get(i)));
+			for(int i=0;i<pointList.size();i++){
+				clusteredPoints.add(new ClusterPoint(pointList.get(i)));
+			}
+			if(Settings.isStraigthen()){
+				switch(Settings.getStraigthen_type()){
+					case arithmetic:
+						straighten.ArithmetischesMittel(clusteredPoints, pointList);
+						break;
+					case harmonic:
+						straighten.HarmonischeMittel(clusteredPoints, pointList);
+						break;
+					case geometric:
+						straighten.GeometrischeMittel(clusteredPoints, pointList);
+						break;
 				}
 			}
 			// clustern

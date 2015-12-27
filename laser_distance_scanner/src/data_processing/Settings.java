@@ -4,6 +4,11 @@ public class Settings {
 	
 	/**
 	 * gobale settings
+	 * 
+	 * angle_number 	= Anzahl an Sensormessungen 
+	 * angle_total 		= Der Winkel des Ausschnits auf dem Gemessen wird, von 0 bis x, die ausrichtung im raum wird nicht berücksichtigt
+	 * angle_angle 		= Der Winkel zwischen 2 direkt nebeneinander liegenden Messungen
+	 * angle_tan_array 	= der Tangenz alle Winkel zwischen einer Messunge und einem Beliebigen anzahl plätze entfernten winkel. Der Index entspricht die der entfernung zur ausgangsmessung
 	 */
 	private static int angle_number = 270*4;
 	private static int angle_total = 270;
@@ -11,45 +16,45 @@ public class Settings {
 	private static double[] angle_tan_array = null;
 	
 	/**
-	 *  graymap = schwarz weiß schatierte karte. dunkel = objekt, hell = frei
-	 *  		  \-> wird zur erkennung von bewegenden objekten verwendet
-	 *  graymap_state = aktiv oder inaktiv
+	 *   graymap 						= schwarz weiß schatierte karte. dunkel = objekt, hell = frei
+	 *  		  						  \-> wird zur erkennung von bewegenden objekten verwendet
+	 *  graymap_state 					= aktiv oder inaktiv
+	 *
+	 *   angle 							= winkel -> kreisförmig angeordnete vektoren,
+	 *  graymap_angle_size				= anzahl an messwerten die in die selbe Graymap spallte projeziert werden
+	 *  graymap_angle_steps 			= anzahl an unabhängigen spalten in der graymap, berechnung = angle_number / graymap_angle_size
+	 *
+	 *   section 						= abschnitt -> ein einzelner Vektor zerlegt in abschnitte
+	 *  graymap_section_count 			= maximale entfernung der messung in mm -> 10 meter 
+	 *  graymap_section_size			= größe der graymap section in mm 
+	 *  graymap_section_steps			= anzahl an unabhängigen sectionen in der Graymap, berechnung aus graymap_section_count / graymap_section_size
+	 *
+	 *   move_area 						= bewegendes gebiet -> bereich das als sich bewegend betrachtet wird
+	 *  graymap_move_area_min_size 	   	= mininale anzahl an beieinanderliegenden messwerten eines areals
+	 *  graymap_move_area_gap_max_Size 	= maximale lücke zwischen zwei arealen befor diese vereint werden
+	 *  graymap_max_gray 				= der maximalwert der graymap, wird gesetzt wenn ein punkt im feld erkannt wird
+	 *  graymap_max_unknown_gray 		= grau wert der gesetzt wird, wenn keine informationen forhanden sind
+	 *  graymap_gray_Step 				= ein einzelner verdunkelungs schritt von weiß zu grau in den sectionen nach außen, wegen sich öffnenden winkeln und daraus entstehenden messfehlern kleiner objekte
+	 *
+	 *   recognition					= einstellungen die das erkennungsverhalten steuern
+	 *  graymap_recognition_threshold 	= schwelle ab der ein objekt als fest erkannt wird
+	 *  graymap_update_factor 		 	= factor mit dem die karte angepasst wird
+	 *  graymap_update_direction_factor = fector: neu Dunkel auf alt Hell /, neu dunkel auf alt Dunkel *, neu hell auf alt hell *, neu hell auf alt dunkel /
+	 * 									  \-> sorgt dafür das stationäre objekte lansamer verschwinden und sich bewegende langsamer festsetzen
+	 *  graymap_edge_accuracy			= verwaschung der gesetzten punkte in naheliegende graymap felder, wenn an nur eigenes feld, wenn aus auch nachbarfelder,
+	 * 									  \-> wenn =false werden ungenauigkeiten der messung ausgeglichen
 	 */
 	private static boolean graymap_state = true;				// true! 
-	/**
-	 *  angle = winkel -> kreisförmig angeordnete vektoren,
-	 */
-	private static int graymap_angle_count = 270*4; 			// 270° winkel, je 0,25° ein sensorwert
 	private static int graymap_angle_size = 4;					// 1 - 10 scheint gut zu sein
 	private static int graymap_angle_steps = 0;					// berechnung
-	/**
-	 *  section = abschnitt -> ein einzelner Vektor zerlegt in abschnitte
-	 */
 	private static int graymap_section_count = 10000; 			// 10000 = 10 meter
 	private static int graymap_section_size = 200;				// 20 - 500 je größer desto besser
 	private static int graymap_section_steps = 0;				// berechnung
-	/**
-	 *  move_area = bewegendes gebiet -> bereich das als sich bewegend betrachtet wird
-	 *  graymap_move_area_min_size 	   = mininale anzahl an beieinanderliegenden messwerten eines areals
-	 *  graymap_move_area_gap_max_Size = maximale lücke zwischen zwei arealen befor diese vereint werden
-	 */
 	private static int graymap_move_area_min_size = 10;			// 2 - 50, je extremer desto mehr fehler
-	private static int graymap_move_area_gap_max_Size = 100;	// 10 - 150, je extremer desto mehr fehler
-	/**
-	 * boring settings, dont change
-	 */
+	private static int graymap_move_area_gap_max_Size = 20;	// 10 - 150, je extremer desto mehr fehler
 	private static int graymap_max_gray = 255;					// 255
 	private static int graymap_max_unknown_gray = 127;			// 127
 	private static double graymap_gray_Step = 0;				// berechnung
-	/**
-	 * recognition settings, carefully change
-	 * graymap_recognition_threshold 	= schwelle ab der ein objekt als fest erkannt wird
-	 * graymap_update_factor 		 	= factor mit dem die karte angepasst wird
-	 * graymap_update_direction_factor 	= fector: neu Dunkel auf alt Hell /, neu dunkel auf alt Dunkel *, neu hell auf alt hell *, neu hell auf alt dunkel /
-	 * 									  \-> sorgt dafür das stationäre objekte lansamer verschwinden und sich bewegende langsamer festsetzen
-	 * graymap_edge_accuracy			= verwaschung der gesetzten punkte in naheliegende graymap felder, wenn an nur eigenes feld, wenn aus auch nachbarfelder,
-	 * 									  \-> wenn =false werden ungenauigkeiten der messung ausgeglichen
-	 */
 	private static int graymap_recognition_threshold = 128;		// graymap_max_unknown_gray+1 bis graymap_max_gray
 	private static int graymap_update_direction_factor = 4;		// 1 - 10;
 	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wählen, wegen datentyp rundungs problemen
@@ -59,15 +64,27 @@ public class Settings {
 	 * Clustering = objekte finden
 	 * clustering_state 			= ob der algorythmus aktiv ist
 	 * clustering_threshold 		= eine schwelle an entfernung ab dem zwei punkte dem selben kluster angehören
-	 * 
 	 * clustering_search_range 		= anzahl an punkten die rückwers überprüft werden, ob sie den selben cluster angehören. sollte so klein gewählt werden wie möglich, aber sogroß das, dass selbe ergebnis wie bei einer beliebig großen zahl herauskommt
 	 * clustering_min_cluster_size 	= die minimale anzahl an elementen die ein cluster benötigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
 	 */
 	private static boolean clustering_state = true;				// true
-	private static double clustering_threshold = 1.8;			// 0.7				// 1.2 
-	private static int clustering_search_range = 20;			// 1 - 1000000, kleiner = besser
-	private static int clustering_min_cluster_size = 150;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
+	private static double clustering_threshold = 2;				// 0.7				// 1.2 
+	private static int clustering_search_range = 50;			// 1 - 1000000, kleiner = besser
+	private static int clustering_min_cluster_size = 200;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
 	
+	/**
+	 * straighten			= glätten
+	 * straigthen_state		= ob geglättet wirt
+	 * straightenFactor 	= die stärke der glättung, kleine werte reichen meist
+	 * straighten_type_enum - arithmetic: Das ArithmetischeMittel
+	 * 						- harmonic: Das HarmonischeMittel
+	 * 						- geometric: Das GeometrischeMittel
+	 * straigthen_type		= der Algorythmus der zum Glätten verwendet wird
+	 */
+	private static boolean straigthen_state = false;													// true
+	private static int straightenFactor = 4;													// 1- 30, klein = wenig, groß = sehr glatt, meist zu glatt,
+	public enum straighten_type_enum {arithmetic,harmonic,geometric};
+	private static straighten_type_enum straigthen_type = straighten_type_enum.arithmetic ;		// arithmetic
 	
 	public Settings(){
 		updateAllValues();
@@ -79,13 +96,33 @@ public class Settings {
 		for(int i=0;i<angle_number;i++){
 			angle_tan_array[i] = Math.tan(Math.toRadians((double)(angle_angle*i)));
 		}
-		graymap_angle_steps = (getGraymap_angle_count() / getGraymap_angle_size());
-		graymap_section_steps = (getGraymap_section_count() / getGraymap_section_size());
-		graymap_gray_Step = (((double)getGraymap_max_unknown_gray()-1)/((double)getGraymap_section_steps()));
+		graymap_angle_steps = (angle_number / graymap_angle_size);
+		graymap_section_steps = (graymap_section_count / graymap_section_size);
+		graymap_gray_Step = (((double)graymap_max_unknown_gray-1)/((double)graymap_section_steps));
 	
 	}
 
 	
+	public static int getAngle_number() {
+		return angle_number;
+	}
+	public static void setAngle_number(int angle_number) {
+		if(angle_number > 100 && angle_number < 10000){
+			Settings.angle_number = angle_number;
+			updateAllValues();
+		}
+	}
+
+	public static int getAngle_total() {
+		return angle_total;
+	}
+	public static void setAngle_total(int angle_total) {
+		if(angle_total > 1 && angle_total <= 360){
+			Settings.angle_total = angle_total;
+			updateAllValues();
+		}
+	}
+
 	public static double getAngle_angle() {
 		return angle_angle;
 	}
@@ -107,22 +144,11 @@ public class Settings {
 	}
 
 	
-	public static int getGraymap_angle_count() {
-		return graymap_angle_count;
-	}
-	public static void setGraymap_angle_count(int graymap_angle_count) {
-		if(graymap_angle_count > 0 && graymap_angle_count < 100000){
-			Settings.graymap_angle_count = graymap_angle_count;
-			Settings.updateAllValues();
-		}
-	}
-
-	
 	public static int getGraymap_angle_size() {
 		return graymap_angle_size;
 	}
 	public static void setGraymap_angle_size(int graymap_angle_size) {
-		if(graymap_angle_size >0 && graymap_angle_size<graymap_angle_count){
+		if(graymap_angle_size >0 && graymap_angle_size< angle_number){
 			Settings.graymap_angle_size = graymap_angle_size;
 			Settings.updateAllValues();
 		}
@@ -293,5 +319,33 @@ public class Settings {
 			Settings.clustering_min_cluster_size = clustering_min_cluster_size;
 			Settings.updateAllValues();
 		}
+	}
+
+	// Glätten
+	
+	public static boolean isStraigthen() {
+		return straigthen_state;
+	}
+	public static void setStraigthen(boolean straigthen) {
+		Settings.straigthen_state = straigthen;
+		Settings.updateAllValues();
+	}
+
+	public static int getStraightenFactor() {
+		return straightenFactor;
+	}
+	public static void setStraightenFactor(int straightenFactor) {
+		if(straightenFactor>0 && straightenFactor<100){
+			Settings.straightenFactor = straightenFactor;
+			Settings.updateAllValues();
+		}
+	}
+
+	public static straighten_type_enum getStraigthen_type() {
+		return straigthen_type;
+	}
+	public static void setStraigthen_type(straighten_type_enum straigthen_type) {
+		Settings.straigthen_type = straigthen_type;
+		Settings.updateAllValues();
 	}
 }
