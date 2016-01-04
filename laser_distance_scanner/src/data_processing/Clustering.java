@@ -56,11 +56,14 @@ public class Clustering {
 		}
 		
 		// zu kleine Kluster entfernen
-		// TODO entfernung zur mitte in bezug ziehen
-		// das macht wirglich sinn, einfügen !
+		// die kluster entfernung spielt eine rolle, die element anzahl muss bei näheren objekten größer sein als bei weit entfertnet.
+		// damit sollen kleine kluster die fälschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 
+		// durch geringe abtastraten wenig elemente besitzen trotzdem berücksichtigt werden
 		for(int i=0;i<hCluster.size();i++){
-			if(hCluster.get(i).getElementCount()<minClusterSize)
+			if(hCluster.get(i).getElementCount() < minClusterSize*Settings.getAngle_number() / hCluster.get(i).getCenter().distance(0, 0)){
 				hCluster.remove(i);
+				i=i-1;
+			}	
 		}
 
 		return hCluster;

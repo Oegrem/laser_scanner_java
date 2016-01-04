@@ -51,14 +51,14 @@ public class Settings {
 	private static int graymap_section_size = 200;				// 20 - 500 je größer desto besser
 	private static int graymap_section_steps = 0;				// berechnung
 	private static int graymap_move_area_min_size = 10;			// 2 - 50, je extremer desto mehr fehler
-	private static int graymap_move_area_gap_max_Size = 20;	// 10 - 150, je extremer desto mehr fehler
+	private static int graymap_move_area_gap_max_Size = 5;		// 1-100, je extremer desto mehr fehler
 	private static int graymap_max_gray = 255;					// 255
 	private static int graymap_max_unknown_gray = 127;			// 127
 	private static double graymap_gray_Step = 0;				// berechnung
 	private static int graymap_recognition_threshold = 128;		// graymap_max_unknown_gray+1 bis graymap_max_gray
 	private static int graymap_update_direction_factor = 4;		// 1 - 10;
 	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wählen, wegen datentyp rundungs problemen
-	private static boolean graymap_edge_accuracy = false;		// false
+	private static boolean graymap_edge_accuracy = true;		// false
 	
 	/**
 	 * Clustering = objekte finden
@@ -66,11 +66,13 @@ public class Settings {
 	 * clustering_threshold 		= eine schwelle an entfernung ab dem zwei punkte dem selben kluster angehören
 	 * clustering_search_range 		= anzahl an punkten die rückwers überprüft werden, ob sie den selben cluster angehören. sollte so klein gewählt werden wie möglich, aber sogroß das, dass selbe ergebnis wie bei einer beliebig großen zahl herauskommt
 	 * clustering_min_cluster_size 	= die minimale anzahl an elementen die ein cluster benötigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
+	 * 								  \-> Die anzahl wird in relation zur Entfernung zum Mittelpunkt gesetzt um kleine kluster verstärkt im nahen bereich zu filtern
+	 * 									  Damit soll die messungenauigkeit in der entfernung berücksichtigt werden
 	 */
 	private static boolean clustering_state = true;				// true
-	private static double clustering_threshold = 2;				// 0.7				// 1.2 
+	private static double clustering_threshold = 1.5;				// 0.7				// 1.2 
 	private static int clustering_search_range = 50;			// 1 - 1000000, kleiner = besser
-	private static int clustering_min_cluster_size = 200;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
+	private static int clustering_min_cluster_size = 10;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
 	
 	/**
 	 * straighten			= glätten

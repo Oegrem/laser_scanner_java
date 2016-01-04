@@ -15,10 +15,7 @@ public class Processing {
 
 	// the straighting/smothing class
 	private Straighten straighten = new Straighten();
-	
-	// polish/straighten funktionality
-	public static boolean isStraightening = false;
-	public static boolean graymapping = true;
+
 
 	private Clustering clustering = new Clustering();
 	private Vector<Cluster> cluster= new Vector<Cluster>();
@@ -62,7 +59,7 @@ public class Processing {
 		Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
 		Vector<HelpCluster> hCluster = new Vector<HelpCluster>();
 		
-		if(graymapping == true){
+		if(Settings.isGraymap_state() == true){
 			Graymap map = Graymap.getGraymap();
 			Vector<Long> polar = new Vector<Long>();
 			Vector<int[]> moving = new Vector<int[]>();

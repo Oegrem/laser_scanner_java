@@ -253,11 +253,11 @@ public class Graphics {
 					}
 				}
 				if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
-					if (Processing.isStraightening) {
-						Processing.isStraightening = false;
+					if (Settings.isGraymap_state()) {
+						Settings.setGraymap_state(false);
 						System.out.println("Glätten OF");
 					} else {
-						Processing.isStraightening = true;
+						Settings.setGraymap_state(true);
 						System.out.println("Glätten ON");
 					}
 				}
