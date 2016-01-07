@@ -203,6 +203,7 @@ public class Graymap {
         for(int i=0;i<vektorSteps;i++){
         	for(int j=0;j<steps;j++){
         		current = Integer.parseInt( input.get(i).get(j)+"" );
+
         		if(current > 255) current =255;
         		try {
 					current = new Color(255- current,255- current,255- current).getRGB();

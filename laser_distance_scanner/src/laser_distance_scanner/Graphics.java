@@ -395,23 +395,19 @@ public class Graphics {
 
 		}
 		if (drawDbscan) {
-			
-			int rec = 0;
-			
-			for (clusterLineStrip cLS : SynchronListHandler.getClusterLines()) {
-				if(cLS.recognised){
-					rec++;
-				setColor(cLS.getClusterId());
-				
-				glBegin(GL_LINE_STRIP);
-
-				for (Point p : cLS.getLineStripPoints()) {
-					glVertex2f((float) p.x, (float) p.y);
-				}
-				glEnd();
-				}
-			}
-}
+			/*
+			 * int rec = 0;
+			 * 
+			 * for (clusterLineStrip cLS :
+			 * SynchronListHandler.getClusterLines()) { if(cLS.recognised){
+			 * rec++; setColor(cLS.getClusterId());
+			 * 
+			 * glBegin(GL_LINE_STRIP);
+			 * 
+			 * for (Point p : cLS.getLineStripPoints()) { glVertex2f((float)
+			 * p.x, (float) p.y); } glEnd(); } }
+			 */
+		}
 		if (drawLines) {
 
 			// irgendwas anderes glColor4f(0.0f, 1.0f, 0.0f, 1.0f);

@@ -43,7 +43,7 @@ public class SynchronListHandler {
 		
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
-
+		
 		p = new Processing();
 		p.startProcess(_pointList);
 
@@ -53,8 +53,8 @@ public class SynchronListHandler {
 		// clusteredPoints.clear();
 		// clusteredPoints.addAll(p.getClusterPoints());
 		
-		clusterLines.clear();
-		clusterLines.addAll(dbscan.getClustersAsLines(copyPointVector, 0));
+		//clusterLines.clear();
+		//clusterLines.addAll(dbscan.getClustersAsLines(copyPointVector, 0));
 		
 	
 	}
