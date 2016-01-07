@@ -109,6 +109,7 @@ class HelpCluster{
 	public void addPoint(ClusterPoint cP, Point p){
 		pointList.add(p);
 		cPointList.add(cP);
+		cluster.increaseElements();
 	}
 	public Cluster getCluster(){
 		return cluster;

@@ -4,12 +4,8 @@ import java.awt.Point;
 import java.util.Vector;
 
 public class Straighten {
-	int k = 1;
 	
 	public Straighten(){}
-	public Straighten(int _k){
-		this.k = _k;
-	}
 	
 	
 	/**
@@ -40,13 +36,14 @@ public class Straighten {
 		double x = 0;
 		double y = 0;
 		int count =0;
+		int smoothingFactor = Settings.getStraightenFactor();
 		
 		if(point.size()<1)
 			return;
 		
 		// if to less points
-		if(point.size()<k)
-			k = 1;
+		if(point.size()<smoothingFactor)
+			smoothingFactor = 1;
 		// why ever it should by k<1, WE WONT DO IT 
 		//if(k<1)return;
 		
@@ -57,11 +54,11 @@ public class Straighten {
 			}
 		}
 		
-		if(point.size()<=k)
-			k -= (k-point.size())+1;
+		if(point.size()<=smoothingFactor)
+			smoothingFactor -= (smoothingFactor-point.size())+1;
 			
 		// add the x and y of the next k elements
-		for(int i=0;i<=k;i++){
+		for(int i=0;i<=smoothingFactor;i++){
 			x= x + point.get(i).getX();
 			y= y + point.get(i).getY();
 			count ++;
@@ -77,14 +74,14 @@ public class Straighten {
 		// remove the k+1 point value from behind, add the k+1 point value from the front
 		// start with 1
 		for(int i=1;i<point.size();i++){
-			if((i-1-k)>=0){
-				x= x - point.get(i-1-k).getX();
-				y= y - point.get(i-1-k).getY();
+			if((i-1-smoothingFactor)>=0){
+				x= x - point.get(i-1-smoothingFactor).getX();
+				y= y - point.get(i-1-smoothingFactor).getY();
 				count --;
 			}
-			if(i+k<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
-				x= x + point.get(i+k).getX();
-				y= y + point.get(i+k).getY();
+			if(i+smoothingFactor<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
+				x= x + point.get(i+smoothingFactor).getX();
+				y= y + point.get(i+smoothingFactor).getY();
 				count++;
 			}
 			x= x + point.get(i).getX();
@@ -99,13 +96,14 @@ public class Straighten {
 		double x = 0;
 		double y = 0;
 		int count =0;
+		int smoothingFactor = Settings.getStraightenFactor();
 		
 		if(point.size()<1)
 			return;
 		
 		// if to less points
-		if(point.size()<k)
-			k = 1;
+		if(point.size()<smoothingFactor)
+			smoothingFactor = 1;
 		// why ever it should by k<1, WE WONT DO IT 
 		//if(k<1)return;
 		
@@ -116,11 +114,11 @@ public class Straighten {
 			}
 		}
 		
-		if(point.size()<=k)
-			k -= (k-point.size())+1;
+		if(point.size()<=smoothingFactor)
+			smoothingFactor -= (smoothingFactor-point.size())+1;
 			
 		// add the x and y of the next k elements
-		for(int i=0;i<=k;i++){
+		for(int i=0;i<=smoothingFactor;i++){
 			x= x + point.get(i).getX();
 			y= y + point.get(i).getY();
 			count ++;
@@ -136,14 +134,14 @@ public class Straighten {
 		// remove the k+1 point value from behind, add the k+1 point value from the front
 		// start with 1
 		for(int i=1;i<point.size();i++){
-			if((i-1-k)>=0){
-				x= x - point.get(i-1-k).getX();
-				y= y - point.get(i-1-k).getY();
+			if((i-1-smoothingFactor)>=0){
+				x= x - point.get(i-1-smoothingFactor).getX();
+				y= y - point.get(i-1-smoothingFactor).getY();
 				count --;
 			}
-			if(i+k<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
-				x= x + point.get(i+k).getX();
-				y= y + point.get(i+k).getY();
+			if(i+smoothingFactor<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
+				x= x + point.get(i+smoothingFactor).getX();
+				y= y + point.get(i+smoothingFactor).getY();
 				count++;
 			}
 			x= x + point.get(i).getX();
@@ -158,6 +156,7 @@ public class Straighten {
 		double x = 0;
 		double y = 0;
 		int count =0;
+		int smoothingFactor = Settings.getStraightenFactor();
 		
 		if(cPoint.size()<1)
 			return;
@@ -165,11 +164,11 @@ public class Straighten {
 			return;
 		
 		// if to less points
-		if(point.size()<=k)
-			k -= (k-point.size())+1;
+		if(point.size()<=smoothingFactor)
+			smoothingFactor -= (smoothingFactor-point.size())+1;
 			
 		// add the x and y of the next k elements
-		for(int i=0;i<=k;i++){
+		for(int i=0;i<=smoothingFactor;i++){
 			x= x + point.get(i).getX();
 			y= y + point.get(i).getY();
 			count ++;
@@ -181,18 +180,18 @@ public class Straighten {
 		
 		// element 0 average 
 		cPoint.get(0).setLocation(x/count, y/count);
-		count +=k;
+		count +=smoothingFactor;
 		// remove the k+1 point value from behind, add the k+1 point value from the front
 		// start with 1
 		for(int i=1;i<point.size();i++){
-			if((i-1-k)>=0){
-				x= x - point.get(i-1-k).getX();
-				y= y - point.get(i-1-k).getY();
+			if((i-1-smoothingFactor)>=0){
+				x= x - point.get(i-1-smoothingFactor).getX();
+				y= y - point.get(i-1-smoothingFactor).getY();
 				count --;
 			}
-			if(i+k<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
-				x= x + point.get(i+k).getX();
-				y= y + point.get(i+k).getY();
+			if(i+smoothingFactor<point.size()){ // changed <= to < because of ArrayIndexOutOfBoundsException
+				x= x + point.get(i+smoothingFactor).getX();
+				y= y + point.get(i+smoothingFactor).getY();
 				count++;
 			}
 			x= x + point.get(i).getX();
@@ -204,26 +203,27 @@ public class Straighten {
 		return;
 	}
 	public void ArithmetischesMittel(Vector<ClusterPoint> cPoint, Vector<Point> point){
+		int smoothingFactor = Settings.getStraightenFactor();
 		if(cPoint.size()!=point.size())
 			return;
 		
-		if(k>cPoint.size())
-			k-= k-cPoint.size()+1;
+		if(smoothingFactor>cPoint.size())
+			smoothingFactor-= smoothingFactor-cPoint.size()+1;
 		
 		double currentX = 0,currentY = 0;
 		int count = 0;
 		int currentK = 0;
 		for(int i=0;i<cPoint.size();i++){
-			currentK = k;
+			currentK = smoothingFactor;
 			currentX = 0;
 			currentY = 0;
 			count = 0;
-			if(i-k<0)
+			if(i-smoothingFactor<0)
 				currentK =i;
 			if(i+currentK>=cPoint.size())
 				currentK = cPoint.size() - i-1;
-			if(currentK>k)
-				currentK = k;
+			if(currentK>smoothingFactor)
+				currentK = smoothingFactor;
 			if(currentK>2)
 				System.out.println(currentK);
 			for(int j=0;j<=currentK;j++){
@@ -240,26 +240,27 @@ public class Straighten {
 	}
 	
 	public void HarmonischeMittel(Vector<ClusterPoint> clusterPoints, Vector<Point> sourcePoints){
+		int smoothingFactor = Settings.getStraightenFactor();
 		if(clusterPoints.size()!=sourcePoints.size())
 			return;
 		
-		if(k>sourcePoints.size())
-			k-= k-sourcePoints.size()+1;
+		if(smoothingFactor>sourcePoints.size())
+			smoothingFactor-= smoothingFactor-sourcePoints.size()+1;
 		
 		double currentX = 0,currentY = 0;
 		int count = 0;
 		int currentK = 0;
 		for(int i=0;i<sourcePoints.size();i++){
-			currentK = k;
+			currentK = smoothingFactor;
 			currentX = 0;
 			currentY = 0;
 			count = 0;
-			if(i-k<0)
+			if(i-smoothingFactor<0)
 				currentK =i;
 			if(i+currentK>=sourcePoints.size())
 				currentK = sourcePoints.size() - i-1;
-			if(currentK>k)
-				currentK = k;
+			if(currentK>smoothingFactor)
+				currentK = smoothingFactor;
 
 			for(int j=0;j<=currentK;j++){
 				currentX += 1/(sourcePoints.get(i+j).getX());
@@ -275,26 +276,27 @@ public class Straighten {
 	}
 	
 	public void GeometrischeMittel(Vector<ClusterPoint> clusterPoints, Vector<Point> sourcePoints){
+		int smoothingFactor = Settings.getStraightenFactor();
 		if(clusterPoints.size()!=sourcePoints.size())
 			return;
 		
-		if(k>sourcePoints.size())
-			k-= k-sourcePoints.size()+1;
+		if(smoothingFactor>sourcePoints.size())
+			smoothingFactor-= smoothingFactor-sourcePoints.size()+1;
 		
 		double currentX = 0,currentY = 0;
 		int count = 0;
 		int currentK = 0;
 		for(int i=0;i<sourcePoints.size();i++){
-			currentK = k;
+			currentK = smoothingFactor;
 			currentX = 1;
 			currentY = 1;
 			count = 0;
-			if(i-k<0)
+			if(i-smoothingFactor<0)
 				currentK =i;
 			if(i+currentK>=sourcePoints.size())
 				currentK = sourcePoints.size() - i-1;
-			if(currentK>k)
-				currentK = k;
+			if(currentK>smoothingFactor)
+				currentK = smoothingFactor;
 
 			for(int j=0;j<=currentK;j++){
 				currentX *= sourcePoints.get(i+j).getX();

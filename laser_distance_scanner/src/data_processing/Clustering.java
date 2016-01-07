@@ -4,17 +4,7 @@ import java.awt.Point;
 import java.util.Vector;
 
 public class Clustering {
-	public static double threshold = 0.7;
-	
-	// min 2 to skip error values
-	// as low as possible, validation, low value same kluster result as high value!
-	public static int searchRange = 20;
-	// faktor mit dem array elemente entfernt der trashold angeglichen wird
-	public static double leapFactor=1.2;
-	// faktor mit dem die entfernung zum mitellpunkt über den trashold ausgeglichen wird
-	private double tan4= 0.07 ;//0.06993;
-	// minimale kluster größe, min 1, max egal
-	public static int minClusterSize = 10;
+
 	
 	
 	public Clustering(){
@@ -25,7 +15,8 @@ public class Clustering {
 		Vector<HelpCluster> hCluster = new Vector<>();
 		Point currentPoint = null;
 		int cCount = -1;
-		
+		int searchRange = Settings.getClustering_search_range();
+		int minClusterSize = Settings.getClustering_min_cluster_size();
 		// Clustern
 		
 		// each original Point
@@ -64,32 +55,25 @@ public class Clustering {
 			hCluster.get(i).computeData();
 		}
 		
-		/*
-		Point center = null;
-		Point maxCorner = null;
-		Point minCorner = null;
-		for(int i=0;i<hCluster.size();i++){
-			center= hCluster.get(i).getCenter();
-			maxCorner = hCluster.get(i).getMaxCorner();
-			minCorner = hCluster.get(i).getMinCorner();
-			for(int j=0;i+j<hCluster.size();i++){
-				
-			}
-		}*/
-		
-		
 		// zu kleine Kluster entfernen
+		// die kluster entfernung spielt eine rolle, die element anzahl muss bei näheren objekten größer sein als bei weit entfertnet.
+		// damit sollen kleine kluster die fälschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 
+		// durch geringe abtastraten wenig elemente besitzen trotzdem berücksichtigt werden
 		for(int i=0;i<hCluster.size();i++){
-			if(hCluster.get(i).getElementCount()<minClusterSize)
+			if(hCluster.get(i).getElementCount() < minClusterSize*Settings.getAngle_number() / hCluster.get(i).getCenter().distance(0, 0)){
 				hCluster.remove(i);
+				i=i-1;
+			}	
 		}
 
 		return hCluster;
 	}
 	
 	/**
+	 * Prüft ob ein punkt nah genug an einem weiteren punkt ist, sodass beide dem gleichen Cluster angehöhren
+	 * es wird davon ausgegangen das die punkte nebeneinander liegen, leaps ist die anzahl an plätzen zwischen den punkten
+	 * wodurch der winkel bestimmt wird der zum entfernungs ausgleich im radius wie auch zum mittelpunkt genutzt wird
 	 * 
-	 * TODO komplexe abfrage einbauen die in abhängigkeit der entfernung die schwelle berechnet
 	 * 
 	 * @param a
 	 * @param b
@@ -100,6 +84,7 @@ public class Clustering {
 		double A = a.distance(0,0);
 		double B = b.distance(0,0);
 		double adjacent = 0.0;
+		double[] angle = Settings.getAngle_tan_array();
 		if(A<B)
 			adjacent = A;
 		else 
@@ -107,8 +92,8 @@ public class Clustering {
 
 		//  ankathete * tangenz(4) -> skalierung auf entfernung, aufspannwinkel 4°
 		//  leaps 	  * leapFactor -> skalierung auf breite, schritte je 4° 
-		double factor = adjacent * tan4 +leaps*leapFactor;
-		if(distance < threshold*factor){
+		double factor = adjacent * angle[leaps];
+		if(distance < Settings.getClustering_threshold()*factor){
 			return true;
 		}
 		return false;
