@@ -61,7 +61,7 @@ public class Processing {
 		
 		long t1,t2,t3,t4;
 		
-		t1=System.currentTimeMillis();
+		t1=Settings.nstp.currentNanoSecondsTimestamp();
 		if(Settings.isGraymap_state() == true){
 			Graymap map = Graymap.getGraymap();
 			Vector<Long> polar = new Vector<Long>();
@@ -92,7 +92,7 @@ public class Processing {
 			// ohne graymap alle punkte
 			movingPointLists.add(pointList);
 		}
-		t2 = System.currentTimeMillis();
+		t2 = Settings.nstp.currentNanoSecondsTimestamp();
 		if(Settings.isClustering_state()== true){
 			// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
 			for(int list=0;list <movingPointLists.size();list++){
@@ -122,7 +122,7 @@ public class Processing {
 			for(int i=0;i<hCluster.size();i++)
 				cluster.add(hCluster.get(i).getCluster());
 		}
-		t3 = System.currentTimeMillis();
+		t3 = Settings.nstp.currentNanoSecondsTimestamp();
 		Settings.printCalcTime("Graymap ", t1, t2);
 		Settings.printCalcTime("Clustern", t2, t3);
 		// TODO cluster bekannten klustern zuordnen

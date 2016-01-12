@@ -16,7 +16,9 @@ public class Graymap {
 
 	private static Vector<Vector<Long>> map = new Vector<Vector<Long>>();
 	private static Vector<Vector<Long>> newMap = new Vector<Vector<Long>>();
-	
+	private static boolean[] change = new boolean[Settings.getAngle_number()];
+	private static int minChangeStep = 0;
+	private static int maxChangeStep = 0;
 	
 	JFrame frame = new JFrame();
 	JLabel label = new JLabel();
@@ -62,11 +64,11 @@ public class Graymap {
 	private void clearNewMap(){
 		int angleSteps = Settings.getGraymap_angle_steps();
 		int sectionSteps = Settings.getGraymap_section_steps();
-		double graystep = Settings.getGraymap_gray_Step();
+		int[] graysteps = Settings.getGraymap_section_steps_array();
 		for(int i=0;i<angleSteps;i++){
 			Vector<Long> current = newMap.get(i);
 			for(int j=0;j<sectionSteps;j++){
-				current.set(j, (long) (j*graystep));
+				current.set(j,(long)graysteps[j]);
 			}
 		}
 	}
@@ -133,12 +135,14 @@ public class Graymap {
 		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
 		int angleSteps = Settings.getGraymap_angle_steps();
 		int sectionSteps = Settings.getGraymap_section_steps();
-		
 		// jeden vektor absuchen (ein vektor kann mehrere sensorvektoren beinhaltet)
 		for(int i=0;i<angleSteps;i++){
+			// wenn neue werte im alten maxgray -> keine änderungen zur map, überspringen
+			if(change[i]!=true) continue;
+			
 			// addierter grauwert aller steps als erkennung von gleichen vektoren ?
 			// vektor in einzelne abschnitte teilen
-			for(int j=0;j<sectionSteps;j++){
+			for(int j=minChangeStep;j<maxChangeStep;j++){
 				valueOld = map.get(i).get(j);
 				valueCurrent = newMap.get(i).get(j);
 				// nur bei unterschied
@@ -165,6 +169,7 @@ public class Graymap {
 					map.get(i).set(j,valueNew);
 				}
 			}
+			
 		}
 	}
 	
@@ -197,37 +202,55 @@ public class Graymap {
 		int angleSteps= Settings.getGraymap_angle_steps();
 		int sectionSteps = Settings.getGraymap_section_steps();
 		int sectionSize = Settings.getGraymap_section_size();
+		int recognition = Settings.getGraymap_recognition_threshold();
+		int oldVectorStep=0, oldStep=0;
+		boolean oldMove=false;
 		// wenn größen nicht passen
 		/*if(stepVector.size()!= vektorSteps){
 			moving.add((long) -1);
 			return moving;
 		}*/
 		long t1,t2,t3,t4,t5,t6;
-		t1 = System.currentTimeMillis();
+		t1 = Settings.nstp.currentNanoSecondsTimestamp();
 		clearNewMap();
-		t2 = System.currentTimeMillis();
+		t2 = Settings.nstp.currentNanoSecondsTimestamp();
 		
+		minChangeStep = sectionSteps-1;
+		maxChangeStep = 0;
 		// neue graymap befüllen
 		for(int i=0;i<stepVector.size();i++){
 			// finde das feld der map indem der neue punkt gesetzt wird
 			vektorStep = i/angleSize;
-			
 			if(vektorStep>=angleSteps){
 				vektorStep = angleSteps -1;
 			}
 			step = (int) (stepVector.get(i)/sectionSize);
-			
 			if(step>=sectionSteps){
 				step = sectionSteps-1;
 			}
-
+			
+			if(oldStep==step && oldVectorStep==vektorStep){
+				if(oldMove)
+					movingPoints.add(i);
+				continue;
+			}
+			
+			oldVectorStep = vektorStep;
+			oldStep = step;
+			if(minChangeStep>step)minChangeStep=step;
+			if(maxChangeStep<step)maxChangeStep=step;
 			newMap.get(vektorStep).set(step,(long) maxGray);
 			valueOld = map.get(vektorStep).get(step);
 				
 			// wenn punkt im hellembereich ist, --> als bewegung erkennen 
-				if(valueOld < Settings.getGraymap_recognition_threshold()){
-					movingPoints.add(i);
-				}
+			if(valueOld < recognition){
+				movingPoints.add(i);
+				oldMove=true;
+			}else oldMove = false;
+			// wenn punkt nicht im perfekten schwarz, karte muss upgedatet werden
+			if(valueOld != maxGray){
+				change[vektorStep] = true;
+			}else change[vektorStep] = false;
 			
 			// sharpEdge = true -> nur das feld in dem momentaner messwert gemessen wurde
 			// sharpEge = false -> felder links rechts und vor dem momentanen feld werden ebenfalsl verdunkelt
@@ -250,15 +273,15 @@ public class Graymap {
 				newMap.get(vektorStep).set(j,(long) maxUnknownGray);
 			}
 		}
-		t3 = System.currentTimeMillis();
+		t3 = Settings.nstp.currentNanoSecondsTimestamp();
 		// berechne aus einzelnen bewegenden punkten bereiche mit start und ente
 		movingArea = calcMovingAreas(movingPoints);
-		t4 = System.currentTimeMillis();
+		t4 = Settings.nstp.currentNanoSecondsTimestamp();
 		// graymap zusammenführen
 		mergeMaps();
-		t5 = System.currentTimeMillis();
-		showVisual(map,movingArea);
-		t6 = System.currentTimeMillis();
+		t5 = Settings.nstp.currentNanoSecondsTimestamp();
+		//showVisual(map,movingArea);
+		t6 = Settings.nstp.currentNanoSecondsTimestamp();
 		Settings.printCalcTime("Graymap clear map ", t1, t2);
 		Settings.printCalcTime("Graymap fill  map ", t2, t3);
 		Settings.printCalcTime("Graymap calc  move", t3, t4);

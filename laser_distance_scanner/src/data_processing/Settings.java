@@ -4,6 +4,8 @@ import java.sql.Time;
 
 public class Settings {
 	
+	public static NanoSecondsTimestampProvider nstp = new NanoSecondsTimestampProvider();
+	
 	/**
 	 * gobale settings
 	 * 
@@ -25,11 +27,12 @@ public class Settings {
 	 *   angle 							= winkel -> kreisförmig angeordnete vektoren,
 	 *  graymap_angle_size				= anzahl an messwerten die in die selbe Graymap spallte projeziert werden
 	 *  graymap_angle_steps 			= anzahl an unabhängigen spalten in der graymap, berechnung = angle_number / graymap_angle_size
-	 *
+	 *	
 	 *   section 						= abschnitt -> ein einzelner Vektor zerlegt in abschnitte
 	 *  graymap_section_count 			= maximale entfernung der messung in mm -> 10 meter 
 	 *  graymap_section_size			= größe der graymap section in mm 
 	 *  graymap_section_steps			= anzahl an unabhängigen sectionen in der Graymap, berechnung aus graymap_section_count / graymap_section_size
+	 *	graymap_section_steps_array		= alle einzelnen steps, als array um rechenzeit zu sparen
 	 *
 	 *   move_area 						= bewegendes gebiet -> bereich das als sich bewegend betrachtet wird
 	 *  graymap_move_area_min_size 	   	= mininale anzahl an beieinanderliegenden messwerten eines areals
@@ -52,6 +55,7 @@ public class Settings {
 	private static int graymap_section_count = 10000; 			// 10000 = 10 meter
 	private static int graymap_section_size = 500;				// 20 - 500 je größer desto besser
 	private static int graymap_section_steps = 0;				// berechnung
+	private static int[] graymap_section_steps_array;			// berechnung
 	private static int graymap_move_area_min_size = 10;			// 2 - 50, je extremer desto mehr fehler
 	private static int graymap_move_area_gap_max_Size = 5;		// 1-100, je extremer desto mehr fehler
 	private static int graymap_max_gray = 255;					// 255
@@ -60,7 +64,7 @@ public class Settings {
 	private static int graymap_recognition_threshold = 128;		// graymap_max_unknown_gray+1 bis graymap_max_gray
 	private static int graymap_update_direction_factor = 4;		// 1 - 10;
 	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wählen, wegen datentyp rundungs problemen
-	private static boolean graymap_edge_accuracy = true;		// false
+	private static boolean graymap_edge_accuracy = true;		// true, deutlich erhöhter rechenaufwand
 	
 	/**
 	 * Clustering = objekte finden
@@ -103,7 +107,12 @@ public class Settings {
 		graymap_angle_steps = (angle_number / graymap_angle_size);
 		graymap_section_steps = (graymap_section_count / graymap_section_size);
 		graymap_gray_Step = (((double)graymap_max_unknown_gray-1)/((double)graymap_section_steps));
-	
+		graymap_section_steps_array = new int[graymap_section_steps];
+		for(int i=0;i<graymap_section_steps;i++){
+			graymap_section_steps_array[i] = (int) ((i*graymap_gray_Step));
+			if(graymap_section_steps_array[i] > graymap_max_unknown_gray)
+				graymap_section_steps_array[i] = graymap_max_unknown_gray;
+		}
 	}
 
 	
@@ -189,7 +198,9 @@ public class Settings {
 	public static int getGraymap_section_steps() {
 		return graymap_section_steps;
 	}
-
+	public static int[] getGraymap_section_steps_array() {
+		return graymap_section_steps_array;
+	}
 	
 	public static int getGraymap_move_area_min_size() {
 		return graymap_move_area_min_size;
@@ -358,13 +369,50 @@ public class Settings {
 	
 	
 	public static void printCalcTime(String name, long t1, long t2){
-		String st1,st2;
+		String st1,st2,div;
 		st1 = t1+"";
-		st1 = st1.substring(9);
+		st1 = st1.substring(8, 10) + "." + st1.substring(10, 13)+ " " + st1.substring(13, 16) ;
+		//st1 = st1.substring(9);
 		st2 = t2+"";
-		st2 = st2.substring(9);
+		st2 = st2.substring(8, 10) + "." + st2.substring(10, 13)+ " " + st2.substring(13, 16) ;
+		//st2 = st2.substring(9);
+		div = (t2 - t1)+"";
+		while(div.length()<19){
+			div="0"+div;
+		}
+		div = div.substring(8, 10) + "." + div.substring(10, 13)+ " " + div.substring(13, 16) ;
 		
-		System.out.println(name + " " + (t2-t1) + " " + st1 + " " + st2);
+		System.out.println(name + " ");
+		System.out.println("  diverenz " + div);
+		System.out.println("     start " + st1);
+		System.out.println("      stop " + st2);
 
 	}
+}
+class NanoSecondsTimestampProvider {
+
+    private long nanoSecondsOffset, nanoSecondsError;
+
+    public NanoSecondsTimestampProvider() {
+        long curMilliSecs0, curMilliSecs1, 
+               curNanoSecs, startNanoSecs, endNanoSecs;
+        do {    
+            startNanoSecs = System.nanoTime();
+            curMilliSecs0 = System.currentTimeMillis(); 
+            curNanoSecs = System.nanoTime();
+            curMilliSecs1 = System.currentTimeMillis(); 
+            endNanoSecs = System.nanoTime();
+        } while ( curMilliSecs0 == curMilliSecs1 );
+         
+        nanoSecondsOffset = 1000000L*curMilliSecs1 - curNanoSecs;
+        nanoSecondsError = endNanoSecs - startNanoSecs;
+    }   
+
+    public long getNanoSecondsDeviation() {
+        return nanoSecondsError;
+    }   
+
+    public long currentNanoSecondsTimestamp() {
+        return System.nanoTime() + nanoSecondsOffset;
+    }   
 }
