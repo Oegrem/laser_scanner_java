@@ -11,25 +11,16 @@ import javax.swing.JLabel;
 public class Graymap {
 	private static Graymap me = null;
 
-
-
-
 	private static Vector<Vector<Short>> map = new Vector<Vector<Short>>();
 	private static Vector<Vector<Short>> newMap = new Vector<Vector<Short>>();
 	private static boolean[] change = new boolean[Settings.getAngle_number()];
 	private static int minChangeStep = 0;
 	private static int maxChangeStep = 0;
-	
-	JFrame frame = new JFrame();
-	JLabel label = new JLabel();
-	
+		
 	private Graymap(){
 		me = this;
 		map = createRawMap();
 		newMap = createRawMap();
-		frame.add(label);
-		frame.setVisible(true);
-		frame.setSize(1050, 350);
 	}
 	/**
 	 * erstellt eine neue Karte, 
@@ -287,7 +278,7 @@ public class Graymap {
 		// graymap zusammenführen
 		mergeMaps();
 		t5 = Settings.nstp.currentNanoSecondsTimestamp();
-		showVisual(map,movingArea);
+		//showVisual(map,movingArea);
 		t6 = Settings.nstp.currentNanoSecondsTimestamp();
 		Settings.printCalcTime("Graymap clear map ", t1, t2);
 		Settings.printCalcTime("Graymap fill  map ", t2, t3);
@@ -300,47 +291,4 @@ public class Graymap {
 	public Vector<Vector<Short>> getMap(){
 		return map;
 	}
-	
-	private int showVisual(Vector<Vector<Short>> map, Vector<int[]> moving){
-		label.setIcon( new ImageIcon(getImageFromArray(map,moving).getScaledInstance(1000,300,Image.SCALE_DEFAULT) ) );
-
-	    return 1;
-	}
-	
-	public static Image getImageFromArray(Vector<Vector<Short>> map2, Vector<int[]> moving) {
-		int angleSteps = Settings.getGraymap_angle_steps();
-		int angleSize = Settings.getGraymap_angle_size();
-		int sectionSteps = Settings.getGraymap_section_steps();
-		
-        BufferedImage image = new BufferedImage(angleSteps, sectionSteps+50, BufferedImage.TYPE_BYTE_GRAY);
-        int current = 0;
-        for(int i=0;i<angleSteps;i++){
-        	for(int j=0;j<sectionSteps;j++){
-        		current = Integer.parseInt( map2.get(i).get(j)+"" );
-
-        		if(current > 255) current =255;
-        		if(current < 0) current =0;
-        		try {
-					current = new Color(255- current,255- current,255- current).getRGB();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-        		image.setRGB(i, j, current );
-   
-            }
-        }
-        int start,stop = 0;
-        current = new Color(127,127,127).getRGB();
-        for(int i=0;i<moving.size();i++){
-        	start = moving.get(i)[0];
-        	stop = moving.get(i)[1];
-        	for(int j=start;j<stop;j++){
-        		for(int k=sectionSteps +5; k< sectionSteps + 25;k++){
-        			image.setRGB(j/angleSize, k, current );
-        		}
-            }
-        }
-        return image;
-    }
 }
