@@ -194,6 +194,7 @@ public class Graymap {
 		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
 		int maxGray = Settings.getGraymap_max_gray();
 		int angleSize = Settings.getGraymap_angle_size();
+		int angleSteps= Settings.getGraymap_angle_steps();
 		int sectionSteps = Settings.getGraymap_section_steps();
 		int sectionSize = Settings.getGraymap_section_size();
 		// wenn größen nicht passen
@@ -208,7 +209,16 @@ public class Graymap {
 		for(int i=0;i<stepVector.size();i++){
 			// finde das feld der map indem der neue punkt gesetzt wird
 			vektorStep = i/angleSize;
+			
+			if(vektorStep>=angleSteps){
+				vektorStep = angleSteps -1;
+			}
 			step = (int) (stepVector.get(i)/sectionSize);
+			
+			if(step>=sectionSteps){
+				step = sectionSteps-1;
+			}
+
 			newMap.get(vektorStep).set(step,(long) maxGray);
 			valueOld = map.get(vektorStep).get(step);
 				

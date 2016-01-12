@@ -235,7 +235,7 @@ public class Distance_scanner implements Runnable {
 				writeData();
 				
 			} else {
-				device.stopCapture(); // stop Caputre !!important!!
+				device.stopCapture(); // stop Capture !!important!!
 
 				if (isRecorded) {
 					SimFileHandler sFH = new SimFileHandler(recordName);

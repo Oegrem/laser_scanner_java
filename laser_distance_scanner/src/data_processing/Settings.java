@@ -48,7 +48,7 @@ public class Settings {
 	private static int graymap_angle_size = 4;					// 1 - 10 scheint gut zu sein
 	private static int graymap_angle_steps = 0;					// berechnung
 	private static int graymap_section_count = 10000; 			// 10000 = 10 meter
-	private static int graymap_section_size = 200;				// 20 - 500 je größer desto besser
+	private static int graymap_section_size = 500;				// 20 - 500 je größer desto besser
 	private static int graymap_section_steps = 0;				// berechnung
 	private static int graymap_move_area_min_size = 10;			// 2 - 50, je extremer desto mehr fehler
 	private static int graymap_move_area_gap_max_Size = 5;		// 1-100, je extremer desto mehr fehler

@@ -77,6 +77,8 @@ public class Processing {
 			for(int i=0;i<moving.size();i++){
 				start = moving.get(i)[0];
 				stop = moving.get(i)[1];
+				if(stop>= pointList.size())
+					stop = pointList.size()-1;
 				Vector<Point> currentPointList = new Vector<Point>();
 				for(int j=start;j<=stop;j++){
 					currentPointList.add(pointList.get(j));
