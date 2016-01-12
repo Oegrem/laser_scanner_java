@@ -59,6 +59,9 @@ public class Processing {
 		Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
 		Vector<HelpCluster> hCluster = new Vector<HelpCluster>();
 		
+		long t1,t2,t3,t4;
+		
+		t1=System.currentTimeMillis();
 		if(Settings.isGraymap_state() == true){
 			Graymap map = Graymap.getGraymap();
 			Vector<Long> polar = new Vector<Long>();
@@ -89,36 +92,39 @@ public class Processing {
 			// ohne graymap alle punkte
 			movingPointLists.add(pointList);
 		}
-		
-		
-		// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
-		for(int list=0;list <movingPointLists.size();list++){
-			pointList = movingPointLists.get(list);
-			
-			clusteredPoints.removeAllElements();
-			for(int i=0;i<pointList.size();i++){
-				clusteredPoints.add(new ClusterPoint(pointList.get(i)));
-			}
-			if(Settings.isStraigthen()){
-				switch(Settings.getStraigthen_type()){
-					case arithmetic:
-						straighten.ArithmetischesMittel(clusteredPoints, pointList);
-						break;
-					case harmonic:
-						straighten.HarmonischeMittel(clusteredPoints, pointList);
-						break;
-					case geometric:
-						straighten.GeometrischeMittel(clusteredPoints, pointList);
-						break;
+		t2 = System.currentTimeMillis();
+		if(Settings.isClustering_state()== true){
+			// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
+			for(int list=0;list <movingPointLists.size();list++){
+				pointList = movingPointLists.get(list);
+				
+				clusteredPoints.removeAllElements();
+				for(int i=0;i<pointList.size();i++){
+					clusteredPoints.add(new ClusterPoint(pointList.get(i)));
 				}
+				if(Settings.isStraigthen()){
+					switch(Settings.getStraigthen_type()){
+						case arithmetic:
+							straighten.ArithmetischesMittel(clusteredPoints, pointList);
+							break;
+						case harmonic:
+							straighten.HarmonischeMittel(clusteredPoints, pointList);
+							break;
+						case geometric:
+							straighten.GeometrischeMittel(clusteredPoints, pointList);
+							break;
+					}
+				}
+				// clustern
+				hCluster.addAll(clustering.cluster(pointList, clusteredPoints));
 			}
-			// clustern
-			hCluster.addAll(clustering.cluster(pointList, clusteredPoints));
+			
+			for(int i=0;i<hCluster.size();i++)
+				cluster.add(hCluster.get(i).getCluster());
 		}
-		
-		for(int i=0;i<hCluster.size();i++)
-			cluster.add(hCluster.get(i).getCluster());
-		
+		t3 = System.currentTimeMillis();
+		Settings.printCalcTime("Graymap ", t1, t2);
+		Settings.printCalcTime("Clustern", t2, t3);
 		// TODO cluster bekannten klustern zuordnen
 		
 		// TODO momentane bewegung berechnen

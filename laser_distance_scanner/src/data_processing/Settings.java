@@ -1,5 +1,7 @@
 package data_processing;
 
+import java.sql.Time;
+
 public class Settings {
 	
 	/**
@@ -349,5 +351,20 @@ public class Settings {
 	public static void setStraigthen_type(straighten_type_enum straigthen_type) {
 		Settings.straigthen_type = straigthen_type;
 		Settings.updateAllValues();
+	}
+	
+	
+	
+	
+	
+	public static void printCalcTime(String name, long t1, long t2){
+		String st1,st2;
+		st1 = t1+"";
+		st1 = st1.substring(9);
+		st2 = t2+"";
+		st2 = st2.substring(9);
+		
+		System.out.println(name + " " + (t2-t1) + " " + st1 + " " + st2);
+
 	}
 }

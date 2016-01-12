@@ -202,8 +202,10 @@ public class Graymap {
 			moving.add((long) -1);
 			return moving;
 		}*/
-		
+		long t1,t2,t3,t4,t5,t6;
+		t1 = System.currentTimeMillis();
 		clearNewMap();
+		t2 = System.currentTimeMillis();
 		
 		// neue graymap befüllen
 		for(int i=0;i<stepVector.size();i++){
@@ -248,14 +250,20 @@ public class Graymap {
 				newMap.get(vektorStep).set(j,(long) maxUnknownGray);
 			}
 		}
-
+		t3 = System.currentTimeMillis();
 		// berechne aus einzelnen bewegenden punkten bereiche mit start und ente
 		movingArea = calcMovingAreas(movingPoints);
-		
+		t4 = System.currentTimeMillis();
 		// graymap zusammenführen
 		mergeMaps();
-		
+		t5 = System.currentTimeMillis();
 		showVisual(map,movingArea);
+		t6 = System.currentTimeMillis();
+		Settings.printCalcTime("Graymap clear map ", t1, t2);
+		Settings.printCalcTime("Graymap fill  map ", t2, t3);
+		Settings.printCalcTime("Graymap calc  move", t3, t4);
+		Settings.printCalcTime("Graymap merge map ", t4, t5);
+		Settings.printCalcTime("Graymap show  pic ", t5, t6);
 		return movingArea;
 	}
 	
