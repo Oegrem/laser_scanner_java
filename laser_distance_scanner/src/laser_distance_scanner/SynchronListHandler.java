@@ -34,6 +34,8 @@ public class SynchronListHandler {
 	
 	private static Processing p;
 	
+	private static int id = 0;
+	
 	public synchronized static void setRawData(Vector<Long> vS){
 		rawSensorData.clear();
 		rawSensorData.addAll(vS);
@@ -43,13 +45,13 @@ public class SynchronListHandler {
 		
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
-		
+/*
 		p = new Processing();
 		p.startProcess(_pointList);
 
 		clusterVector.clear();
 		clusterVector.addAll(p.getCluster());
-
+*/
 		// clusteredPoints.clear();
 		// clusteredPoints.addAll(p.getClusterPoints());
 		
