@@ -224,8 +224,8 @@ public class Straighten {
 				currentK = cPoint.size() - i-1;
 			if(currentK>smoothingFactor)
 				currentK = smoothingFactor;
-			if(currentK>2)
-				System.out.println(currentK);
+			//if(currentK>2)
+			//	System.out.println(currentK);
 			for(int j=0;j<=currentK;j++){
 				currentX += point.get(i+j).getX();
 				currentY += point.get(i+j).getY();

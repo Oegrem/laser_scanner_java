@@ -1,7 +1,5 @@
 package data_processing;
 
-import java.sql.Time;
-
 public class Settings {
 	
 	public static NanoSecondsTimestampProvider nstp = new NanoSecondsTimestampProvider();
@@ -23,6 +21,8 @@ public class Settings {
 	 *   graymap 						= schwarz weiß schatierte karte. dunkel = objekt, hell = frei
 	 *  		  						  \-> wird zur erkennung von bewegenden objekten verwendet
 	 *  graymap_state 					= aktiv oder inaktiv
+	 *  graymap_direct_adding			= aktiv   -> funktion addNewDataDirect: Erstellt eine Momentane karte, die mit den neuen daten befüllt wird, und die in einem weiteren schritt in die globale karte geupdatet wird
+	 *  								  inaktiv -> funktion addNewData:       Änderungen werden direkt in die Globale Karte gespeichert. Dadurch sollen resourcen gespart werden
 	 *
 	 *   angle 							= winkel -> kreisförmig angeordnete vektoren,
 	 *  graymap_angle_size				= anzahl an messwerten die in die selbe Graymap spallte projeziert werden
@@ -48,9 +48,11 @@ public class Settings {
 	 * 									  \-> sorgt dafür das stationäre objekte lansamer verschwinden und sich bewegende langsamer festsetzen
 	 *  graymap_edge_accuracy			= verwaschung der gesetzten punkte in naheliegende graymap felder, wenn an nur eigenes feld, wenn aus auch nachbarfelder,
 	 * 									  \-> wenn =false werden ungenauigkeiten der messung ausgeglichen
+	 * graymap_visual_server			= zeigt serverseitig ein fenster mit einer linearen representation der graymap an.
 	 */
 	private static boolean graymap_state = true;				// true! 
-	private static int graymap_angle_size = 4;					// 1 - 10 scheint gut zu sein
+	private static boolean graymap_direct_adding = true;		// true, direktes einfügen ist performanter
+	private static int graymap_angle_size = 8;					// 1 - 10 scheint gut zu sein
 	private static int graymap_angle_steps = 0;					// berechnung
 	private static int graymap_section_count = 10000; 			// 10000 = 10 meter
 	private static int graymap_section_size = 500;				// 20 - 500 je größer desto besser
@@ -62,9 +64,10 @@ public class Settings {
 	private static int graymap_max_unknown_gray = 127;			// 127
 	private static double graymap_gray_Step = 0;				// berechnung
 	private static int graymap_recognition_threshold = 128;		// graymap_max_unknown_gray+1 bis graymap_max_gray
-	private static int graymap_update_direction_factor = 4;		// 1 - 10;
+	private static int graymap_update_direction_factor = 1;		// 1 - 10;
 	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wählen, wegen datentyp rundungs problemen
 	private static boolean graymap_edge_accuracy = true;		// true, deutlich erhöhter rechenaufwand
+	private static boolean graymap_visual_server = false;		// false, sehr sehr rechenaufwändig!
 	
 	/**
 	 * Clustering = objekte finden
@@ -77,8 +80,8 @@ public class Settings {
 	 */
 	private static boolean clustering_state = true;				// true
 	private static double clustering_threshold = 1.5;				// 0.7				// 1.2 
-	private static int clustering_search_range = 50;			// 1 - 1000000, kleiner = besser
-	private static int clustering_min_cluster_size = 10;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
+	private static int clustering_search_range = 15;			// 1 - 1000000, kleiner = besser
+	private static int clustering_min_cluster_size = 15;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
 	
 	/**
 	 * straighten			= glätten
@@ -152,6 +155,14 @@ public class Settings {
 	public static boolean isGraymap_state() {
 		return graymap_state;
 	}
+	public static boolean isGraymap_direct_adding() {
+		return graymap_direct_adding;
+	}
+
+	public static void setGraymap_direct_adding(boolean graymap_direct_adding) {
+		Settings.graymap_direct_adding = graymap_direct_adding;
+	}
+
 	public static void setGraymap_state(boolean graymap_state) {
 		Settings.graymap_state = graymap_state;
 	}
@@ -292,6 +303,14 @@ public class Settings {
 	}
 
 	
+	public static boolean isGraymap_visual_server() {
+		return graymap_visual_server;
+	}
+	public static void setGraymap_visual_server(boolean graymap_visual_server) {
+		Settings.graymap_visual_server = graymap_visual_server;
+	}
+
+	
 	// CLUSTERING
 	
 	
@@ -363,56 +382,5 @@ public class Settings {
 		Settings.straigthen_type = straigthen_type;
 		Settings.updateAllValues();
 	}
-	
-	
-	
-	
-	
-	public static void printCalcTime(String name, long t1, long t2){
-		String st1,st2,div;
-		st1 = t1+"";
-		st1 = st1.substring(8, 10) + "." + st1.substring(10, 13)+ " " + st1.substring(13, 16) ;
-		//st1 = st1.substring(9);
-		st2 = t2+"";
-		st2 = st2.substring(8, 10) + "." + st2.substring(10, 13)+ " " + st2.substring(13, 16) ;
-		//st2 = st2.substring(9);
-		div = (t2 - t1)+"";
-		while(div.length()<19){
-			div="0"+div;
-		}
-		div = div.substring(8, 10) + "." + div.substring(10, 13)+ " " + div.substring(13, 16) ;
-		
-		System.out.println(name + " ");
-		System.out.println("  diverenz " + div);
-		System.out.println("     start " + st1);
-		System.out.println("      stop " + st2);
-
-	}
 }
-class NanoSecondsTimestampProvider {
 
-    private long nanoSecondsOffset, nanoSecondsError;
-
-    public NanoSecondsTimestampProvider() {
-        long curMilliSecs0, curMilliSecs1, 
-               curNanoSecs, startNanoSecs, endNanoSecs;
-        do {    
-            startNanoSecs = System.nanoTime();
-            curMilliSecs0 = System.currentTimeMillis(); 
-            curNanoSecs = System.nanoTime();
-            curMilliSecs1 = System.currentTimeMillis(); 
-            endNanoSecs = System.nanoTime();
-        } while ( curMilliSecs0 == curMilliSecs1 );
-         
-        nanoSecondsOffset = 1000000L*curMilliSecs1 - curNanoSecs;
-        nanoSecondsError = endNanoSecs - startNanoSecs;
-    }   
-
-    public long getNanoSecondsDeviation() {
-        return nanoSecondsError;
-    }   
-
-    public long currentNanoSecondsTimestamp() {
-        return System.nanoTime() + nanoSecondsOffset;
-    }   
-}

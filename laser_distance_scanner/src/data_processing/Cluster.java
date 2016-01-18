@@ -111,6 +111,10 @@ class HelpCluster{
 		cPointList.add(cP);
 		cluster.increaseElements();
 	}
+	public void addPoint(ClusterPoint cP){
+		cPointList.add(cP);
+		cluster.increaseElements();
+	}
 	public Cluster getCluster(){
 		return cluster;
 	}
