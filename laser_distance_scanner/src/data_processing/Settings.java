@@ -2,7 +2,6 @@ package data_processing;
 
 public class Settings {
 	
-	public static NanoSecondsTimestampProvider nstp = new NanoSecondsTimestampProvider();
 	
 	/**
 	 * gobale settings

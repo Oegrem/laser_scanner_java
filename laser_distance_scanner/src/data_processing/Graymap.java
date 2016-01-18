@@ -244,10 +244,7 @@ public class Graymap {
 			moving.add((long) -1);
 			return moving;
 		}*/
-		long t1,t2,t3,t4,t5,t6;
-		t1 = Settings.nstp.currentNanoSecondsTimestamp();
 		clearNewMap();
-		t2 = Settings.nstp.currentNanoSecondsTimestamp();
 		
 		minChangeStep = sectionSteps-1;
 		// neue graymap befüllen
@@ -305,26 +302,15 @@ public class Graymap {
 				newMap.get(vektorStep).set(j,(short) maxUnknownGray);
 			}
 		}
-		t3 = Settings.nstp.currentNanoSecondsTimestamp();
+
 		// berechne aus einzelnen bewegenden punkten bereiche mit start und ente
 		movingArea = calcMovingAreas(movingPoints);
-		t4 = Settings.nstp.currentNanoSecondsTimestamp();
+		
 		// graymap zusammenführen
 		mergeMaps();
-		t5 = Settings.nstp.currentNanoSecondsTimestamp();
 		showVisual(map,movingArea);
-		t6 = Settings.nstp.currentNanoSecondsTimestamp();
 
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap clear map");
-		RuntimeMeasure.getRuntimeMeasure().add(t2-t1+"");
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap fill  map");
-		RuntimeMeasure.getRuntimeMeasure().add(t3-t2+"");
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap calc  move");
-		RuntimeMeasure.getRuntimeMeasure().add(t4-t3+"");
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap merge map");
-		RuntimeMeasure.getRuntimeMeasure().add(t5-t4+"");
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap show  pic");
-		RuntimeMeasure.getRuntimeMeasure().add(t6-t5+"");
+
 		return movingArea;
 	}
 	
@@ -359,8 +345,6 @@ public class Graymap {
 		int oldStep = 0;
 		boolean oldMove = false;
 		
-		long t1,t2,t3,t4;
-		t1 = Settings.nstp.currentNanoSecondsTimestamp();
 			
 		
 		// neue graymap befüllen
@@ -419,18 +403,12 @@ public class Graymap {
 			}
 			
 		}
-		t2 = Settings.nstp.currentNanoSecondsTimestamp();
+
 		// berechne aus einzelnen bewegenden punkten bereiche mit start und ente
 		movingArea = calcMovingAreas(movingPoints);
-		t3 = Settings.nstp.currentNanoSecondsTimestamp();
+		
 		showVisual(map,movingArea);
-		t4 = Settings.nstp.currentNanoSecondsTimestamp();
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap doAllstuff");
-		RuntimeMeasure.getRuntimeMeasure().add(t2-t1+"");
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap calc Area");
-		RuntimeMeasure.getRuntimeMeasure().add(t3-t2+"");
-		RuntimeMeasure.getRuntimeMeasure().addNames("Graymap show  pic ");
-		RuntimeMeasure.getRuntimeMeasure().add(t4-t3+"");
+
 		return movingArea;
 	}
 	
