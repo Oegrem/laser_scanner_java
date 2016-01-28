@@ -71,8 +71,6 @@ public class Graphics {
 		scn = Distance_scanner.getDistanceScanner(); // Getting/Creating
 														// Distance_scanner
 
-		scn.start(); // starting Thread with connecting and starting Measurement
-
 		// clusterList.addAll(scn.getClusterVector());
 
 		// dbscn.cluster(SynchronListHandler.getPointVector());
@@ -166,8 +164,10 @@ public class Graphics {
 								buttonAction(id);
 							}
 						}
+					
 						xold = xpos;
 						yold = ypos;
+
 					}
 				});
 
