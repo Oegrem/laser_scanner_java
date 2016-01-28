@@ -49,7 +49,7 @@ public class Settings {
 	 * 									  \-> wenn =false werden ungenauigkeiten der messung ausgeglichen
 	 * graymap_visual_server			= zeigt serverseitig ein fenster mit einer linearen representation der graymap an.
 	 */
-	private static boolean graymap_state = true;				// true! 
+	private static boolean graymap_state = false;				// true! 
 	private static boolean graymap_direct_adding = true;		// true, direktes einfügen ist performanter
 	private static int graymap_angle_size = 8;					// 1 - 10 scheint gut zu sein
 	private static int graymap_angle_steps = 0;					// berechnung

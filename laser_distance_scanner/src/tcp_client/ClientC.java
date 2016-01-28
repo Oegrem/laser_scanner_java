@@ -1,4 +1,4 @@
-package clientPackage;
+package tcp_client;
 
 import java.net.*;
 import java.util.Vector;
@@ -9,12 +9,13 @@ import java.io.*;
 import code_snippets.clusterLineStrip;
 import laser_distance_scanner.Distance_scanner;
 import laser_distance_scanner.SynchronListHandler;
-import tcpServerClientExample.ServerC;
+import tcp_server.ServerC;
 
 public class ClientC extends Thread {
 
 	public static CopyOnWriteArrayList<Point> copyPoint = new CopyOnWriteArrayList<Point>();
 
+	
 	private static Socket client;
 
 	private static InputStream inFromServer;
@@ -54,10 +55,9 @@ public class ClientC extends Thread {
 					e.printStackTrace();
 				} catch (SocketException e){
 					System.out.println("SckError");
+					client.close();
 				}
 			}
-
-			// client.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
