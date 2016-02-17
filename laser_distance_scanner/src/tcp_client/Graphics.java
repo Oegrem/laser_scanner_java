@@ -21,7 +21,6 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import laser_distance_scanner.DSButton;
 import laser_distance_scanner.SynchronListHandler;
 
 public class Graphics {

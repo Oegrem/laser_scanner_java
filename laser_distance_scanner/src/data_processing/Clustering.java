@@ -18,7 +18,7 @@ public class Clustering {
 		int cCount = -1;
 		int searchRange = Settings.getClustering_search_range();
 		int minClusterSize = Settings.getClustering_min_cluster_size();
-		for(int i=0;i<sensorData.size();i++){
+		for(int i=0;i<sensorData.size()&&i<cPoints.size();i++){
 			currentPoint = cPoints.get(i);
 			
 			currentSData = sensorData.get(i);

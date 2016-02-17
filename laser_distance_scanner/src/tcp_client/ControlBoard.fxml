@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.media.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="350.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tcp_client.Controller">
+   <children>
+      <Button fx:id="startButton" layoutX="84.0" layoutY="102.0" mnemonicParsing="false" text="startButton" />
+      <Button fx:id="parTest" layoutX="173.0" layoutY="102.0" mnemonicParsing="false" text="parTest" />
+      <Button fx:id="pause" layoutX="134.0" layoutY="175.0" mnemonicParsing="false" text="pause" />
+      <Slider fx:id="slide" layoutX="31.0" layoutY="218.0" prefHeight="14.0" prefWidth="281.0" />
+   </children>
+</AnchorPane>

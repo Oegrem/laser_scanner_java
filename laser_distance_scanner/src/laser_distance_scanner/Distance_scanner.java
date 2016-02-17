@@ -54,6 +54,8 @@ public class Distance_scanner implements Runnable {
 
 	public static boolean lastFrame = false;
 
+	public static Float sliderValue = -1.0f;
+
 	public static long slomo = (long) 1.0;
 
 	/*
@@ -122,8 +124,7 @@ public class Distance_scanner implements Runnable {
 			RangeSensorInformation info = device.getInformation();
 			if (info != null) {
 				System.out.println("Sensor model:" + info.product);
-				System.out
-						.println("Sensor serial number:" + info.serial_number);
+				System.out.println("Sensor serial number:" + info.serial_number);
 			} else {
 				System.out.println("Sensor error:" + device.what());
 			}
@@ -236,7 +237,7 @@ public class Distance_scanner implements Runnable {
 
 		while (true) { // Running until Thread gets interrupted
 			if (t.isInterrupted()) {
-			//	device.stopCapture(); // stop Capture !!important!!
+				// device.stopCapture(); // stop Capture !!important!!
 
 				if (isRecorded) {
 					SimFileHandler sFH = new SimFileHandler(recordName);
@@ -308,6 +309,16 @@ public class Distance_scanner implements Runnable {
 
 							lastFrame = false;
 						}
+
+						if (sliderValue != -1.0f) {
+							i = ((int)((sliderValue/1000)*((float)sDSize)-1));
+							
+							SData sD = dataVector.elementAt(i);
+
+							SynchronListHandler.setPointList(sD.pVector);
+
+							sliderValue = -1.0f;
+						}
 					}
 
 					SData sD = dataVector.elementAt(i);
@@ -348,6 +359,10 @@ public class Distance_scanner implements Runnable {
 
 	public Vector<Cluster> getClusterVector() {
 		return clusterVector;
+	}
+
+	public boolean isUsingSimFile() {
+		return usingSimFile;
 	}
 
 	/*

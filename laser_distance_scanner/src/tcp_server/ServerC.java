@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -16,6 +17,8 @@ import laser_distance_scanner.SynchronListHandler;
 public class ServerC extends Thread {
 	private ServerSocket serverSocket;
 
+	private InetAddress serverIp = InetAddress.getByName("localhost");
+	
 	public ServerC() throws IOException {
 		serverSocket = new ServerSocket(9988);
 		//serverSocket.setSoTimeout();
@@ -23,12 +26,12 @@ public class ServerC extends Thread {
 
 	public synchronized void run() {
 
-		/*Distance_scanner.setInstantSimulation(true);
+		Distance_scanner.setInstantSimulation(true);
 
-		Distance_scanner scn = Distance_scanner.getDistanceScanner("walk");
+		//Distance_scanner scn = Distance_scanner.getDistanceScanner("walk");
 
-		scn.start();
-		*/
+		//scn.start();
+		
 		
 		Distance_scanner.getDistanceScanner().start();
 
@@ -43,15 +46,7 @@ public class ServerC extends Thread {
 						clientSocket.getInputStream());
 				System.out.println(in.readUTF());
 
-				/*
-				 * DataOutputStream out = new DataOutputStream(
-				 * server.getOutputStream());
-				 * out.writeUTF("Thank you for connecting to " +
-				 * server.getLocalSocketAddress() + "\nGoodbye!");
-				 */
-
 				new Thread(new ConnectionThread(clientSocket)).start();
-				;
 
 			} catch (SocketTimeoutException s) {
 				System.out.println("Socket timed out!");
