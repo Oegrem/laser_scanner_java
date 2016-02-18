@@ -3,6 +3,9 @@ package data_processing;
 import java.awt.Point;
 import java.util.Vector;
 
+/**
+ * @deprecated
+ */
 public class Cluster {
 	private Point center = new Point(0,0);
 	// minimale und maximale x und y werte in je einem punkt um rechteck erzeugen zu können
@@ -51,6 +54,7 @@ public class Cluster {
 }
 
 /**
+ * @deprecated
  * HelpCluster erweitert den Cluster um seine zugehörigen Punkte
  * Die punkte liegen in form einer liste bereits for, deswegen wird die Cluster classe simpel gehalten
  * die berechnung der ecken und des mittelpunkts erfolgt aber mit hilfe der clusterPunkte und wird in HelpCluster ausgeführt

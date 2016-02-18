@@ -10,11 +10,13 @@ public class Settings {
 	 * angle_total 		= Der Winkel des Ausschnits auf dem Gemessen wird, von 0 bis x, die ausrichtung im raum wird nicht berücksichtigt
 	 * angle_angle 		= Der Winkel zwischen 2 direkt nebeneinander liegenden Messungen
 	 * angle_tan_array 	= der Tangenz alle Winkel zwischen einer Messunge und einem Beliebigen anzahl plätze entfernten winkel. Der Index entspricht die der entfernung zur ausgangsmessung
+	 * longVersion		= Es gibt 2 grundlegende Implementierungen, eine die ausschließlich mit den Long werten des Sensors arbeitet, die zweite arbeitet mit den Long werten + den daraus berechneten kartesischen koordinaten als punkte
 	 */
 	private static int angle_number = 270*4;
 	private static int angle_total = 270;
 	private static double angle_angle = 0;
 	private static double[] angle_tan_array = null;
+	private static boolean longVersion = true;
 	
 	/**
 	 *   graymap 						= schwarz weiß schatierte karte. dunkel = objekt, hell = frei
@@ -43,6 +45,10 @@ public class Settings {
 	 *   recognition					= einstellungen die das erkennungsverhalten steuern
 	 *  graymap_recognition_threshold 	= schwelle ab der ein objekt als fest erkannt wird
 	 *  graymap_update_factor 		 	= factor mit dem die karte angepasst wird
+	 *  graymap_update_sympel_direction_center  = Wert mit dem bei mergeValueSimpel der wert in richtung 127 abgändert wird
+	 *  graymap_update_sympel_direction_extreme = Wert mit dem bei mergeValueSimpel der wert in richtung 0 oder Max Gray abgändert wird
+	 *  graymap_update_sympel                   = Stellt zwischen mergeValueSimpel und mergeValue um, wobei mergeValue die größere Rechenzeit besitzt, jedoch schöner funktioniert
+	 *
 	 *  graymap_update_direction_factor = fector: neu Dunkel auf alt Hell /, neu dunkel auf alt Dunkel *, neu hell auf alt hell *, neu hell auf alt dunkel /
 	 * 									  \-> sorgt dafür das stationäre objekte lansamer verschwinden und sich bewegende langsamer festsetzen
 	 *  graymap_edge_accuracy			= verwaschung der gesetzten punkte in naheliegende graymap felder, wenn an nur eigenes feld, wenn aus auch nachbarfelder,
@@ -63,8 +69,11 @@ public class Settings {
 	private static int graymap_max_unknown_gray = 127;			// 127
 	private static double graymap_gray_Step = 0;				// berechnung
 	private static int graymap_recognition_threshold = 128;		// graymap_max_unknown_gray+1 bis graymap_max_gray
-	private static int graymap_update_direction_factor = 1;		// 1 - 10;
+	private static int graymap_update_direction_factor = 4;		// 1 - 10;
 	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wählen, wegen datentyp rundungs problemen
+	private static int graymap_update_sympel_direction_center = 1; // update in die richtung 127 Gray
+	private static int graymap_update_sympel_direction_extreme = 2; //  update in die richtung extreme 0 und Max Gray
+	private static boolean graymap_update_sympel = true;		// true, verwendet eine einfachere berechnung der zusammenführung der karten
 	private static boolean graymap_edge_accuracy = true;		// true, deutlich erhöhter rechenaufwand
 	private static boolean graymap_visual_server = false;		// false, sehr sehr rechenaufwändig!
 	
@@ -148,8 +157,14 @@ public class Settings {
 	}
 
 
-	// GRAYMAP
+	public static boolean isLongVersion() {
+		return longVersion;
+	}
+	public static void setLongVersion(boolean longVersion) {
+		Settings.longVersion = longVersion;
+	}
 	
+	// GRAYMAP
 	
 	public static boolean isGraymap_state() {
 		return graymap_state;
@@ -293,6 +308,30 @@ public class Settings {
 	}
 
 	
+	public static double getGraymap_update_sympel_direction_center() {
+		return graymap_update_sympel_direction_center;
+	}
+	public static void setGraymap_update_sympel_direction_center(int graymap_update_sympel_direction_center) {
+		if(graymap_update_sympel_direction_center > 0)
+			Settings.graymap_update_sympel_direction_center = graymap_update_sympel_direction_center;
+	}
+
+	public static double getGraymap_update_sympel_direction_extreme() {
+		return graymap_update_sympel_direction_extreme;
+	}
+	public static void setGraymap_update_sympel_direction_extreme(int graymap_update_sympel_direction_extreme) {
+		if(graymap_update_sympel_direction_extreme > 0)
+			Settings.graymap_update_sympel_direction_extreme = graymap_update_sympel_direction_extreme;
+	}
+
+	public static boolean isGraymap_update_sympel() {
+		return graymap_update_sympel;
+	}
+
+	public static void setGraymap_update_sympel(boolean graymap_update_sympel) {
+		Settings.graymap_update_sympel = graymap_update_sympel;
+	}
+
 	public static boolean isGraymap_edge_accuracy() {
 		return graymap_edge_accuracy;
 	}
