@@ -12,6 +12,7 @@ import code_snippets.Line;
 import data_processing.Cluster;
 import data_processing.ClusterPoint;
 import data_processing.Processing;
+import data_processing.SimpleCluster;
 
 /*
  * Class to enable saving and getting Multithreaded lists
@@ -32,6 +33,8 @@ public class SynchronListHandler {
 
 	private static CopyOnWriteArrayList<Long> rawSensorData = new CopyOnWriteArrayList<Long>();
 	
+	private static CopyOnWriteArrayList<SimpleCluster> simCluster = new CopyOnWriteArrayList<SimpleCluster>();
+	
 	private static Processing p;
 	
 	private static int id = 0;
@@ -49,8 +52,11 @@ public class SynchronListHandler {
 		p = new Processing();
 		p.startProcess();
 
-		clusterVector.clear();
-		clusterVector.addAll(p.getCluster());
+		simCluster.clear();
+		simCluster.addAll(p.getSimpleCluster());
+		
+		//clusterVector.clear();
+		//clusterVector.addAll(p.getCluster());
 
 		// clusteredPoints.clear();
 		// clusteredPoints.addAll(p.getClusterPoints());
@@ -94,6 +100,10 @@ public class SynchronListHandler {
 
 	public synchronized static CopyOnWriteArrayList<clusterLineStrip> getClusterLines() {
 		return clusterLines;
+	}
+	
+	public synchronized static CopyOnWriteArrayList<SimpleCluster> getSimpleCluster() {
+		return simCluster;
 	}
 
 }

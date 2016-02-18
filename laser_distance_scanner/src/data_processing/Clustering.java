@@ -21,7 +21,7 @@ public class Clustering {
 		for(int i=0;i<sensorData.size();i++){			
 			currentSData = sensorData.get(i);			
 			// look at i - x elements 
-			// durchläuft bei kluster grenzen, fehlerhaften daten mehrfach
+			// durchlï¿½uft bei kluster grenzen, fehlerhaften daten mehrfach
 			for(int j=1;j<searchRange;j++){
 				if(i-j >0){
 					// if it fits to previous cluster
@@ -42,9 +42,9 @@ public class Clustering {
 			}
 		}		
 		// zu kleine Kluster entfernen
-		// die kluster entfernung spielt eine rolle, die element anzahl muss bei näheren objekten größer sein als bei weit entfertnet.
-		// damit sollen kleine kluster die fälschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 
-		// durch geringe abtastraten wenig elemente besitzen trotzdem berücksichtigt werden
+		// die kluster entfernung spielt eine rolle, die element anzahl muss bei nï¿½heren objekten grï¿½ï¿½er sein als bei weit entfertnet.
+		// damit sollen kleine kluster die fï¿½lschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 
+		// durch geringe abtastraten wenig elemente besitzen trotzdem berï¿½cksichtigt werden
 		for(int i=0;i<clusterList.size();i++){
 			if(clusterList.get(i).getEelementCount() < minClusterSize*Settings.getAngle_number()*clusterList.get(i).getEelementCount()/clusterList.get(i).getDistanceSum()){
 				clusterList.remove(i);
@@ -75,7 +75,7 @@ public class Clustering {
 			// current = i
 			currentPoint = cPoints.get(i);
 			// look at i - x elements 
-			// durchläuft bei kluster grenzen, fehlerhaften daten mehrfach
+			// durchlï¿½uft bei kluster grenzen, fehlerhaften daten mehrfach
 			for(int j=1;j<searchRange;j++){
 				if(i-j >0){
 					// if it fits to previous cluster
@@ -107,9 +107,9 @@ public class Clustering {
 		}
 		
 		// zu kleine Kluster entfernen
-		// die kluster entfernung spielt eine rolle, die element anzahl muss bei näheren objekten größer sein als bei weit entfertnet.
-		// damit sollen kleine kluster die fälschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 
-		// durch geringe abtastraten wenig elemente besitzen trotzdem berücksichtigt werden
+		// die kluster entfernung spielt eine rolle, die element anzahl muss bei nï¿½heren objekten grï¿½ï¿½er sein als bei weit entfertnet.
+		// damit sollen kleine kluster die fï¿½lschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 
+		// durch geringe abtastraten wenig elemente besitzen trotzdem berï¿½cksichtigt werden
 		for(int i=0;i<hCluster.size();i++){
 			if(hCluster.get(i).getElementCount() < minClusterSize*Settings.getAngle_number() / hCluster.get(i).getCenter().distance(0, 0)){
 				hCluster.remove(i);
@@ -122,8 +122,8 @@ public class Clustering {
 	
 	/**
 	 * @deprecated
-	 * Prüft ob ein punkt nah genug an einem weiteren punkt ist, sodass beide dem gleichen Cluster angehöhren
-	 * es wird davon ausgegangen das die punkte nebeneinander liegen, leaps ist die anzahl an plätzen zwischen den punkten
+	 * Prï¿½ft ob ein punkt nah genug an einem weiteren punkt ist, sodass beide dem gleichen Cluster angehï¿½hren
+	 * es wird davon ausgegangen das die punkte nebeneinander liegen, leaps ist die anzahl an plï¿½tzen zwischen den punkten
 	 * wodurch der winkel bestimmt wird der zum entfernungs ausgleich im radius wie auch zum mittelpunkt genutzt wird
 	 * 
 	 * 
@@ -142,8 +142,8 @@ public class Clustering {
 		else 
 			adjacent = B;
 		// adjacent = adjacent + adjacent/100;
-		//  ankathete * tangenz(4) -> skalierung auf entfernung, aufspannwinkel 4°
-		//  leaps 	  * leapFactor -> skalierung auf breite, schritte je 4° 
+		//  ankathete * tangenz(4) -> skalierung auf entfernung, aufspannwinkel 4ï¿½
+		//  leaps 	  * leapFactor -> skalierung auf breite, schritte je 4ï¿½ 
 		double factor = adjacent * angle[leaps] * 1.5;
 		//System.out.println( angle[leaps]);
 		if(distance < Settings.getClustering_threshold()*factor){
@@ -153,7 +153,7 @@ public class Clustering {
 	}
 	
 	/**
-	 * ersetzt insideThreshold(Point,Point,int). inhaltlich gleich, jedoch wird anstelle der karthesischen koordinaten als punkte, die long radius werte übergeben
+	 * ersetzt insideThreshold(Point,Point,int). inhaltlich gleich, jedoch wird anstelle der karthesischen koordinaten als punkte, die long radius werte ï¿½bergeben
 	 * @param long1
 	 * @param long2
 	 * @param leaps

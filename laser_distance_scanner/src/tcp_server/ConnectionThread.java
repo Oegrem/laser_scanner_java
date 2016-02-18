@@ -70,10 +70,15 @@ public class ConnectionThread implements Runnable {
 
 					toSend = ti.id;
 					toData = ti.data;
-
+					
 				} catch (SocketException e) {
 					System.out.println("SckError");
 					clientSocket.close();
+					ServerC.connCount--;
+					if(ServerC.connCount<=0){
+						ServerC.connCount = 0;
+						Distance_scanner.getDistanceScanner().readData = false;
+					}
 					break;
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block

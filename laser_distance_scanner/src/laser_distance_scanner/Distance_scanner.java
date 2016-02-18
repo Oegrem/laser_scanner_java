@@ -58,6 +58,8 @@ public class Distance_scanner implements Runnable {
 
 	public static long slomo = (long) 1.0;
 
+	public static boolean readData = true;
+
 	/*
 	 * Constructor using static SimFileName
 	 */
@@ -225,18 +227,19 @@ public class Distance_scanner implements Runnable {
 	 */
 	public void getDistances() {
 
-		device.setCaptureMode(CaptureSettings.CaptureMode.MD_Capture_mode); // communication
+		device.setCaptureMode(CaptureSettings.CaptureMode.GD_Capture_mode); // communication
 																			// type
 																			// (SCIP
 																			// 2.0)
-
 		// We set the capture type to a continuous mode so we have to start
 		// the capture
 		// device.stopCapture();
 		device.startCapture(); // starting to capture
 
 		while (true) { // Running until Thread gets interrupted
+
 			if (t.isInterrupted()) {
+
 				// device.stopCapture(); // stop Capture !!important!!
 
 				if (isRecorded) {
@@ -248,8 +251,17 @@ public class Distance_scanner implements Runnable {
 								// disconnect => else not able reconnecting
 
 				System.exit(0);
-			} else if (writeData() == 255) {
-				return;
+			} else {
+				if (readData) {
+					if (writeData() == 255) {
+						return;
+					}
+				}
+			}
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				System.exit(0);
 			}
 		}
 	}
@@ -311,8 +323,8 @@ public class Distance_scanner implements Runnable {
 						}
 
 						if (sliderValue != -1.0f) {
-							i = ((int)((sliderValue/1000)*((float)sDSize)-1));
-							
+							i = ((int) ((sliderValue / 1000) * ((float) sDSize) - 1));
+
 							SData sD = dataVector.elementAt(i);
 
 							SynchronListHandler.setPointList(sD.pVector);

@@ -7,10 +7,10 @@ public class Settings {
 	 * gobale settings
 	 * 
 	 * angle_number 	= Anzahl an Sensormessungen 
-	 * angle_total 		= Der Winkel des Ausschnits auf dem Gemessen wird, von 0 bis x, die ausrichtung im raum wird nicht berücksichtigt
+	 * angle_total 		= Der Winkel des Ausschnits auf dem Gemessen wird, von 0 bis x, die ausrichtung im raum wird nicht berï¿½cksichtigt
 	 * angle_angle 		= Der Winkel zwischen 2 direkt nebeneinander liegenden Messungen
-	 * angle_tan_array 	= der Tangenz alle Winkel zwischen einer Messunge und einem Beliebigen anzahl plätze entfernten winkel. Der Index entspricht die der entfernung zur ausgangsmessung
-	 * longVersion		= Es gibt 2 grundlegende Implementierungen, eine die ausschließlich mit den Long werten des Sensors arbeitet, die zweite arbeitet mit den Long werten + den daraus berechneten kartesischen koordinaten als punkte
+	 * angle_tan_array 	= der Tangenz alle Winkel zwischen einer Messunge und einem Beliebigen anzahl plï¿½tze entfernten winkel. Der Index entspricht die der entfernung zur ausgangsmessung
+	 * longVersion		= Es gibt 2 grundlegende Implementierungen, eine die ausschlieï¿½lich mit den Long werten des Sensors arbeitet, die zweite arbeitet mit den Long werten + den daraus berechneten kartesischen koordinaten als punkte
 	 */
 	private static int angle_number = 270*4;
 	private static int angle_total = 270;
@@ -19,48 +19,48 @@ public class Settings {
 	private static boolean longVersion = true;
 	
 	/**
-	 *   graymap 						= schwarz weiß schatierte karte. dunkel = objekt, hell = frei
+	 *   graymap 						= schwarz weiï¿½ schatierte karte. dunkel = objekt, hell = frei
 	 *  		  						  \-> wird zur erkennung von bewegenden objekten verwendet
 	 *  graymap_state 					= aktiv oder inaktiv
-	 *  graymap_direct_adding			= aktiv   -> funktion addNewDataDirect: Erstellt eine Momentane karte, die mit den neuen daten befüllt wird, und die in einem weiteren schritt in die globale karte geupdatet wird
-	 *  								  inaktiv -> funktion addNewData:       Änderungen werden direkt in die Globale Karte gespeichert. Dadurch sollen resourcen gespart werden
+	 *  graymap_direct_adding			= aktiv   -> funktion addNewDataDirect: Erstellt eine Momentane karte, die mit den neuen daten befï¿½llt wird, und die in einem weiteren schritt in die globale karte geupdatet wird
+	 *  								  inaktiv -> funktion addNewData:       ï¿½nderungen werden direkt in die Globale Karte gespeichert. Dadurch sollen resourcen gespart werden
 	 *
-	 *   angle 							= winkel -> kreisförmig angeordnete vektoren,
+	 *   angle 							= winkel -> kreisfï¿½rmig angeordnete vektoren,
 	 *  graymap_angle_size				= anzahl an messwerten die in die selbe Graymap spallte projeziert werden
-	 *  graymap_angle_steps 			= anzahl an unabhängigen spalten in der graymap, berechnung = angle_number / graymap_angle_size
+	 *  graymap_angle_steps 			= anzahl an unabhï¿½ngigen spalten in der graymap, berechnung = angle_number / graymap_angle_size
 	 *	
 	 *   section 						= abschnitt -> ein einzelner Vektor zerlegt in abschnitte
 	 *  graymap_section_count 			= maximale entfernung der messung in mm -> 10 meter 
-	 *  graymap_section_size			= größe der graymap section in mm 
-	 *  graymap_section_steps			= anzahl an unabhängigen sectionen in der Graymap, berechnung aus graymap_section_count / graymap_section_size
+	 *  graymap_section_size			= grï¿½ï¿½e der graymap section in mm 
+	 *  graymap_section_steps			= anzahl an unabhï¿½ngigen sectionen in der Graymap, berechnung aus graymap_section_count / graymap_section_size
 	 *	graymap_section_steps_array		= alle einzelnen steps, als array um rechenzeit zu sparen
 	 *
 	 *   move_area 						= bewegendes gebiet -> bereich das als sich bewegend betrachtet wird
 	 *  graymap_move_area_min_size 	   	= mininale anzahl an beieinanderliegenden messwerten eines areals
-	 *  graymap_move_area_gap_max_Size 	= maximale lücke zwischen zwei arealen befor diese vereint werden
+	 *  graymap_move_area_gap_max_Size 	= maximale lï¿½cke zwischen zwei arealen befor diese vereint werden
 	 *  graymap_max_gray 				= der maximalwert der graymap, wird gesetzt wenn ein punkt im feld erkannt wird
 	 *  graymap_max_unknown_gray 		= grau wert der gesetzt wird, wenn keine informationen forhanden sind
-	 *  graymap_gray_Step 				= ein einzelner verdunkelungs schritt von weiß zu grau in den sectionen nach außen, wegen sich öffnenden winkeln und daraus entstehenden messfehlern kleiner objekte
+	 *  graymap_gray_Step 				= ein einzelner verdunkelungs schritt von weiï¿½ zu grau in den sectionen nach auï¿½en, wegen sich ï¿½ffnenden winkeln und daraus entstehenden messfehlern kleiner objekte
 	 *
 	 *   recognition					= einstellungen die das erkennungsverhalten steuern
 	 *  graymap_recognition_threshold 	= schwelle ab der ein objekt als fest erkannt wird
 	 *  graymap_update_factor 		 	= factor mit dem die karte angepasst wird
-	 *  graymap_update_sympel_direction_center  = Wert mit dem bei mergeValueSimpel der wert in richtung 127 abgändert wird
-	 *  graymap_update_sympel_direction_extreme = Wert mit dem bei mergeValueSimpel der wert in richtung 0 oder Max Gray abgändert wird
-	 *  graymap_update_sympel                   = Stellt zwischen mergeValueSimpel und mergeValue um, wobei mergeValue die größere Rechenzeit besitzt, jedoch schöner funktioniert
+	 *  graymap_update_sympel_direction_center  = Wert mit dem bei mergeValueSimpel der wert in richtung 127 abgï¿½ndert wird
+	 *  graymap_update_sympel_direction_extreme = Wert mit dem bei mergeValueSimpel der wert in richtung 0 oder Max Gray abgï¿½ndert wird
+	 *  graymap_update_sympel                   = Stellt zwischen mergeValueSimpel und mergeValue um, wobei mergeValue die grï¿½ï¿½ere Rechenzeit besitzt, jedoch schï¿½ner funktioniert
 	 *
 	 *  graymap_update_direction_factor = fector: neu Dunkel auf alt Hell /, neu dunkel auf alt Dunkel *, neu hell auf alt hell *, neu hell auf alt dunkel /
-	 * 									  \-> sorgt dafür das stationäre objekte lansamer verschwinden und sich bewegende langsamer festsetzen
+	 * 									  \-> sorgt dafï¿½r das stationï¿½re objekte lansamer verschwinden und sich bewegende langsamer festsetzen
 	 *  graymap_edge_accuracy			= verwaschung der gesetzten punkte in naheliegende graymap felder, wenn an nur eigenes feld, wenn aus auch nachbarfelder,
 	 * 									  \-> wenn =false werden ungenauigkeiten der messung ausgeglichen
 	 * graymap_visual_server			= zeigt serverseitig ein fenster mit einer linearen representation der graymap an.
 	 */
 	private static boolean graymap_state = false;				// true! 
-	private static boolean graymap_direct_adding = true;		// true, direktes einfügen ist performanter
+	private static boolean graymap_direct_adding = true;		// true, direktes einfï¿½gen ist performanter
 	private static int graymap_angle_size = 8;					// 1 - 10 scheint gut zu sein
 	private static int graymap_angle_steps = 0;					// berechnung
 	private static int graymap_section_count = 10000; 			// 10000 = 10 meter
-	private static int graymap_section_size = 500;				// 20 - 500 je größer desto besser
+	private static int graymap_section_size = 500;				// 20 - 500 je grï¿½ï¿½er desto besser
 	private static int graymap_section_steps = 0;				// berechnung
 	private static int[] graymap_section_steps_array;			// berechnung
 	private static int graymap_move_area_min_size = 10;			// 2 - 50, je extremer desto mehr fehler
@@ -70,38 +70,38 @@ public class Settings {
 	private static double graymap_gray_Step = 0;				// berechnung
 	private static int graymap_recognition_threshold = 128;		// graymap_max_unknown_gray+1 bis graymap_max_gray
 	private static int graymap_update_direction_factor = 4;		// 1 - 10;
-	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wählen, wegen datentyp rundungs problemen
+	private static double graymap_update_factor =(double)0.05;  // 0.01 - 0.08, nicht zu klein wï¿½hlen, wegen datentyp rundungs problemen
 	private static int graymap_update_sympel_direction_center = 1; // update in die richtung 127 Gray
 	private static int graymap_update_sympel_direction_extreme = 2; //  update in die richtung extreme 0 und Max Gray
-	private static boolean graymap_update_sympel = true;		// true, verwendet eine einfachere berechnung der zusammenführung der karten
-	private static boolean graymap_edge_accuracy = true;		// true, deutlich erhöhter rechenaufwand
-	private static boolean graymap_visual_server = false;		// false, sehr sehr rechenaufwändig!
+	private static boolean graymap_update_sympel = true;		// true, verwendet eine einfachere berechnung der zusammenfï¿½hrung der karten
+	private static boolean graymap_edge_accuracy = true;		// true, deutlich erhï¿½hter rechenaufwand
+	private static boolean graymap_visual_server = false;		// false, sehr sehr rechenaufwï¿½ndig!
 	
 	/**
 	 * Clustering = objekte finden
 	 * clustering_state 			= ob der algorythmus aktiv ist
-	 * clustering_threshold 		= eine schwelle an entfernung ab dem zwei punkte dem selben kluster angehören
-	 * clustering_search_range 		= anzahl an punkten die rückwers überprüft werden, ob sie den selben cluster angehören. sollte so klein gewählt werden wie möglich, aber sogroß das, dass selbe ergebnis wie bei einer beliebig großen zahl herauskommt
-	 * clustering_min_cluster_size 	= die minimale anzahl an elementen die ein cluster benötigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
-	 * 								  \-> Die anzahl wird in relation zur Entfernung zum Mittelpunkt gesetzt um kleine kluster verstärkt im nahen bereich zu filtern
-	 * 									  Damit soll die messungenauigkeit in der entfernung berücksichtigt werden
+	 * clustering_threshold 		= eine schwelle an entfernung ab dem zwei punkte dem selben kluster angehï¿½ren
+	 * clustering_search_range 		= anzahl an punkten die rï¿½ckwers ï¿½berprï¿½ft werden, ob sie den selben cluster angehï¿½ren. sollte so klein gewï¿½hlt werden wie mï¿½glich, aber sogroï¿½ das, dass selbe ergebnis wie bei einer beliebig groï¿½en zahl herauskommt
+	 * clustering_min_cluster_size 	= die minimale anzahl an elementen die ein cluster benï¿½tigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
+	 * 								  \-> Die anzahl wird in relation zur Entfernung zum Mittelpunkt gesetzt um kleine kluster verstï¿½rkt im nahen bereich zu filtern
+	 * 									  Damit soll die messungenauigkeit in der entfernung berï¿½cksichtigt werden
 	 */
 	private static boolean clustering_state = true;				// true
 	private static double clustering_threshold = 1.5;				// 0.7				// 1.2 
 	private static int clustering_search_range = 15;			// 1 - 1000000, kleiner = besser
-	private static int clustering_min_cluster_size = 15;		// 1 - 1000000, sollte so gewählt werden das kleine gegenstände bei maximaler entfernung erkannt werden, möglicherweise eine entfernung zur mitte in bezugziehen
+	private static int clustering_min_cluster_size = 15;		// 1 - 1000000, sollte so gewï¿½hlt werden das kleine gegenstï¿½nde bei maximaler entfernung erkannt werden, mï¿½glicherweise eine entfernung zur mitte in bezugziehen
 	
 	/**
-	 * straighten			= glätten
-	 * straigthen_state		= ob geglättet wirt
-	 * straightenFactor 	= die stärke der glättung, kleine werte reichen meist
+	 * straighten			= glï¿½tten
+	 * straigthen_state		= ob geglï¿½ttet wirt
+	 * straightenFactor 	= die stï¿½rke der glï¿½ttung, kleine werte reichen meist
 	 * straighten_type_enum - arithmetic: Das ArithmetischeMittel
 	 * 						- harmonic: Das HarmonischeMittel
 	 * 						- geometric: Das GeometrischeMittel
-	 * straigthen_type		= der Algorythmus der zum Glätten verwendet wird
+	 * straigthen_type		= der Algorythmus der zum Glï¿½tten verwendet wird
 	 */
 	private static boolean straigthen_state = false;													// true
-	private static int straightenFactor = 4;													// 1- 30, klein = wenig, groß = sehr glatt, meist zu glatt,
+	private static int straightenFactor = 4;													// 1- 30, klein = wenig, groï¿½ = sehr glatt, meist zu glatt,
 	public enum straighten_type_enum {arithmetic,harmonic,geometric};
 	private static straighten_type_enum straigthen_type = straighten_type_enum.arithmetic ;		// arithmetic
 	
@@ -393,7 +393,7 @@ public class Settings {
 		}
 	}
 
-	// Glätten
+	// Glï¿½tten
 	
 	public static boolean isStraigthen() {
 		return straigthen_state;

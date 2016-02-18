@@ -19,22 +19,22 @@ public class ServerC extends Thread {
 
 	private InetAddress serverIp = InetAddress.getByName("localhost");
 	
+	public static int connCount = 0;
+	
 	public ServerC() throws IOException {
 		serverSocket = new ServerSocket(9988);
 		//serverSocket.setSoTimeout();
 	}
 
 	public synchronized void run() {
-
-		Distance_scanner.setInstantSimulation(true);
-
-		//Distance_scanner scn = Distance_scanner.getDistanceScanner("walk");
-
-		//scn.start();
+		//Distance_scanner.setInstantSimulation(true);
 		
-		
-		Distance_scanner.getDistanceScanner().start();
+		Distance_scanner scn = Distance_scanner.getDistanceScanner("walk");
 
+		scn.start();
+		
+		scn.readData = false;
+		
 		while (true) {
 			try {
 				System.out.println("Waiting for client on port "
@@ -47,7 +47,12 @@ public class ServerC extends Thread {
 				System.out.println(in.readUTF());
 
 				new Thread(new ConnectionThread(clientSocket)).start();
-
+				
+				connCount++;
+				if(connCount==1){
+					Distance_scanner.getDistanceScanner().readData = true;
+				}
+				
 			} catch (SocketTimeoutException s) {
 				System.out.println("Socket timed out!");
 				break;

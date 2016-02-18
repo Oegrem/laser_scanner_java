@@ -10,6 +10,7 @@ import data_processing.Cluster;
 import data_processing.Clustering;
 import data_processing.Processing;
 import data_processing.Settings;
+import data_processing.SimpleCluster;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -17,6 +18,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graphics {
 
@@ -69,6 +71,8 @@ public class Graphics {
 		scn = Distance_scanner.getDistanceScanner(); // Getting/Creating
 														// Distance_scanner
 
+		scn.start();
+		
 		// clusterList.addAll(scn.getClusterVector());
 
 		// dbscn.cluster(SynchronListHandler.getPointVector());
@@ -244,10 +248,10 @@ public class Graphics {
 				if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
 					if (Settings.isGraymap_state()) {
 						Settings.setGraymap_state(false);
-						System.out.println("Glätten OF");
+						System.out.println("Glï¿½tten OF");
 					} else {
 						Settings.setGraymap_state(true);
-						System.out.println("Glätten ON");
+						System.out.println("Glï¿½tten ON");
 					}
 				}
 
@@ -369,12 +373,29 @@ public class Graphics {
 			glBegin(GL_POINTS);
 			// rot
 
+			CopyOnWriteArrayList<SimpleCluster> simC = new CopyOnWriteArrayList<SimpleCluster>();
+			simC.addAll(SynchronListHandler.getSimpleCluster());
+			
+			for(int i=0; i<SynchronListHandler.getPointVector().size(); i++){
+				Point p = SynchronListHandler.getPointVector().get(i);
+			
+				for(SimpleCluster sC : simC){
+					if(i>=sC.getFirstElement() && i<=sC.getLastElement()){
+						setColor(sC.getID());
+					}
+				}
+				
+				float x = ((float) p.x);
+				float y = ((float) p.y);
+				glVertex2f(x, y);
+			}
+			/*
 			for (Point p : SynchronListHandler.getPointVector()) {
 				float x = ((float) p.x);
 				float y = ((float) p.y);
 				glVertex2f(x, y);
 			}
-
+	*/
 			glEnd();
 
 		}
@@ -395,11 +416,16 @@ public class Graphics {
 		if (drawLines) {
 
 			// irgendwas anderes glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-			glBegin(GL_POINTS);
-			for (Cluster c : SynchronListHandler.getClusterVector()) {
+			/*glBegin(GL_POINTS);
+			
+			CopyOnWriteArrayList<Cluster> cpCluster = new CopyOnWriteArrayList<Cluster>();
+			
+			cpCluster.addAll(SynchronListHandler.getClusterVector());
+			
+			for (Cluster c : cpCluster) {
 				float x = ((float) c.getCenter().x);
 				float y = ((float) c.getCenter().y);
-				glVertex2f(x, y); // wenn möglich noch rechteck mit den cluster
+				glVertex2f(x, y); // wenn mï¿½glich noch rechteck mit den cluster
 									// // ecken zeichnen(c.getMinCorner() (min x
 									// // und // min y) c.getMaxCorner() (max x
 									// und max // y)) } glEnd();
@@ -408,11 +434,11 @@ public class Graphics {
 												// opacity(transparenz):
 												// lower =
 												// // more opacity
-
+			glEnd();
 			glBegin(GL_QUADS);
-			for (Cluster c : SynchronListHandler.getClusterVector()) {
+			for (Cluster c : cpCluster) {
 				if (clusterColors) {
-					setColor(c.getID());
+					//setColor(c.getID());
 				}
 				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
 						.getMinCorner().getY()));
@@ -423,7 +449,9 @@ public class Graphics {
 				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
 						.getMaxCorner().getY()));
 			}
-			glEnd();
+			glEnd();*/
+			
+			
 
 		}
 	}
