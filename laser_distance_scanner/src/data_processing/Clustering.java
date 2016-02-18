@@ -18,10 +18,8 @@ public class Clustering {
 		int clusterCount = clusterOffset;
 		int searchRange = Settings.getClustering_search_range();
 		int minClusterSize = Settings.getClustering_min_cluster_size();
-		for(int i=0;i<sensorData.size();i++){
-			
-			currentSData = sensorData.get(i);
-			
+		for(int i=0;i<sensorData.size();i++){			
+			currentSData = sensorData.get(i);			
 			// look at i - x elements 
 			// durchläuft bei kluster grenzen, fehlerhaften daten mehrfach
 			for(int j=1;j<searchRange;j++){
@@ -42,8 +40,7 @@ public class Clustering {
 				// ID, elemente anzahl, startposition, entposition, distance
 				clusterList.add( new SimpleCluster(clusterCount,1,areaOffset+i,areaOffset+i,sensorDataID.get(i)));
 			}
-		}
-		
+		}		
 		// zu kleine Kluster entfernen
 		// die kluster entfernung spielt eine rolle, die element anzahl muss bei näheren objekten größer sein als bei weit entfertnet.
 		// damit sollen kleine kluster die fälschlich erkannt werden im nahen bereich gefltert, und kleine kluster in weiter nefernung die 

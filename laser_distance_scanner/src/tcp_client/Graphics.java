@@ -1,4 +1,4 @@
-package clientPackage;
+package tcp_client;
 
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
@@ -26,16 +26,37 @@ import laser_distance_scanner.SynchronListHandler;
 public class Graphics {
 
 	// private GLFWErrorCallback errorCallback;
+	@SuppressWarnings("unused")
 	private GLFWKeyCallback keyCallback;
+
+	@SuppressWarnings("unused")
+	private GLFWScrollCallback scrollCallBack;
+
+	@SuppressWarnings("unused")
+	private GLFWMouseButtonCallback mouseButtonCallBack;
+
+	@SuppressWarnings("unused")
+	private GLFWCursorPosCallback cursorPosCallBack;
+
+	private double xold = 0;
+
+	private double yold = 0;
+
+	private boolean leftButtonPressed = false;
+
+	private float xMove = 1;
+
+	private float yMove = 1;
+
+	private float zoom = 1;
 
 	// The window handle
 	private long window;
-	
+
 	public static CopyOnWriteArrayList<Point> cp = new CopyOnWriteArrayList<Point>();
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
-
 
 		try {
 			init();
@@ -80,7 +101,49 @@ public class Graphics {
 		// Setup a key callback. It will be called every time a key is pressed,
 		// repeated or released.
 
-	
+		glfwSetScrollCallback(window,
+				scrollCallBack = new GLFWScrollCallback() {
+
+					@Override
+					public void invoke(long window, double xoffset,
+							double yoffset) {
+						zoom += yoffset / 5;
+					}
+				});
+
+		glfwSetMouseButtonCallback(window,
+				mouseButtonCallBack = new GLFWMouseButtonCallback() {
+
+					@Override
+					public void invoke(long window, int button, int action,
+							int mods) {
+						if (button == GLFW_MOUSE_BUTTON_LEFT
+								&& action == GLFW_PRESS) {
+							leftButtonPressed = true;
+						}
+
+						if (button == GLFW_MOUSE_BUTTON_LEFT
+								&& action == GLFW_RELEASE) {
+							leftButtonPressed = false;
+						}
+					}
+
+				});
+
+		glfwSetCursorPosCallback(window,
+				cursorPosCallBack = new GLFWCursorPosCallback() {
+					@Override
+					public void invoke(long window, double xpos, double ypos) {
+						if (leftButtonPressed) {
+
+							xMove += (float) (xpos - xold) * 10;
+							yMove += (float) (yold - ypos) * 10;
+
+						}
+						xold = xpos;
+						yold = ypos;
+					}
+				});
 
 		// Get the resolution of the primary monitor
 		/*
@@ -100,17 +163,17 @@ public class Graphics {
 
 	private synchronized void drawSensorPixel() {
 
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_POINTS);
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+		glBegin(GL_POINTS);
 
-			for (Point p : cp) {
+		for (Point p : cp) {
 
-					glVertex2f((float) p.x, (float) p.y);
+			glVertex2f((float) p.x, (float) p.y);
 
-				}
-			glEnd();
-			}
-	
+		}
+		glEnd();
+	}
+
 	private void setColor(int i) {
 		switch (i % 9) {
 		case 0:
@@ -175,7 +238,11 @@ public class Graphics {
 			glPointSize(2);
 
 			glPushMatrix();
-			
+
+			glTranslatef(xMove, yMove, 1);
+
+			glScalef(zoom, zoom, 1);
+
 			drawSensorPixel();
 
 			glBegin(GL_POINTS);
@@ -198,7 +265,7 @@ public class Graphics {
 			// invoked during this call.
 			glfwPollEvents();
 		}
-		
+		System.exit(0);
 	}
 
 }

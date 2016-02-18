@@ -61,8 +61,6 @@ public class Graphics {
 
 	private boolean clusterColors = false;
 
-	private ArrayList<DSButton> buttonList = new ArrayList<DSButton>();
-
 	// private dbscan dbscn = new dbscan(10, 5); // DBSCAN clustering
 
 	public void run() {
@@ -71,14 +69,9 @@ public class Graphics {
 		scn = Distance_scanner.getDistanceScanner(); // Getting/Creating
 														// Distance_scanner
 
-		scn.start(); // starting Thread with connecting and starting Measurement
-
 		// clusterList.addAll(scn.getClusterVector());
 
 		// dbscn.cluster(SynchronListHandler.getPointVector());
-
-		buttonList.add(new DSButton(new Point(1000, 1000),
-				new Point(2000, 2000), 1, 255, 0, 0, 100));
 
 		try {
 			init();
@@ -157,17 +150,13 @@ public class Graphics {
 					@Override
 					public void invoke(long window, double xpos, double ypos) {
 						if (leftButtonPressed) {
-							int id = DSButton.isButtonClicked(xpos, ypos,
-									buttonList);
-							if (id == -1) {
-								xMove += (float) (xpos - xold) * 10;
-								yMove += (float) (yold - ypos) * 10;
-							} else {
-								buttonAction(id);
-							}
+							xMove += (float) (xpos - xold) * 10;
+							yMove += (float) (yold - ypos) * 10;
 						}
+
 						xold = xpos;
 						yold = ypos;
+
 					}
 				});
 
@@ -265,9 +254,10 @@ public class Graphics {
 				if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Settings.setClustering_threshold(Settings.getClustering_threshold() + 0.1);
-						System.out
-								.println("threshold: " + Settings.getClustering_threshold());
+						Settings.setClustering_threshold(Settings
+								.getClustering_threshold() + 0.1);
+						System.out.println("threshold: "
+								+ Settings.getClustering_threshold());
 						break;
 					case 1:
 						break;
@@ -276,7 +266,8 @@ public class Graphics {
 						System.out.println("slomo: " + Distance_scanner.slomo);
 						break;
 					case 3:
-						Settings.setClustering_search_range(Settings.getClustering_search_range() + 1);
+						Settings.setClustering_search_range(Settings
+								.getClustering_search_range() + 1);
 						System.out.println("searchRange: "
 								+ Settings.getClustering_search_range());
 						break;
@@ -292,9 +283,10 @@ public class Graphics {
 				if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Settings.setClustering_threshold(Settings.getClustering_threshold() - 0.1);
-						System.out
-								.println("threshold: " + Settings.getClustering_threshold());
+						Settings.setClustering_threshold(Settings
+								.getClustering_threshold() - 0.1);
+						System.out.println("threshold: "
+								+ Settings.getClustering_threshold());
 						break;
 					case 1:
 						break;
@@ -306,7 +298,8 @@ public class Graphics {
 						}
 						break;
 					case 3:
-						Settings.setClustering_search_range(Settings.getClustering_search_range() - 1);
+						Settings.setClustering_search_range(Settings
+								.getClustering_search_range() - 1);
 						System.out.println("searchRange: "
 								+ Settings.getClustering_search_range());
 						break;
@@ -366,17 +359,13 @@ public class Graphics {
 		glfwShowWindow(window);
 	}
 
-	private void buttonAction(int id) {
-		switch (id) {
-		default:
-			System.out.println(id);
-			break;
-		}
-	}
-
 	private synchronized void drawSensorPixel() {
 		if (drawPoints) {
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			if (Distance_scanner.getDistanceScanner().isUsingSimFile()) {
+				glColor4f(0.0f, 0.5f, 0.5f, 1.0f);
+			} else {
+				glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			}
 			glBegin(GL_POINTS);
 			// rot
 
@@ -527,10 +516,6 @@ public class Graphics {
 			}
 
 			glPopMatrix();
-
-			for (DSButton dsb : buttonList) {
-				// dsb.drawButton();
-			}
 
 			glfwSwapBuffers(window); // swap the color buffers
 

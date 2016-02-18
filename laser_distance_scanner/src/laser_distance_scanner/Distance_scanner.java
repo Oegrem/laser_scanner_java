@@ -51,9 +51,11 @@ public class Distance_scanner implements Runnable {
 	public static boolean playRecord = true;
 
 	public static boolean nextFrame = false;
-	
+
 	public static boolean lastFrame = false;
-	
+
+	public static Float sliderValue = -1.0f;
+
 	public static long slomo = (long) 1.0;
 
 	/*
@@ -113,7 +115,7 @@ public class Distance_scanner implements Runnable {
 		}
 
 		device = new UrgDevice(new EthernetConnection());
-		
+
 		// Connect to the sensor
 		if (device.connect("192.168.0.10")) { // Connection to IP of Sensor
 			System.out.println("connected");
@@ -122,8 +124,7 @@ public class Distance_scanner implements Runnable {
 			RangeSensorInformation info = device.getInformation();
 			if (info != null) {
 				System.out.println("Sensor model:" + info.product);
-				System.out
-						.println("Sensor serial number:" + info.serial_number);
+				System.out.println("Sensor serial number:" + info.serial_number);
 			} else {
 				System.out.println("Sensor error:" + device.what());
 			}
@@ -149,33 +150,30 @@ public class Distance_scanner implements Runnable {
 	/*
 	 * Synchronized write Data from Sensor to exchange Vector
 	 */
-	public synchronized void writeData() {
-		
+	public synchronized int writeData() {
+
 		Vector<Point> pVect = new Vector<Point>();
-		
+
 		CaptureData data = null;
 		// Data reception happens when calling capture
-	
+
 		data = device.capture();
 
 		if (data != null) {
-			
+
 			Vector<Long> Vlong = new Vector<Long>();
-			for(Step p : data.steps){
+			for (Step p : data.steps) {
 				Vlong.add(p.distances.elementAt(0));
 			}
-			
+
 			SynchronListHandler.setRawData(Vlong);
-			
-			
+
 			for (int b = 0; b < data.steps.size(); b++) { // read all steps
 				long l = data.steps.elementAt(b).distances.elementAt(0); // get
 																			// distance
 																			// of
 																			// step
 
-				
-				
 				if (l > 21 && l < 30000) { // avoid adding error-values to
 											// vector
 
@@ -196,10 +194,9 @@ public class Distance_scanner implements Runnable {
 
 				}
 			}
-			
-			
+
 			SynchronListHandler.setPointList(pVect);
-			
+
 			if (isRecorded) { // for recording of sensor data
 				SData nD = new SData(); // sData combines x/y Point Vector and
 										// Timestamp
@@ -209,9 +206,17 @@ public class Distance_scanner implements Runnable {
 				sVect.add(nD);
 			}
 		} else {
+
 			System.out.println("Sensor error:" + device.what());
+
+			usingSimFile = true;
+
+			isConnected = false;
+
+			return 255;
 		}
-		
+
+		return 1;
 	}
 
 	/*
@@ -227,15 +232,12 @@ public class Distance_scanner implements Runnable {
 
 		// We set the capture type to a continuous mode so we have to start
 		// the capture
+		// device.stopCapture();
 		device.startCapture(); // starting to capture
 
 		while (true) { // Running until Thread gets interrupted
-			if (!t.isInterrupted()) {
-				
-				writeData();
-				
-			} else {
-				device.stopCapture(); // stop Capture !!important!!
+			if (t.isInterrupted()) {
+				// device.stopCapture(); // stop Capture !!important!!
 
 				if (isRecorded) {
 					SimFileHandler sFH = new SimFileHandler(recordName);
@@ -244,9 +246,11 @@ public class Distance_scanner implements Runnable {
 
 				disconnect(); // disconnecting !!!VERY IMPORTANT!!! to
 								// disconnect => else not able reconnecting
+
+				System.exit(0);
+			} else if (writeData() == 255) {
 				return;
 			}
-
 		}
 	}
 
@@ -263,55 +267,64 @@ public class Distance_scanner implements Runnable {
 
 		Vector<SData> dataVector = sFH.readObject(); // reading an SimFile
 
-		while (true) { // Looping until interrupted => recorded File starts from
-						// Beginning after its over
+		while (true) { // Looping until interrupted =>
+						// recorded File starts from
+			// Beginning after its over
 
 			int sDSize = dataVector.size();
-			
-			for(int i=0; i<sDSize; i++){
-				
+
+			for (int i = 0; i < sDSize; i++) {
+
 				if (!t.isInterrupted()) { // exiting at interrupt
-					
-					
-					
+
 					while (!playRecord) {
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							return;
 						}
-						if(nextFrame){
-							if(i>=sDSize-1){
-								i=0;
-							}else{
+						if (nextFrame) {
+							if (i >= sDSize - 1) {
+								i = 0;
+							} else {
 								i++;
 							}
 							SData sD = dataVector.elementAt(i);
-							
+
 							SynchronListHandler.setPointList(sD.pVector);
-							
+
 							nextFrame = false;
 						}
-						
-						if(lastFrame){
-							if(i<=0){
-								i=sDSize-1;
-							}else{
-								i-=1;
+
+						if (lastFrame) {
+							if (i <= 0) {
+								i = sDSize - 1;
+							} else {
+								i -= 1;
 							}
+
+							SData sD = dataVector.elementAt(i);
+
+							SynchronListHandler.setPointList(sD.pVector);
+
+							lastFrame = false;
+						}
+
+						if (sliderValue != -1.0f) {
+							i = ((int)((sliderValue/1000)*((float)sDSize)-1));
 							
 							SData sD = dataVector.elementAt(i);
-							
+
 							SynchronListHandler.setPointList(sD.pVector);
-						
-							lastFrame = false;
+
+							sliderValue = -1.0f;
 						}
 					}
 
 					SData sD = dataVector.elementAt(i);
-					
+
 					SynchronListHandler.setPointList(sD.pVector);
-					
+
 					try {
 						Thread.sleep(sD.freq * slomo); // sleeping timestamp in
 														// millis (timestamp in
@@ -346,6 +359,10 @@ public class Distance_scanner implements Runnable {
 
 	public Vector<Cluster> getClusterVector() {
 		return clusterVector;
+	}
+
+	public boolean isUsingSimFile() {
+		return usingSimFile;
 	}
 
 	/*
@@ -402,12 +419,14 @@ public class Distance_scanner implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if (!usingSimFile) {
-			getDistances();
-		} else {
-			getRecordedDistances();
+		while (true) {
+			if (!usingSimFile) {
+				getDistances();
+			}
+			if (usingSimFile) {
+				getRecordedDistances();
+			}
 		}
-
 	}
 
 	/*
