@@ -9,37 +9,46 @@ import laser_distance_scanner.SynchronListHandler;
 
 public class Processing {
 
+	static boolean isWorking = false;
+	
 	// list with the unchanged raw point data
 	private  Vector<Point> pointList = new Vector<Point>();
-
+	private  Vector<Long> longList = new Vector<Long>();
+	
 	// the straighting/smothing class
 	private Straighten straighten = new Straighten();
 
 
 	private Clustering clustering = new Clustering();
 	private Vector<Cluster> cluster= new Vector<Cluster>();
+	private Vector<SimpleCluster> sCluster = new Vector<SimpleCluster>();
 	
 	
 	public Processing(){
 		Settings.updateAllValues();
 	}
 	
-	// initialisation
-	public Processing(Distance_scanner _scanner){
-	}
-	
 	/**
-	 * gehts the Points from the scanner class, fills the pointlist and starts the real start prozessing
+	 * switches the mode of the processing algorythms and starts the spezific funktion
 	 */
 	public synchronized void startProcess(){ 
-		pointList.clear();
-		CopyOnWriteArrayList<Point> currentPoints = new CopyOnWriteArrayList<>();
-
-		currentPoints.addAll(SynchronListHandler.getPointVector());
-		
-		pointList.addAll(currentPoints);
-
-		startProcess(pointList);
+		if(isWorking == true)
+			System.out.println(isWorking);
+		isWorking = true;
+		if(Settings.isLongVersion()==true){
+			longList.clear();
+			sCluster.clear();
+			longList.addAll(SynchronListHandler.getRawData());
+			startLong(longList);
+		}else{
+			longList.clear();
+			pointList.clear();
+			cluster.clear();
+			longList.addAll(SynchronListHandler.getRawData());
+			pointList.addAll(SynchronListHandler.getPointVector());
+			startPoint(pointList);
+		}
+		isWorking = false;
 	}
 	
 	private Vector<Long> calcDistances(Vector<Point> pointList){
@@ -52,21 +61,21 @@ public class Processing {
 	}
 	
 	/**
-	 * starts prozessing
+	 * @deprecated
+	 * Analysiert die sensordaten, Die Sensordaten müssen in Kartesischen Koordinaten in form der übergebenen Pointlist sowie als Long array hinterlegt sein
 	 */ // doesnt need to be synchronized => data copied already in startProcess()
-	public synchronized void startProcess(Vector<Point> pointList){ 
+	public synchronized void startPoint(Vector<Point> pointList){ 
+		if(pointList == null || pointList.size()<1){
+			return;
+		}
 		Vector<Vector<Point>> movingPointLists = new Vector<Vector<Point>>();
-		Vector<Vector<Long>> movingLongLists = new Vector<Vector<Long>>();
 		Vector<ClusterPoint> clusteredPoints = new Vector<ClusterPoint>();
 		Vector<HelpCluster> hCluster = new Vector<HelpCluster>();
-		Vector<Long> polar = new Vector<Long>();
 		
-		polar.addAll(SynchronListHandler.getRawData());
 		// berechnet die polarcoordinaten falls noch nicht forhanden
-		if(polar.size()<2){
-			polar = calcDistances(pointList);
+		if(longList.size()<2){
+			longList = calcDistances(pointList);
 		}
-		
 
 		if(Settings.isGraymap_state() == true){
 			Graymap map = Graymap.getGraymap();
@@ -75,7 +84,7 @@ public class Processing {
 			
 			// übergibt polarkoordinaten,
 			// das ergebnis ist ein vektor mit bereichen die sich bewegen, [0] = start [1] ende
-			moving = (Settings.isGraymap_direct_adding())?map.addNewDataDirect(polar):map.addNewData(polar);
+			moving = (Settings.isGraymap_direct_adding())?map.addNewDataDirect(longList):map.addNewData(longList);
 			
 			for(int i=0;i<moving.size();i++){
 				start = moving.get(i)[0];
@@ -86,15 +95,13 @@ public class Processing {
 				Vector<Long> currentLongList = new Vector<>();
 				for(int j=start;j<=stop;j++){
 					currentPointList.add(pointList.get(j));
-					currentLongList.add(polar.get(j));
+					currentLongList.add(longList.get(j));
 				}
 				movingPointLists.add(currentPointList);
-				movingLongLists.add(currentLongList);
 			}
 		}else{
 			// ohne graymap alle punkte
 			movingPointLists.add(pointList);
-			movingLongLists.add(polar);
 		}
 
 		if(Settings.isClustering_state()== true){
@@ -119,24 +126,76 @@ public class Processing {
 							break;
 					}
 				}
-				// clustern
-				//hCluster.addAll(clustering.cluster(pointList, clusteredPoints));
-				hCluster.addAll(clustering.cluster2(movingLongLists.get(list), clusteredPoints));
+				// clustern 
+				hCluster.addAll(clustering.cluster(pointList, clusteredPoints));
 			}
-			
 			for(int i=0;i<hCluster.size();i++)
 				cluster.add(hCluster.get(i).getCluster());
 		}
-
-		
 	}
 	
 	/**
+	 * ersetzt die startPoint funktion
+	 * inhaltlich gleich, unterschied, es wird ausschließlich mit den Long werten des Sensorvektors gearbeitet. es ist keine umrechnung ins Kartesische koordinatensystem nötig.
+	 * @param polar
+	 */
+	public synchronized void startLong(Vector<Long> polar){ 
+		if(polar == null || polar.size()<1){
+			return;
+		}
+		Vector<Vector<Long>> movingLongLists = new Vector<Vector<Long>>();
+		Vector<SimpleCluster> clusterList = new Vector<SimpleCluster>();
+
+		if(Settings.isGraymap_state() == true){
+			Graymap map = Graymap.getGraymap();
+			Vector<int[]> moving = new Vector<int[]>();
+			int start,stop;
+			
+			// übergibt polarkoordinaten,
+			// das ergebnis ist ein vektor mit bereichen die sich bewegen, [0] = start [1] ende
+			moving = (Settings.isGraymap_direct_adding())?map.addNewDataDirect(polar):map.addNewData(polar);
+			
+			for(int i=0;i<moving.size();i++){
+				start = moving.get(i)[0];
+				stop = moving.get(i)[1];
+				if(stop>= polar.size())
+					stop = polar.size()-1;
+				Vector<Long> currentLongList = new Vector<>();
+				for(int j=start;j<=stop;j++){
+					currentLongList.add(polar.get(j));
+				}
+				movingLongLists.add(currentLongList);
+			}
+		}else{
+			movingLongLists.add(polar);
+		}
+
+		if(Settings.isClustering_state()== true){
+			int start = 0;
+			// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
+			for(int list=0;list <movingLongLists.size();list++){
+				// zusammenhängendeLongListe, start der liste im original
+				clusterList.addAll(clustering.cluster(movingLongLists.get(list),start,clusterList.size()));
+				start =+ movingLongLists.size();
+			}
+		}
+		sCluster.addAll(clusterList);
+	}
+	
+	/**
+	 * @deprecated
 	 * provides the clusterlist
 	 * @return
 	 */
 	public Vector<Cluster> getCluster(){
 		return cluster;
+	}
+	/**
+	 * provides the SimpleClusterList
+	 * @return
+	 */
+	public Vector<SimpleCluster> getSimpleCluster(){
+		return sCluster;
 	}
 	
 	

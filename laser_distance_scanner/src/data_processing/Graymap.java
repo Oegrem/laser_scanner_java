@@ -133,6 +133,7 @@ public class Graymap {
 		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
 		int angleSteps = Settings.getGraymap_angle_steps();
 		int sectionSteps = Settings.getGraymap_section_steps();
+
 		boolean unknown = false;
 		// jeden vektor absuchen (ein vektor kann mehrere sensorvektoren beinhaltet)
 		for(int i=0;i<angleSteps;i++){
@@ -164,6 +165,8 @@ public class Graymap {
 	
 	private short mergeValue(short valueOld, short valueCurrent, int maxUnknownGray, double updateFactor , int updateDirectionFactor){
 		double updatevalue=0;
+		if(Settings.isGraymap_update_sympel())
+			return mergeValueSimpel(valueOld, valueCurrent, maxUnknownGray);
 		if(valueOld < valueCurrent){
 			// untergrund hell
 			if(valueOld < maxUnknownGray)
@@ -183,15 +186,15 @@ public class Graymap {
 		}
 		return (short) updatevalue;
 	}
-	private short mergeValueSimpel(short valueOld, short valueCurrent, int maxUnknownGray, double updateFactor , int updateDirectionFactor){
+	private short mergeValueSimpel(short valueOld, short valueCurrent, int maxUnknownGray){
 		double updatevalue=0;
 		if(valueOld < valueCurrent){
 			// untergrund hell
 			if(valueOld < maxUnknownGray)
-				updatevalue =  ( updateDirectionFactor * 1);
+				updatevalue =  Settings.getGraymap_update_sympel_direction_center();
 			// untergrund dunkel
 			else 
-				updatevalue =  ( updateDirectionFactor * 2);
+				updatevalue =  Settings.getGraymap_update_sympel_direction_extreme();
 		}
 		// neu = alt
 		else if(valueOld == valueCurrent) updatevalue = 0;
@@ -199,10 +202,10 @@ public class Graymap {
 		else{
 			// untergrund hell
 			if(valueOld < maxUnknownGray)
-				updatevalue =  ( -updateDirectionFactor * 2);
+				updatevalue =  -Settings.getGraymap_update_sympel_direction_extreme();
 			// untergrund dunkel
 			else 
-				updatevalue =  ( -updateDirectionFactor * 1);
+				updatevalue =  -Settings.getGraymap_update_sympel_direction_center();
 		}
 		return (short) updatevalue;
 	}
@@ -297,6 +300,9 @@ public class Graymap {
 					sideUpdate = (short) (maxGray- 0.5*( maxGray - newMap.get(vektorStep+1).get(step)));
 					newMap.get(vektorStep+1).set(step,(short) sideUpdate);
 				}
+				change[vektorStep-1] = true;
+				change[vektorStep] = true;
+				change[vektorStep+1] = true;
 			}
 			for(int j=step+1;j<sectionSteps;j++){
 				newMap.get(vektorStep).set(j,(short) maxUnknownGray);
@@ -326,8 +332,7 @@ public class Graymap {
 		short valueOld;
 		int vektorStep;
 		int step;
-
-		
+	
 		int maxUnknownGray = Settings.getGraymap_max_unknown_gray();
 		int maxGray = Settings.getGraymap_max_gray();
 		int angleSize = Settings.getGraymap_angle_size();
@@ -344,16 +349,9 @@ public class Graymap {
 		int oldVectorStep = 0;
 		int oldStep = 0;
 		boolean oldMove = false;
-		
-			
-		
-		// neue graymap befüllen
+
 		for(int i=0;i<stepVector.size();i++){
-			// finde das feld der map indem der neue punkt gesetzt wird
-			// wenn weniger grau als 50% add to moving points
-			// wenn 
-			
-			// feld der map ermitteln, die map kann beliebige dimensionen annehmen
+
 			vektorStep = i/angleSize;
 			if(vektorStep>=angleSteps){
 				vektorStep = angleSteps -1;
@@ -383,11 +381,11 @@ public class Graymap {
 
 			// alle values for dem feld gray abstufen
 			// feld maximal dunkel
-			currentVector.set(step,(short) (valueOld + mergeValueSimpel(valueOld, (short)maxGray, maxUnknownGray, updateFactor, updateDirectionFactor)));
+			currentVector.set(step,(short) (valueOld + mergeValue(valueOld, (short)maxGray, maxUnknownGray, updateFactor, updateDirectionFactor)));
 			for(int j=0;j<step;j++){
 				valueOld = currentVector.get(j);
 				if(graysteps[step] != valueOld){
-					updateValue = mergeValueSimpel(valueOld, (short)graysteps[step], maxUnknownGray, updateFactor, updateDirectionFactor);
+					updateValue = mergeValue(valueOld, (short)graysteps[step], maxUnknownGray, updateFactor, updateDirectionFactor);
 					currentVector.set(j,(short) (valueOld + updateValue));
 				}
 			}
@@ -398,7 +396,7 @@ public class Graymap {
 					if(mergeMaxUnknownGray == true)break;
 					mergeMaxUnknownGray = true;
 				}
-				updateValue = mergeValueSimpel(valueOld, (short)graysteps[step], maxUnknownGray, updateFactor, updateDirectionFactor);
+				updateValue = mergeValue(valueOld, (short)graysteps[step], maxUnknownGray, updateFactor, updateDirectionFactor);
 				currentVector.set(j,(short) (valueOld + updateValue));
 			}
 			
