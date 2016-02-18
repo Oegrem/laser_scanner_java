@@ -21,12 +21,12 @@ public class SimpleCluster {
 		lastElement = -1;
 		distanceSum = 0;
 	}
-	SimpleCluster(int ID, int elementCount, int start, int stop, int distance){
+	SimpleCluster(int ID, int elementCount, int start, int stop, long currentSData){
 		this.ID = ID;
 		this.elementCount = elementCount;
 		this.firstElement = start;
 		this.lastElement = stop;
-		this.distanceSum = distance;
+		this.distanceSum = currentSData;
 	}
 	
 	public int getID(){
@@ -79,11 +79,13 @@ public class SimpleCluster {
 		return lastElement;
 	}
 	
-	public void increaseDistanceSum(int toAdd){
-		distanceSum += toAdd;
+	public void increaseDistanceSum(long currentSData){
+		distanceSum += currentSData;
 	}
 	public long getDistanceSum(){
 		return distanceSum;
 	}
-	
+	public String toString(){
+		return  "ID: " + ID + " | Elements: " + elementCount + " | first: " + firstElement + " | last: " + lastElement ;
+	}
 }

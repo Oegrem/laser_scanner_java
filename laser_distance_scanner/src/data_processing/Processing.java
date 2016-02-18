@@ -39,6 +39,13 @@ public class Processing {
 			longList.clear();
 			sCluster.clear();
 			longList.addAll(SynchronListHandler.getRawData());
+			if(longList == null || longList.size()<1 && pointList != null){
+				pointList.addAll(SynchronListHandler.getPointVector());
+				Point center = new Point(0,0);
+				for(int i=0;i<pointList.size();i++){
+					longList.add((long)center.distance(pointList.get(i)));
+				}
+			}
 			startLong(longList);
 		}else{
 			longList.clear();
@@ -145,10 +152,9 @@ public class Processing {
 		}
 		Vector<Vector<Long>> movingLongLists = new Vector<Vector<Long>>();
 		Vector<SimpleCluster> clusterList = new Vector<SimpleCluster>();
-
+		Vector<int[]> moving = new Vector<int[]>();
 		if(Settings.isGraymap_state() == true){
 			Graymap map = Graymap.getGraymap();
-			Vector<int[]> moving = new Vector<int[]>();
 			int start,stop;
 			
 			// übergibt polarkoordinaten,
@@ -175,8 +181,15 @@ public class Processing {
 			// alle nachfolgenden algorythmen gehen von zusammenhängenden daten aus, deswegen wurden die daten gesplittet und werden immer wieder pointlist übergeben
 			for(int list=0;list <movingLongLists.size();list++){
 				// zusammenhängendeLongListe, start der liste im original
-				clusterList.addAll(clustering.cluster(movingLongLists.get(list),start,clusterList.size()));
-				start =+ movingLongLists.size();
+				if(list < moving.size())
+					start =moving.get(list)[0];
+				Vector<SimpleCluster> current = clustering.cluster(movingLongLists.get(list));
+				for(SimpleCluster sC : current){
+					sC.setFirstElement(sC.getFirstElement() + start);
+					sC.setLastElement(sC.getLastElement() + start);
+					sC.setID(sC.getID() + clusterList.size());
+				}
+				clusterList.addAll(current);
 			}
 		}
 		sCluster.addAll(clusterList);
