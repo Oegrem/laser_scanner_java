@@ -13,8 +13,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 
 public class Controller implements Initializable {
 
@@ -25,10 +28,22 @@ public class Controller implements Initializable {
 	private Button parTest;
 
 	@FXML // fx:id="pause"
-	private Button pause;
+	private ToggleButton pause;
+
+	@FXML // fx:id="nextFrame"
+	private Button nextFrame;
+
+	@FXML // fx:id="lastFrame"
+	private Button lastFrame;
+
+	@FXML // fx:id="colorPicker"
+	private ColorPicker colorPicker;
 
 	@FXML // fx:id="slide"
 	private Slider slide;
+
+	@FXML // fx:id="ipField"
+	private TextField ipField;
 
 	@Override // This method is called by the FXMLLoader when initialization is
 				// complete
@@ -37,6 +52,10 @@ public class Controller implements Initializable {
 		assert parTest != null : "fx:id=\"parTest\" was not injected: check your FXML file 'RootWin.fxml'.";
 		assert pause != null : "fx:id=\"pause\" was not injected: check your FXML file 'RootWin.fxml'.";
 		assert slide != null : "fx:id=\"slide\" was not injected: check your FXML file 'RootWin.fxml'.";
+		assert nextFrame != null : "fx:id=\"nextFrame\" was not injected: check your FXML file 'RootWin.fxml'.";
+		assert lastFrame != null : "fx:id=\"lastFrame\" was not injected: check your FXML file 'RootWin.fxml'.";
+		assert colorPicker != null : "fx:id=\"colorPicker\" was not injected: check your FXML file 'RootWin.fxml'.";
+		assert ipField != null : "fx:id=\"ipField\" was not injected: check your FXML file 'RootWin.fxml'.";
 
 		// initialize your logic here: all @FXML variables will have been
 		// injected
@@ -44,6 +63,14 @@ public class Controller implements Initializable {
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				if (!ipField.getText().equals("")) {
+					Thread t = new ClientC(ipField.getText(), 9988);
+					t.start();
+				} else {
+					Thread t = new ClientC("127.0.0.1", 9988);
+					t.start();
+				}
+
 				new Graphics().run();
 			}
 		});
@@ -59,7 +86,11 @@ public class Controller implements Initializable {
 		pause.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Pause pressed");
+				if (pause.getText() == "pause") {
+					pause.setText("play");
+				} else {
+					pause.setText("pause");
+				}
 				ClientC.request = 3;
 			}
 		});
@@ -67,8 +98,29 @@ public class Controller implements Initializable {
 		slide.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				ClientC.slider = newValue.floatValue()*10;
+				ClientC.slider = newValue.floatValue() * 10;
 				ClientC.request = 4;
+			}
+		});
+
+		nextFrame.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ClientC.request = 5;
+			}
+		});
+
+		lastFrame.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ClientC.request = 6;
+			}
+		});
+
+		colorPicker.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ClientC.grColor = colorPicker.getValue();
 			}
 		});
 

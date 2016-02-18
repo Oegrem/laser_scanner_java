@@ -38,7 +38,7 @@ public class ConnectionThread implements Runnable {
 			while (true) {
 				try {
 					switch (toSend) {
-					case 1:
+					case 1: // no Action => continue with sensordata
 						CopyOnWriteArrayList<Point> cpy = new CopyOnWriteArrayList<Point>();
 						cpy.addAll(SynchronListHandler.getPointVector());
 
@@ -50,7 +50,7 @@ public class ConnectionThread implements Runnable {
 						v.add("ex1");
 						to = new TransmissionObject(2, v);
 						break;
-					case 3:
+					case 3: // Play/Pause pressed
 						if (Distance_scanner.playRecord) {
 							Distance_scanner.playRecord = false;
 							System.out.println("Record STOP");
@@ -59,8 +59,18 @@ public class ConnectionThread implements Runnable {
 							System.out.println("Record PLAY");
 						}
 						break;
-					case 4:
+					case 4: // Slider moved
 						Distance_scanner.sliderValue = ((float) toData);
+						break;
+					case 5:
+						if (!Distance_scanner.playRecord) {
+							Distance_scanner.nextFrame = true;
+						}
+						break;
+					case 6:
+						if (!Distance_scanner.playRecord) {
+							Distance_scanner.lastFrame = true;
+						}
 						break;
 					}
 

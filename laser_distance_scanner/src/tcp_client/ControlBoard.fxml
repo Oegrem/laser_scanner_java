@@ -9,9 +9,13 @@
 
 <AnchorPane prefHeight="350.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tcp_client.Controller">
    <children>
-      <Button fx:id="startButton" layoutX="84.0" layoutY="102.0" mnemonicParsing="false" text="startButton" />
-      <Button fx:id="parTest" layoutX="173.0" layoutY="102.0" mnemonicParsing="false" text="parTest" />
-      <Button fx:id="pause" layoutX="134.0" layoutY="175.0" mnemonicParsing="false" text="pause" />
-      <Slider fx:id="slide" layoutX="31.0" layoutY="218.0" prefHeight="14.0" prefWidth="281.0" />
+      <Button fx:id="startButton" layoutX="137.0" layoutY="82.0" mnemonicParsing="false" text="startButton" />
+      <Button fx:id="parTest" layoutX="280.0" layoutY="311.0" mnemonicParsing="false" text="parTest" />
+      <Slider fx:id="slide" layoutX="35.0" layoutY="192.0" prefHeight="14.0" prefWidth="281.0" />
+      <ColorPicker fx:id="colorPicker" layoutX="123.0" layoutY="232.0" prefHeight="25.0" prefWidth="105.0" />
+      <ToggleButton fx:id="pause" layoutX="148.0" layoutY="134.0" mnemonicParsing="false" text="pause" />
+      <Button fx:id="lastFrame" layoutX="67.0" layoutY="134.0" mnemonicParsing="false" text="lastFrame" />
+      <Button fx:id="nextFrame" layoutX="210.0" layoutY="134.0" mnemonicParsing="false" text="nextFrame" />
+      <TextField fx:id="ipField" layoutX="98.0" layoutY="35.0" promptText="IP_Address" />
    </children>
 </AnchorPane>
