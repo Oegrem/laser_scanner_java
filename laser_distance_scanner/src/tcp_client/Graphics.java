@@ -93,57 +93,49 @@ public class Graphics {
 		int HEIGHT = 700;
 
 		// Create the window
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner",
-				NULL, NULL);
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Setup a key callback. It will be called every time a key is pressed,
 		// repeated or released.
 
-		glfwSetScrollCallback(window,
-				scrollCallBack = new GLFWScrollCallback() {
+		glfwSetScrollCallback(window, scrollCallBack = new GLFWScrollCallback() {
 
-					@Override
-					public void invoke(long window, double xoffset,
-							double yoffset) {
-						zoom += yoffset / 5;
-					}
-				});
+			@Override
+			public void invoke(long window, double xoffset, double yoffset) {
+				zoom += yoffset / 5;
+			}
+		});
 
-		glfwSetMouseButtonCallback(window,
-				mouseButtonCallBack = new GLFWMouseButtonCallback() {
+		glfwSetMouseButtonCallback(window, mouseButtonCallBack = new GLFWMouseButtonCallback() {
 
-					@Override
-					public void invoke(long window, int button, int action,
-							int mods) {
-						if (button == GLFW_MOUSE_BUTTON_LEFT
-								&& action == GLFW_PRESS) {
-							leftButtonPressed = true;
-						}
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+				if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+					leftButtonPressed = true;
+				}
 
-						if (button == GLFW_MOUSE_BUTTON_LEFT
-								&& action == GLFW_RELEASE) {
-							leftButtonPressed = false;
-						}
-					}
+				if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+					leftButtonPressed = false;
+				}
+			}
 
-				});
+		});
 
-		glfwSetCursorPosCallback(window,
-				cursorPosCallBack = new GLFWCursorPosCallback() {
-					@Override
-					public void invoke(long window, double xpos, double ypos) {
-						if (leftButtonPressed) {
+		glfwSetCursorPosCallback(window, cursorPosCallBack = new GLFWCursorPosCallback() {
+			@Override
+			public void invoke(long window, double xpos, double ypos) {
+				if (leftButtonPressed) {
 
-							xMove += (float) (xpos - xold) * 10;
-							yMove += (float) (yold - ypos) * 10;
+					xMove += (float) (xpos - xold) * 10;
+					yMove += (float) (yold - ypos) * 10;
 
-						}
-						xold = xpos;
-						yold = ypos;
-					}
-				});
+				}
+				xold = xpos;
+				yold = ypos;
+			}
+		});
 
 		// Get the resolution of the primary monitor
 		/*
@@ -162,8 +154,12 @@ public class Graphics {
 	}
 
 	private synchronized void drawSensorPixel() {
+		float r, g, b;
+		r = (float) ClientC.grColor.getRed();
+		g = (float) ClientC.grColor.getGreen();
+		b = (float) ClientC.grColor.getBlue();
 
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+		glColor4f(r, g, b, 1.0f);
 		glBegin(GL_POINTS);
 
 		for (Point p : cp) {

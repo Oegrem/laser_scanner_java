@@ -9,6 +9,7 @@ import java.io.*;
 import code_snippets.clusterLineStrip;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import laser_distance_scanner.Distance_scanner;
 import laser_distance_scanner.SynchronListHandler;
 import tcp_server.ServerC;
@@ -23,15 +24,24 @@ public class ClientC extends Thread {
 	private static InputStream inFromServer;
 
 	private static ObjectInputStream in;
-	
+
 	public static int request = 1;
-	
+
 	public static float slider = -1;
+	
+	public static Color grColor = new Color(1, 0, 0, 1);
+	
+	private String serverName = "141.69.97.178";
 
+	private int port = 9988;
+	
+	public ClientC(String _name, int _port){
+		serverName = _name;
+		port = _port;
+	}
+	
 	public void run() {
-		String serverName = "localhost";
-
-		int port = 9988;
+		
 		try {
 			System.out.println("Connecting to " + serverName + " on port " + port);
 			client = new Socket(serverName, port);
@@ -45,6 +55,9 @@ public class ClientC extends Thread {
 			ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
 			// System.out.println("Server says " + in.readUTF());
 			CopyOnWriteArrayList<Point> cpy = new CopyOnWriteArrayList<Point>();
+
+			Object data = null;
+
 			while (true) {
 				try {
 
@@ -71,22 +84,15 @@ public class ClientC extends Thread {
 					}
 
 					switch (request) {
-					case 1:
-						to = new TransmissionObject(1);
-						break;
-					case 2:
-						to = new TransmissionObject(2);
-						request = 1;
-						break;
-					case 3:
-						to = new TransmissionObject(3);
-						request = 1;
-						break;
 					case 4:
-						to = new TransmissionObject(4,slider);
+						data = slider;
 						slider = -1;
-						request = 1;
+						break;
 					}
+
+					to = new TransmissionObject(request, data);
+					data = null;
+					request = 1;
 
 					out.writeObject(to);
 
@@ -105,9 +111,7 @@ public class ClientC extends Thread {
 
 	public static void main(String[] args) {
 
-		Thread t = new ClientC();
-		t.start();
-
 		UserInterface.main(args);
+				
 	}
 }
