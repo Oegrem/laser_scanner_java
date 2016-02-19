@@ -26,9 +26,7 @@ public class ServerC extends Thread {
 		//serverSocket.setSoTimeout();
 	}
 
-	public synchronized void run() {
-		//Distance_scanner.setInstantSimulation(true);
-		
+	public synchronized void run() {		
 		Distance_scanner scn = Distance_scanner.getDistanceScanner("walk");
 
 		scn.start();
@@ -64,6 +62,14 @@ public class ServerC extends Thread {
 	}
 
 	public static void main(String[] args) {
+		if(args.length >0){
+			if(args[0].equals("-s")){
+				Distance_scanner.setInstantSimulation(true);
+			}
+		}
+		
+		
+		
 		try {
 			Thread t = new ServerC();
 			t.start();

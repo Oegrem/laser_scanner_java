@@ -49,11 +49,11 @@ public class SynchronListHandler {
 		copyPointVector.clear();
 		copyPointVector.addAll(_pointList);
 
-		p = new Processing();
-		p.startProcess();
+		//p = new Processing();
+		//p.startProcess();
 
-		simCluster.clear();
-		simCluster.addAll(p.getSimpleCluster());
+		//simCluster.clear();
+		//simCluster.addAll(p.getSimpleCluster());
 		
 		//clusterVector.clear();
 		//clusterVector.addAll(p.getCluster());
