@@ -12,6 +12,7 @@ import java.net.SocketException;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import data_processing.SimpleCluster;
 import laser_distance_scanner.Distance_scanner;
 import laser_distance_scanner.SynchronListHandler;
 import tcp_client.UserInterface;
@@ -27,8 +28,10 @@ public class ConnectionThread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-			ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+			ObjectOutputStream out = new ObjectOutputStream(
+					clientSocket.getOutputStream());
+			ObjectInputStream in = new ObjectInputStream(
+					clientSocket.getInputStream());
 
 			int toSend = 1;
 			Object toData = null;
@@ -39,6 +42,9 @@ public class ConnectionThread implements Runnable {
 				try {
 					switch (toSend) {
 					case 1: // no Action => continue with sensordata
+
+						Vector<Object> oV = new Vector<Object>();
+
 						CopyOnWriteArrayList<Point> cpy = new CopyOnWriteArrayList<Point>();
 						cpy.addAll(SynchronListHandler.getPointVector());
 
@@ -72,20 +78,32 @@ public class ConnectionThread implements Runnable {
 							Distance_scanner.lastFrame = true;
 						}
 						break;
+					case 7:
+						clientSocket.close();
+						ServerC.connCount--;
+						if (ServerC.connCount <= 0) {
+							ServerC.connCount = 0;
+							Distance_scanner.getDistanceScanner().readData = false;
+						}
+						return;
+					default:
+						System.out.println(Integer.toString(toSend));
+						break;
 					}
 
 					out.writeObject(to);
 
-					TransmissionObject ti = ((TransmissionObject) in.readObject());
+					TransmissionObject ti = ((TransmissionObject) in
+							.readObject());
 
 					toSend = ti.id;
 					toData = ti.data;
-					
+
 				} catch (SocketException e) {
 					System.out.println("SckError");
 					clientSocket.close();
 					ServerC.connCount--;
-					if(ServerC.connCount<=0){
+					if (ServerC.connCount <= 0) {
 						ServerC.connCount = 0;
 						Distance_scanner.getDistanceScanner().readData = false;
 					}

@@ -1,6 +1,14 @@
 package data_processing;
 
-public class SimpleCluster {
+import java.io.Serializable;
+
+public class SimpleCluster implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
 	private int ID = -1;				// eindeutige identifikation
 	private int elementCount = 0;		// anzahl an elementen
 	private int firstElement = -1;		// erste position des ersten elements in der sensorListe

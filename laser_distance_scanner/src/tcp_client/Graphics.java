@@ -13,6 +13,7 @@ import data_processing.Cluster;
 import data_processing.ClusterPoint;
 import data_processing.Clustering;
 import data_processing.Processing;
+import data_processing.SimpleCluster;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -55,6 +56,9 @@ public class Graphics {
 
 	public static CopyOnWriteArrayList<Point> cp = new CopyOnWriteArrayList<Point>();
 
+	public static CopyOnWriteArrayList<SimpleCluster> sP = new CopyOnWriteArrayList<SimpleCluster>();
+
+	
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
@@ -162,7 +166,15 @@ public class Graphics {
 		glColor4f(r, g, b, 1.0f);
 		glBegin(GL_POINTS);
 
-		for (Point p : cp) {
+		for (int i=0; i<cp.size(); i++) {
+			
+			Point p = cp.get(i);
+			
+			for(SimpleCluster sC : sP){
+				if(i>=sC.getFirstElement() && i<=sC.getLastElement()){
+					setColor(sC.getID());
+				}
+			}
 
 			glVertex2f((float) p.x, (float) p.y);
 

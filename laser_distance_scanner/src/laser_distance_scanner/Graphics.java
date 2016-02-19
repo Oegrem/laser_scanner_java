@@ -377,6 +377,7 @@ public class Graphics {
 			simC.addAll(SynchronListHandler.getSimpleCluster());
 			
 			for(int i=0; i<SynchronListHandler.getPointVector().size(); i++){
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				Point p = SynchronListHandler.getPointVector().get(i);
 			
 				for(SimpleCluster sC : simC){

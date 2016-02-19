@@ -9,11 +9,11 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		//startDisplay();
+		startDisplay();
 		
 		//startDisplay("ex1", false, 5000);
 		
-		startDisplay("walk", false, 5000);
+		//startDisplay("walk", false, 5000);
 
 		// runSimFileTest("ex1");
 	}
