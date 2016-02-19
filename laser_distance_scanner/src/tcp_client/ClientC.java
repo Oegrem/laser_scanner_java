@@ -1,6 +1,8 @@
 package tcp_client;
 
 import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.Point;
@@ -11,6 +13,7 @@ import data_processing.SimpleCluster;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebHistory.Entry;
 import laser_distance_scanner.Distance_scanner;
 import laser_distance_scanner.SynchronListHandler;
 import tcp_server.ServerC;
@@ -25,6 +28,12 @@ public class ClientC extends Thread {
 	private static InputStream inFromServer;
 
 	private static ObjectInputStream in;
+	
+	public static boolean isSimul = false;
+	
+	public static String sModel = "";
+	
+	public static String sSerial = "";
 
 	public static int request = 1;
 
@@ -76,6 +85,29 @@ public class ClientC extends Thread {
 							.readObject());
 					TransmissionObject to = null;
 					switch (ti.id) {
+					case 0:
+						HashMap<String, String> hM = new HashMap<String, String>();
+						
+						hM.putAll((HashMap<String, String>) ti.data);
+						
+						for(Map.Entry<String, String> ent : hM.entrySet()){
+							switch(ent.getKey()){
+							case "Simul":
+								isSimul = true;
+								break;
+							case "SModel":
+								sModel = ent.getValue();
+								break;
+							case "SSerial":
+								sSerial = ent.getValue();
+								break;
+							}
+						}
+						if(!(sModel.equals("")&&sSerial.equals(""))){
+						logString+="Sensor Model:"+sModel+"\n"+"Sensor Serial:"+sSerial+"\n";
+						}
+						
+						break;
 					case 1:
 		//				CopyOnWriteArrayList<Point> c = new CopyOnWriteArrayList<Point>();
 						
@@ -137,11 +169,14 @@ public class ClientC extends Thread {
 
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
-					logString += e.getMessage()+"\n";
+
 				} catch (SocketException e) {
-					logString += e.getMessage()+"\n";
+
 					System.out.println("SckError");
+					request = 7;
 					client.close();
+				} catch (EOFException e){
+					System.out.println("Disconnected from Server");
 				}
 			}
 		} catch (IOException e) {

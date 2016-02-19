@@ -45,9 +45,13 @@ public class Distance_scanner implements Runnable {
 														// when
 	// connection not successful
 
-	private boolean usingSimFile = false; // Dummy-Plug-System; set to true when
+	public static boolean usingSimFile = false; // Dummy-Plug-System; set to true when
 											// connection not successful
 
+	public static String sModel = "";
+	
+	public static String sSerial = "";	
+	
 	public static boolean playRecord = true;
 
 	public static boolean nextFrame = false;
@@ -125,6 +129,10 @@ public class Distance_scanner implements Runnable {
 			// Get the sensor information
 			RangeSensorInformation info = device.getInformation();
 			if (info != null) {
+				
+				sModel = info.product;
+				sSerial = info.serial_number;
+				
 				System.out.println("Sensor model:" + info.product);
 				System.out.println("Sensor serial number:" + info.serial_number);
 			} else {

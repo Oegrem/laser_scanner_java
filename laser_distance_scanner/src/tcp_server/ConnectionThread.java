@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -33,7 +34,7 @@ public class ConnectionThread implements Runnable {
 			ObjectInputStream in = new ObjectInputStream(
 					clientSocket.getInputStream());
 
-			int toSend = 1;
+			int toSend = 0;
 			Object toData = null;
 
 			TransmissionObject to = null;
@@ -41,6 +42,21 @@ public class ConnectionThread implements Runnable {
 			while (true) {
 				try {
 					switch (toSend) {
+					case 0: // Start Info
+						
+						HashMap<String, String> hM = new HashMap<String, String>();
+						
+						if(Distance_scanner.usingSimFile){
+							hM.put("Simul", "true");
+						}else{
+							hM.put("SModel", Distance_scanner.sModel);
+							hM.put("SSerial", Distance_scanner.sSerial);
+						}
+						
+						
+						
+						to = new TransmissionObject(0, hM);
+						break;
 					case 1: // no Action => continue with sensordata
 
 						Vector<Object> oV = new Vector<Object>();

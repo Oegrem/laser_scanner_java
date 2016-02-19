@@ -29,7 +29,7 @@ public class Controller implements Initializable {
 	@FXML
 	// fx:id="stopButton"
 	private Button stopButton;
-	
+
 	@FXML
 	// fx:id="parTest"
 	private Button parTest;
@@ -57,15 +57,14 @@ public class Controller implements Initializable {
 	@FXML
 	// fx:id="ipField"
 	private TextField ipField;
-	
+
 	@FXML
 	// fx:id="portField"
 	private TextField portField;
-	
+
 	@FXML
 	// fx:id="log"
 	private TextArea log;
-	
 
 	@Override
 	// This method is called by the FXMLLoader when initialization is
@@ -82,44 +81,44 @@ public class Controller implements Initializable {
 		assert ipField != null : "fx:id=\"ipField\" was not injected: check your FXML file 'RootWin.fxml'.";
 		assert portField != null : "fx:id=\"portField\" was not injected: check your FXML file 'RootWin.fxml'.";
 		assert log != null : "fx:id=\"log\" was not injected: check your FXML file 'RootWin.fxml'.";
-		
-		
+
 		// initialize your logic here: all @FXML variables will have been
 		// injected
 
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				
+
 				int port = 9988;
 				String ip = "127.0.0.1";
-				
+
 				if (!portField.getText().equals("")) {
 					port = Integer.parseInt(portField.getText());
 				}
-				
+
 				if (!ipField.getText().equals("")) {
 					ip = ipField.getText();
 				}
-				
-				ClientC.logString += "Connected to "+ip+":"+Integer.toString(port)+"\n";
-				
+
+				ClientC.logString += "Connected to " + ip + ":"
+						+ Integer.toString(port) + "\n";
+
 				log.setText(ClientC.logString);
-				
+
 				Thread t = new ClientC(ip, port);
 				t.start();
 
 				new Graphics().run();
 			}
 		});
-		
+
 		stopButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				ClientC.request = 7;
-				
+
 				ClientC.logString += "Disconnected from Server\n";
-				
+
 				log.setText(ClientC.logString);
 			}
 		});
@@ -128,9 +127,9 @@ public class Controller implements Initializable {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("ParTest pressed");
-				
+
 				log.setText(ClientC.logString);
-				
+
 				ClientC.request = 2;
 			}
 		});
@@ -138,12 +137,23 @@ public class Controller implements Initializable {
 		pause.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (pause.getText() == "pause") {
-					pause.setText("play");
-				} else {
-					pause.setText("pause");
+				if (ClientC.isSimul) {
+					if (pause.getText() == "pause") {
+						pause.setText("play");
+
+						ClientC.logString += "Paused Simulation\n";
+
+						log.setText(ClientC.logString);
+
+					} else {
+						pause.setText("pause");
+
+						ClientC.logString += "Resumed Simulation\n";
+
+						log.setText(ClientC.logString);
+					}
+					ClientC.request = 3;
 				}
-				ClientC.request = 3;
 			}
 		});
 
