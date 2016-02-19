@@ -9,17 +9,17 @@
 
 <AnchorPane prefHeight="350.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tcp_client.Controller">
    <children>
-      <Button fx:id="startButton" layoutX="20.0" layoutY="95.0" mnemonicParsing="false" text="startButton" />
+      <Button fx:id="startButton" layoutX="41.0" layoutY="97.0" mnemonicParsing="false" text="startButton" />
       <Button fx:id="parTest" layoutX="280.0" layoutY="311.0" mnemonicParsing="false" text="parTest" />
       <Slider fx:id="slide" layoutX="35.0" layoutY="265.0" prefHeight="14.0" prefWidth="281.0" />
       <ColorPicker fx:id="colorPicker" layoutX="29.0" layoutY="311.0" prefHeight="25.0" prefWidth="105.0" />
       <ToggleButton fx:id="pause" layoutX="152.0" layoutY="224.0" mnemonicParsing="false" text="pause" />
       <Button fx:id="lastFrame" layoutX="70.0" layoutY="224.0" mnemonicParsing="false" text="lastFrame" />
       <Button fx:id="nextFrame" layoutX="211.0" layoutY="224.0" mnemonicParsing="false" text="nextFrame" />
-      <TextField fx:id="ipField" layoutX="20.0" layoutY="28.0" promptText="IP_Address" />
+      <TextField fx:id="ipField" layoutX="20.0" layoutY="28.0" prefHeight="25.0" prefWidth="118.0" promptText="IP_Address" />
       <Label fx:id="lab" layoutX="233.0" layoutY="315.0" text="Label" />
-      <TextField fx:id="portField" layoutX="20.0" layoutY="63.0" promptText="Port" />
-      <TextArea fx:id="log" layoutX="190.0" layoutY="3.0" prefHeight="209.0" prefWidth="143.0" />
-      <Button fx:id="stopButton" layoutX="20.0" layoutY="128.0" mnemonicParsing="false" text="stopButton" />
+      <TextField fx:id="portField" layoutX="41.0" layoutY="63.0" prefHeight="25.0" prefWidth="76.0" promptText="Port" />
+      <TextArea fx:id="log" layoutX="140.0" layoutY="9.0" prefHeight="200.0" prefWidth="202.0" />
+      <Button fx:id="stopButton" layoutX="42.0" layoutY="133.0" mnemonicParsing="false" text="stopButton" />
    </children>
 </AnchorPane>

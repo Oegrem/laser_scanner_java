@@ -4,9 +4,6 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import code_snippets.clusterLineStrip;
-import code_snippets.dbscan;
-import data_processing.Cluster;
 import data_processing.Clustering;
 import data_processing.Processing;
 import data_processing.Settings;
@@ -72,7 +69,7 @@ public class Graphics {
 														// Distance_scanner
 
 		scn.start();
-		
+
 		// clusterList.addAll(scn.getClusterVector());
 
 		// dbscn.cluster(SynchronListHandler.getPointVector());
@@ -275,12 +272,6 @@ public class Graphics {
 						System.out.println("searchRange: "
 								+ Settings.getClustering_search_range());
 						break;
-					case 4:
-						System.out.println(dbscan.incRange(1));
-						break;
-					case 5:
-						System.out.println(dbscan.incSize(1));
-						break;
 					}
 				}
 
@@ -306,13 +297,6 @@ public class Graphics {
 								.getClustering_search_range() - 1);
 						System.out.println("searchRange: "
 								+ Settings.getClustering_search_range());
-						break;
-					case 4:
-						System.out.println(dbscan.incRange(-1));
-
-						break;
-					case 5:
-						System.out.println(dbscan.incSize(-1));
 						break;
 					}
 				}
@@ -370,33 +354,59 @@ public class Graphics {
 			} else {
 				glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 			}
-			glBegin(GL_POINTS);
-			// rot
+			glPointSize(4);
+			
+			
+
+			CopyOnWriteArrayList<Point> poi = new CopyOnWriteArrayList<Point>();
+			poi.addAll(SynchronListHandler.getPointVector());
 
 			CopyOnWriteArrayList<SimpleCluster> simC = new CopyOnWriteArrayList<SimpleCluster>();
 			simC.addAll(SynchronListHandler.getSimpleCluster());
+
 			
-			for(int i=0; i<SynchronListHandler.getPointVector().size(); i++){
-				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-				Point p = SynchronListHandler.getPointVector().get(i);
-			
-				for(SimpleCluster sC : simC){
-					if(i>=sC.getFirstElement() && i<=sC.getLastElement()){
-						setColor(sC.getID());
-					}
+
+			for (SimpleCluster sC : simC) {
+				Point mid = new Point(0,0);
+				setColor(sC.getID());
+				for (int i = sC.getFirstElement(); i <= sC.getLastElement() && i < poi.size(); i++) {
+					//glVertex2f(((float) poi.get(i).x), ((float) poi.get(i).y));
+					mid.x+=poi.get(i).x;
+					mid.y+=poi.get(i).y;
 				}
 				
-				float x = ((float) p.x);
-				float y = ((float) p.y);
-				glVertex2f(x, y);
+				mid.x/=sC.getEelementCount();
+				mid.y/=sC.getEelementCount();
+				//glBegin(GL_POINTS);
+				//glVertex2f(((float) mid.x), ((float) mid.y));
+				//glEnd();
+				drawCross(mid.x, mid.y);
+				
 			}
+
+			
 			/*
-			for (Point p : SynchronListHandler.getPointVector()) {
-				float x = ((float) p.x);
-				float y = ((float) p.y);
-				glVertex2f(x, y);
-			}
-	*/
+			 * CopyOnWriteArrayList<SimpleCluster> simC = new
+			 * CopyOnWriteArrayList<SimpleCluster>();
+			 * simC.addAll(SynchronListHandler.getSimpleCluster());
+			 * 
+			 * for(int i=0; i<SynchronListHandler.getPointVector().size(); i++){
+			 * glColor4f(1.0f, 1.0f, 1.0f, 1.0f); Point p =
+			 * SynchronListHandler.getPointVector().get(i);
+			 * 
+			 * for(SimpleCluster sC : simC){ if(i>=sC.getFirstElement() &&
+			 * i<=sC.getLastElement()){ setColor(sC.getID()); } }
+			 * 
+			 * float x = ((float) p.x); float y = ((float) p.y); glVertex2f(x,
+			 * y); }
+			 */
+			/*
+			 * for float x = ((float) p.x); float y = ((float) p.y);
+			 * glVertex2f(x, y);(Point p : SynchronListHandler.getPointVector())
+			 * {
+			 * 
+			 * }
+			 */
 			glEnd();
 
 		}
@@ -417,44 +427,42 @@ public class Graphics {
 		if (drawLines) {
 
 			// irgendwas anderes glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-			/*glBegin(GL_POINTS);
-			
-			CopyOnWriteArrayList<Cluster> cpCluster = new CopyOnWriteArrayList<Cluster>();
-			
-			cpCluster.addAll(SynchronListHandler.getClusterVector());
-			
-			for (Cluster c : cpCluster) {
-				float x = ((float) c.getCenter().x);
-				float y = ((float) c.getCenter().y);
-				glVertex2f(x, y); // wenn m�glich noch rechteck mit den cluster
-									// // ecken zeichnen(c.getMinCorner() (min x
-									// // und // min y) c.getMaxCorner() (max x
-									// und max // y)) } glEnd();
-			}
-			glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is
-												// opacity(transparenz):
-												// lower =
-												// // more opacity
-			glEnd();
-			glBegin(GL_QUADS);
-			for (Cluster c : cpCluster) {
-				if (clusterColors) {
-					//setColor(c.getID());
-				}
-				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-						.getMinCorner().getY()));
-				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-						.getMinCorner().getY()));
-				glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-						.getMaxCorner().getY()));
-				glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-						.getMaxCorner().getY()));
-			}
-			glEnd();*/
-			
-			
+			/*
+			 * glBegin(GL_POINTS);
+			 * 
+			 * CopyOnWriteArrayList<Cluster> cpCluster = new
+			 * CopyOnWriteArrayList<Cluster>();
+			 * 
+			 * cpCluster.addAll(SynchronListHandler.getClusterVector());
+			 * 
+			 * for (Cluster c : cpCluster) { float x = ((float)
+			 * c.getCenter().x); float y = ((float) c.getCenter().y);
+			 * glVertex2f(x, y); // wenn m�glich noch rechteck mit den cluster
+			 * // // ecken zeichnen(c.getMinCorner() (min x // // und // min y)
+			 * c.getMaxCorner() (max x // und max // y)) } glEnd(); }
+			 * glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is //
+			 * opacity(transparenz): // lower = // // more opacity glEnd();
+			 * glBegin(GL_QUADS); for (Cluster c : cpCluster) { if
+			 * (clusterColors) { //setColor(c.getID()); } glVertex2f(((float)
+			 * c.getMinCorner().getX()), ((float) c .getMinCorner().getY()));
+			 * glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
+			 * .getMinCorner().getY())); glVertex2f(((float)
+			 * c.getMaxCorner().getX()), ((float) c .getMaxCorner().getY()));
+			 * glVertex2f(((float) c.getMinCorner().getX()), ((float) c
+			 * .getMaxCorner().getY())); } glEnd();
+			 */
 
 		}
+	}
+	
+	private void drawCross(float x, float y){
+		glBegin(GL_QUADS);
+		glColor4f(0.0f,0.0f,0.0f,0.5f);
+		glVertex2f(x-10,y-10);
+		glVertex2f(x+10,y-10);
+		glVertex2f(x+10,y+10);
+		glVertex2f(x-10,y+10);
+		glEnd();
 	}
 
 	private void setColor(int i) {

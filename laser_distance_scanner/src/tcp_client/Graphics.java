@@ -4,13 +4,6 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import code_snippets.clusterLineStrip;
-import code_snippets.clusterPoint;
-import code_snippets.dbscan;
-import code_snippets.line_extraction;
-import code_snippets.Line;
-import data_processing.Cluster;
-import data_processing.ClusterPoint;
 import data_processing.Clustering;
 import data_processing.Processing;
 import data_processing.SimpleCluster;

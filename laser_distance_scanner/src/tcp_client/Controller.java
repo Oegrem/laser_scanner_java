@@ -184,6 +184,8 @@ public class Controller implements Initializable {
 			@Override
 			public void handle(ActionEvent event) {
 				ClientC.grColor = colorPicker.getValue();
+				ClientC.logString += "New Point Color:"+colorPicker.getValue()+"\n";
+				log.setText(ClientC.logString);
 			}
 		});
 

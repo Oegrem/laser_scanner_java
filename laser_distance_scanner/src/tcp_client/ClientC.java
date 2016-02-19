@@ -8,15 +8,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.Point;
 import java.io.*;
 
-import code_snippets.clusterLineStrip;
 import data_processing.SimpleCluster;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.web.WebHistory.Entry;
-import laser_distance_scanner.Distance_scanner;
-import laser_distance_scanner.SynchronListHandler;
-import tcp_server.ServerC;
 import tcp_server.TransmissionObject;
 
 public class ClientC extends Thread {
@@ -54,6 +47,7 @@ public class ClientC extends Thread {
 		port = _port;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void run() {
 
 		try {
@@ -139,12 +133,6 @@ public class ClientC extends Thread {
 
 						break;
 					case 2:
-						FXMLLoader fxmlLoader = new FXMLLoader();
-						Pane p = fxmlLoader.load(getClass().getResource(
-								"ControlBoard.fxml").openStream());
-						Controller controller = (Controller) fxmlLoader
-								.getController();
-
 						Vector<String> vS = new Vector<String>();
 						vS.addAll((Vector<String>) ti.data);
 						System.out.println(vS.get(1));
