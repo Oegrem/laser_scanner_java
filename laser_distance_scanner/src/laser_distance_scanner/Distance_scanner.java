@@ -12,7 +12,6 @@ import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData.Step;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
-import data_processing.Cluster;
 import scanner_simulator.SData;
 import scanner_simulator.SimFileHandler;
 
@@ -26,8 +25,6 @@ public class Distance_scanner implements Runnable {
 	private Thread t; // Thread for running passive
 
 	private UrgDevice device; // The LaserScanner
-
-	Vector<Cluster> clusterVector = new Vector<Cluster>();
 
 	private int currFreq = 25;
 
@@ -375,10 +372,6 @@ public class Distance_scanner implements Runnable {
 		}
 
 		return nearest;
-	}
-
-	public Vector<Cluster> getClusterVector() {
-		return clusterVector;
 	}
 
 	public boolean isUsingSimFile() {

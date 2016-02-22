@@ -4,10 +4,6 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData.Step;
-
-import data_processing.Cluster;
-import data_processing.ClusterPoint;
 import data_processing.Processing;
 import data_processing.SimpleCluster;
 

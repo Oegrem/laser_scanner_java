@@ -16,7 +16,6 @@ public class Settings {
 	private static int angle_total = 270;
 	private static double angle_angle = 0;
 	private static double[] angle_tan_array = null;
-	private static boolean longVersion = true;
 	
 	/**
 	 *   graymap 						= schwarz weiï¿½ schatierte karte. dunkel = objekt, hell = frei
@@ -55,7 +54,7 @@ public class Settings {
 	 * 									  \-> wenn =false werden ungenauigkeiten der messung ausgeglichen
 	 * graymap_visual_server			= zeigt serverseitig ein fenster mit einer linearen representation der graymap an.
 	 */
-	private static boolean graymap_state = true;				// true! 
+	private static boolean graymap_state = false;				// true! 
 	private static boolean graymap_direct_adding = true;		// true, direktes einfï¿½gen ist performanter
 	private static int graymap_angle_size = 8;					// 1 - 10 scheint gut zu sein
 	private static int graymap_angle_steps = 0;					// berechnung
@@ -79,21 +78,25 @@ public class Settings {
 	
 	/**
 	 * Clustering = objekte finden
-	 * clustering_state 			= ob der algorythmus aktiv ist
-	 * clustering_threshold 		= eine schwelle an entfernung bis zu dem zwei punkte dem selben kluster angehï¿½ren
-	 * clustering_threshold_Value   = eine schwelle an entfernung bis zu dem zwei punkten selben kluster angehï¿½ren, algorythmus isInsideThresholdValue
-	 * clustering_search_range 		= anzahl an punkten die rï¿½ckwers ï¿½berprï¿½ft werden, ob sie den selben cluster angehï¿½ren. sollte so klein gewï¿½hlt werden wie mï¿½glich, aber sogroï¿½ das, dass selbe ergebnis wie bei einer beliebig groï¿½en zahl herauskommt
-	 * clustering_min_cluster_size 	= die minimale anzahl an elementen die ein cluster benï¿½tigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
-	 * 								  \-> Die anzahl wird in relation zur Entfernung zum Mittelpunkt gesetzt um kleine kluster verstï¿½rkt im nahen bereich zu filtern
-	 * 									  Damit soll die messungenauigkeit in der entfernung berï¿½cksichtigt werden
+	 * clustering_state 				= ob der algorythmus aktiv ist
+	 * clustering_threshold_Value   	= eine schwelle an entfernung bis zu dem zwei punkten selben kluster angehï¿½ren,
+	 * clustering_threshold_factor_minus= \
+	 * clustering_threshold_factor		= -\-> factor und vactor_minus kontrollieren wie groß die schwelle (value) mit zunehmender entfernung der messpunkte schrumpft, bis sie wegen vector_minus unter 0 fällt
+	 * clustering_search_range 			= anzahl an punkten die rï¿½ckwers ï¿½berprï¿½ft werden, ob sie den selben cluster angehï¿½ren. sollte so klein gewï¿½hlt werden wie mï¿½glich, aber sogroï¿½ das, dass selbe ergebnis wie bei einer beliebig groï¿½en zahl herauskommt
+	 * clustering_min_cluster_size 		= die minimale anzahl an elementen die ein cluster benï¿½tigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
+	 * 								  	\-> Die anzahl wird in relation zur Entfernung zum Mittelpunkt gesetzt um kleine kluster verstï¿½rkt im nahen bereich zu filtern
+	 * 									  	Damit soll die messungenauigkeit in der entfernung berï¿½cksichtigt werden
+	 * 
+	 * cluster zuweisungen erfolgen mit der formel: differenze < clustering_threshold_Value * (clustering_threshold_factor / step - clustering_threshold_factor_minus)
+	 * step steht für die entfernung der beiden messpunkte im messvektor. diese reichweite kann mit searchRange begrenzt werden
+	 * differenze steht für den längenuterschied der messpunkte zum mittelpunkt
 	 */
-	private static boolean clustering_state = true;				// true
-	private static double clustering_threshold = 1.5;			// 0.7				// 1.2
-	private static double clustering_threshold_value = 20.0;	// 10 - 100
-	private static double clustering_threshold_factor_minus = 0.1;//  0.000001 - 1 
-	private static double clustering_threshold_factor = 2.0;	// 1 - 10
-	private static int clustering_search_range = 300;			// 1 - 1000000, kleiner = besser
-	private static int clustering_min_cluster_size = 5;		// 1 - 1000000, sollte so gewï¿½hlt werden das kleine gegenstï¿½nde bei maximaler entfernung erkannt werden, mï¿½glicherweise eine entfernung zur mitte in bezugziehen
+	private static boolean clustering_state = true;					// true
+	private static double clustering_threshold_value = 20.0;		// 10 - 100
+	private static double clustering_threshold_factor_minus = 0.1;	//  0.000001 - 1 
+	private static double clustering_threshold_factor = 2.0;		// 1 - 10
+	private static int clustering_search_range = 300;				// 1 - 1000000, kleiner = besser
+	private static int clustering_min_cluster_size = 10;				// 1 - 1000000, sollte so gewï¿½hlt werden das kleine gegenstï¿½nde bei maximaler entfernung erkannt werden, mï¿½glicherweise eine entfernung zur mitte in bezugziehen
 	
 	/**
 	 * straighten			= glï¿½tten
@@ -158,14 +161,6 @@ public class Settings {
 	
 	public static double[] getAngle_tan_array() {
 		return angle_tan_array;
-	}
-
-
-	public static boolean isLongVersion() {
-		return longVersion;
-	}
-	public static void setLongVersion(boolean longVersion) {
-		Settings.longVersion = longVersion;
 	}
 	
 	// GRAYMAP
@@ -362,17 +357,6 @@ public class Settings {
 	public static void setClustering_state(boolean clustering_state) {
 		Settings.clustering_state = clustering_state;
 		Settings.updateAllValues();
-	}
-
-	
-	public static double getClustering_threshold() {
-		return clustering_threshold;
-	}
-	public static void setClustering_threshold(double clustering_threshold) {
-		if(clustering_threshold>0 && clustering_threshold<20){
-			Settings.clustering_threshold = clustering_threshold;
-			Settings.updateAllValues();
-		}
 	}
 
 	
