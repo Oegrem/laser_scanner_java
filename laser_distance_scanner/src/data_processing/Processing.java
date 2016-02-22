@@ -11,6 +11,7 @@ public class Processing {
 
 	static boolean isWorking = false;
 	
+	static boolean settings = false;
 	// list with the unchanged raw point data
 	private  Vector<Point> pointList = new Vector<Point>();
 	private  Vector<Long> longList = new Vector<Long>();
@@ -25,7 +26,10 @@ public class Processing {
 	
 	
 	public Processing(){
-		Settings.updateAllValues();
+		if(settings==false){
+			settings = true;
+			Settings.updateAllValues();
+		}
 	}
 	
 	/**

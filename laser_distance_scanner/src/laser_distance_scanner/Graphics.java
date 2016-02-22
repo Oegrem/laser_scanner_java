@@ -364,23 +364,46 @@ public class Graphics {
 			CopyOnWriteArrayList<SimpleCluster> simC = new CopyOnWriteArrayList<SimpleCluster>();
 			simC.addAll(SynchronListHandler.getSimpleCluster());
 
-			
-
+			for (Point p: poi){
+				glBegin(GL_POINTS);
+				glColor4f(0.0f,1.0f,0.0f,0.5f);
+				glVertex2f((float)p.x,(float)p.y);
+				glEnd();
+			}
 			for (SimpleCluster sC : simC) {
+				try{
 				Point mid = new Point(0,0);
-				setColor(sC.getID());
+				setColor(1);
+				int z=0;
 				for (int i = sC.getFirstElement(); i <= sC.getLastElement() && i < poi.size(); i++) {
 					//glVertex2f(((float) poi.get(i).x), ((float) poi.get(i).y));
 					mid.x+=poi.get(i).x;
 					mid.y+=poi.get(i).y;
+					z++;
 				}
-				
-				mid.x/=sC.getEelementCount();
-				mid.y/=sC.getEelementCount();
+				if(z==0)
+					continue;
+				mid.x/=z;
+				mid.y/=z;
 				//glBegin(GL_POINTS);
 				//glVertex2f(((float) mid.x), ((float) mid.y));
 				//glEnd();
-				drawCross(mid.x, mid.y);
+				//drawCross(poi.get(sC.getFirstElement()).x,poi.get(sC.getFirstElement()).y);
+				//drawCross(poi.get(sC.getLastElement()).x,poi.get(sC.getLastElement()).y);
+				
+				//drawCross(mid.x, mid.y);
+				glColor4f(1.0f,0.0f,0.0f,0.5f);
+				glBegin(GL_POLYGON);
+				//glVertex2f( poi.get(sC.getFirstElement()).x*(float)1.1, poi.get(sC.getFirstElement()).y*(float)1.1);
+				glVertex2f(poi.get(sC.getFirstElement()).x,poi.get(sC.getFirstElement()).y);
+				glVertex2f(mid.x,mid.y);
+				glVertex2f(poi.get(sC.getLastElement()).x,poi.get(sC.getLastElement()).y);
+				//glVertex2f(poi.get(sC.getLastElement()).x*(float)1.1,poi.get(sC.getLastElement()).y*(float)1.1);
+				glVertex2f(mid.x*(float)1.5,mid.y*(float)1.5);
+				glEnd();
+				}catch (Exception e){
+					System.out.println(e);
+				}
 				
 			}
 
@@ -457,11 +480,11 @@ public class Graphics {
 	
 	private void drawCross(float x, float y){
 		glBegin(GL_QUADS);
-		glColor4f(0.0f,0.0f,0.0f,0.5f);
-		glVertex2f(x-10,y-10);
-		glVertex2f(x+10,y-10);
-		glVertex2f(x+10,y+10);
-		glVertex2f(x-10,y+10);
+		glColor4f(1.0f,0.0f,0.0f,1.0f);
+		glVertex2f(x-30,y-30);
+		glVertex2f(x+30,y-30);
+		glVertex2f(x+30,y+30);
+		glVertex2f(x-30,y+30);
 		glEnd();
 	}
 

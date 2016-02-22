@@ -25,7 +25,7 @@ public class Clustering {
 			for(int j=1;j<searchRange;j++){
 				if(i-j >0){
 					// if it fits to previous cluster
-					if(insideThreshold(currentSData,sensorData.get(i-j),j)){
+					if(insideThresholdValue(currentSData,sensorData.get(i-j),j)){
 						int id = sensorDataID.get(i-j);
 						sensorDataID.add(id);
 						clusterList.get(id).increaseElementCount();
@@ -166,19 +166,28 @@ public class Clustering {
 	 * @return
 	 */
 	private boolean insideThreshold(long long1, Long long2,int leaps) {
-		double A = long1;
-		double B = long2;
 		double adjacent = 0.0;
-		double distance = Math.sqrt(A*A+B*B-2*A*B*Math.cos(Math.toRadians(leaps*0.25))); 		// a*a + b*b - 2*a*b*cos(c)
+		double distance = Math.sqrt(long1*long1+long2*long2-2*long1*long2*Math.cos(Math.toRadians(leaps*0.25))); 		// a*a + b*b - 2*a*b*cos(c)
 		double[] angle = Settings.getAngle_tan_array();
-		if(A<B)
-			adjacent = A;
+		if(long1<long2)
+			adjacent = long1;
 		else 
-			adjacent = B;
+			adjacent = long2;
 		double factor = adjacent * angle[leaps] * 1.5;
 		if(distance < Settings.getClustering_threshold()*factor){
 			return true;
 		}
 		return false;
 	}
+	
+	private boolean insideThresholdValue(long long1, Long long2,int leaps){
+		long difference = long2 - long1;
+		if(long1 > long2){
+			difference = long1 - long2;
+		}
+		if(difference < Settings.getClustering_threshold_value()*(Settings.getClustering_threshold_factor()/leaps - Settings.getClustering_threshold_factor_minus()))
+			return true;
+		return false;
+	}
+	
 }

@@ -80,16 +80,20 @@ public class Settings {
 	/**
 	 * Clustering = objekte finden
 	 * clustering_state 			= ob der algorythmus aktiv ist
-	 * clustering_threshold 		= eine schwelle an entfernung ab dem zwei punkte dem selben kluster angeh�ren
+	 * clustering_threshold 		= eine schwelle an entfernung bis zu dem zwei punkte dem selben kluster angeh�ren
+	 * clustering_threshold_Value   = eine schwelle an entfernung bis zu dem zwei punkten selben kluster angeh�ren, algorythmus isInsideThresholdValue
 	 * clustering_search_range 		= anzahl an punkten die r�ckwers �berpr�ft werden, ob sie den selben cluster angeh�ren. sollte so klein gew�hlt werden wie m�glich, aber sogro� das, dass selbe ergebnis wie bei einer beliebig gro�en zahl herauskommt
 	 * clustering_min_cluster_size 	= die minimale anzahl an elementen die ein cluster ben�tigt damit er als Cluster anerkannt wird. soll messfehler ausgleichen
 	 * 								  \-> Die anzahl wird in relation zur Entfernung zum Mittelpunkt gesetzt um kleine kluster verst�rkt im nahen bereich zu filtern
 	 * 									  Damit soll die messungenauigkeit in der entfernung ber�cksichtigt werden
 	 */
 	private static boolean clustering_state = true;				// true
-	private static double clustering_threshold = 1.5;				// 0.7				// 1.2 
-	private static int clustering_search_range = 15;			// 1 - 1000000, kleiner = besser
-	private static int clustering_min_cluster_size = 15;		// 1 - 1000000, sollte so gew�hlt werden das kleine gegenst�nde bei maximaler entfernung erkannt werden, m�glicherweise eine entfernung zur mitte in bezugziehen
+	private static double clustering_threshold = 1.5;			// 0.7				// 1.2
+	private static double clustering_threshold_value = 20.0;	// 10 - 100
+	private static double clustering_threshold_factor_minus = 0.1;//  0.000001 - 1 
+	private static double clustering_threshold_factor = 2.0;	// 1 - 10
+	private static int clustering_search_range = 300;			// 1 - 1000000, kleiner = besser
+	private static int clustering_min_cluster_size = 5;		// 1 - 1000000, sollte so gew�hlt werden das kleine gegenst�nde bei maximaler entfernung erkannt werden, m�glicherweise eine entfernung zur mitte in bezugziehen
 	
 	/**
 	 * straighten			= gl�tten
@@ -372,6 +376,36 @@ public class Settings {
 	}
 
 	
+	public static double getClustering_threshold_value() {
+		return clustering_threshold_value;
+	}
+	public static void setClustering_threshold_value(double clustering_threshold_value) {
+		if(clustering_threshold_value > 1){
+			Settings.clustering_threshold_value = clustering_threshold_value;
+			Settings.updateAllValues();
+		}
+	}
+
+	public static double getClustering_threshold_factor_minus() {
+		return clustering_threshold_factor_minus;
+	}
+	public static void setClustering_threshold_factor_minus(double clustering_threshold_factor_minus) {
+		if(clustering_threshold_factor_minus > 0){
+			Settings.clustering_threshold_factor_minus = clustering_threshold_factor_minus;
+			Settings.updateAllValues();
+		}
+	}	
+	
+	public static double getClustering_threshold_factor() {
+		return clustering_threshold_factor;
+	}
+	public static void setClustering_threshold_factor(double clustering_threshold_factor) {
+		if(clustering_threshold_factor > 0){
+			Settings.clustering_threshold_factor = clustering_threshold_factor;
+			Settings.updateAllValues();
+		}
+	}
+
 	public static int getClustering_search_range() {
 		return clustering_search_range;
 	}
