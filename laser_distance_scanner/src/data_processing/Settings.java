@@ -97,20 +97,7 @@ public class Settings {
 	private static double clustering_threshold_factor = 2.0;		// 1 - 10
 	private static int clustering_search_range = 300;				// 1 - 1000000, kleiner = besser
 	private static int clustering_min_cluster_size = 10;				// 1 - 1000000, sollte so gew�hlt werden das kleine gegenst�nde bei maximaler entfernung erkannt werden, m�glicherweise eine entfernung zur mitte in bezugziehen
-	
-	/**
-	 * straighten			= gl�tten
-	 * straigthen_state		= ob gegl�ttet wirt
-	 * straightenFactor 	= die st�rke der gl�ttung, kleine werte reichen meist
-	 * straighten_type_enum - arithmetic: Das ArithmetischeMittel
-	 * 						- harmonic: Das HarmonischeMittel
-	 * 						- geometric: Das GeometrischeMittel
-	 * straigthen_type		= der Algorythmus der zum Gl�tten verwendet wird
-	 */
-	private static boolean straigthen_state = false;													// true
-	private static int straightenFactor = 4;													// 1- 30, klein = wenig, gro� = sehr glatt, meist zu glatt,
-	public enum straighten_type_enum {arithmetic,harmonic,geometric};
-	private static straighten_type_enum straigthen_type = straighten_type_enum.arithmetic ;		// arithmetic
+
 	
 	public Settings(){
 		updateAllValues();
@@ -409,34 +396,6 @@ public class Settings {
 			Settings.clustering_min_cluster_size = clustering_min_cluster_size;
 			Settings.updateAllValues();
 		}
-	}
-
-	// Gl�tten
-	
-	public static boolean isStraigthen() {
-		return straigthen_state;
-	}
-	public static void setStraigthen(boolean straigthen) {
-		Settings.straigthen_state = straigthen;
-		Settings.updateAllValues();
-	}
-
-	public static int getStraightenFactor() {
-		return straightenFactor;
-	}
-	public static void setStraightenFactor(int straightenFactor) {
-		if(straightenFactor>0 && straightenFactor<100){
-			Settings.straightenFactor = straightenFactor;
-			Settings.updateAllValues();
-		}
-	}
-
-	public static straighten_type_enum getStraigthen_type() {
-		return straigthen_type;
-	}
-	public static void setStraigthen_type(straighten_type_enum straigthen_type) {
-		Settings.straigthen_type = straigthen_type;
-		Settings.updateAllValues();
 	}
 }
 
