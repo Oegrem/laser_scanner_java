@@ -203,10 +203,6 @@ public class Graphics {
 				if (key == GLFW_KEY_X && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Settings.setClustering_threshold(Settings
-								.getClustering_threshold() + 0.1);
-						System.out.println("threshold: "
-								+ Settings.getClustering_threshold());
 						break;
 					case 1:
 						break;
@@ -226,10 +222,6 @@ public class Graphics {
 				if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
 					switch (toChange) {
 					case 0:
-						Settings.setClustering_threshold(Settings
-								.getClustering_threshold() - 0.1);
-						System.out.println("threshold: "
-								+ Settings.getClustering_threshold());
 						break;
 					case 1:
 						break;
@@ -344,8 +336,8 @@ public class Graphics {
 				drawCross(poi.get(sC.getFirstElement()).x,poi.get(sC.getFirstElement()).y);
 				drawCross(poi.get(sC.getLastElement()).x,poi.get(sC.getLastElement()).y);
 				
-				//drawCross(mid.x, mid.y);
-				glColor4f(1.0f,0.0f,0.0f,0.5f);
+				drawCross(mid.x, mid.y);
+				glColor4f(1.0f,0.0f,0.0f,0.35f);
 				glBegin(GL_POLYGON);
 				//glVertex2f( poi.get(sC.getFirstElement()).x*(float)1.1, poi.get(sC.getFirstElement()).y*(float)1.1);
 				glVertex2f(poi.get(sC.getFirstElement()).x,poi.get(sC.getFirstElement()).y);
