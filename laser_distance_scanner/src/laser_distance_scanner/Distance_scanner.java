@@ -12,7 +12,6 @@ import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData.Step;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
-import data_processing.Cluster;
 import scanner_simulator.SData;
 import scanner_simulator.SimFileHandler;
 
@@ -27,31 +26,30 @@ public class Distance_scanner implements Runnable {
 
 	private UrgDevice device; // The LaserScanner
 
-	Vector<Cluster> clusterVector = new Vector<Cluster>();
-
 	private int currFreq = 25;
 
 	private Vector<SData> sVect = new Vector<SData>(); // SData Vector for
 														// Recording
 
-	private boolean isRecorded = false; // When true the data will be recorded
+	public boolean isRecorded = false; // When true the data will be recorded
 
 	private String recordName = ""; // Filename of the recorded file
 
-	private boolean isConnected = false; // set to true when Thread more than
+	public boolean isConnected = false; // set to true when Thread more than
 											// one times started
 
 	public static String alternativeSimFile = "ex1"; // name of recorded File
 														// when
 	// connection not successful
 
-	public static boolean usingSimFile = false; // Dummy-Plug-System; set to true when
-											// connection not successful
+	public static boolean usingSimFile = false; // Dummy-Plug-System; set to
+												// true when
+	// connection not successful
 
 	public static String sModel = "";
-	
-	public static String sSerial = "";	
-	
+
+	public static String sSerial = "";
+
 	public static boolean playRecord = true;
 
 	public static boolean nextFrame = false;
@@ -63,6 +61,10 @@ public class Distance_scanner implements Runnable {
 	public static long slomo = (long) 1.0;
 
 	public static boolean readData = true;
+
+	public static boolean simChanged = false;
+
+	public static boolean reconnectAttempt = false;
 
 	/*
 	 * Constructor using static SimFileName
@@ -106,6 +108,10 @@ public class Distance_scanner implements Runnable {
 		instantSimulation = _instantSimul;
 	}
 
+	public static void setSimFile(String _alternativeSimFile) {
+		alternativeSimFile = _alternativeSimFile;
+	}
+
 	/*
 	 * Connect to Device (when not successful enable Simulation (Dummy-Plug))
 	 * when opening more Threads
@@ -129,12 +135,13 @@ public class Distance_scanner implements Runnable {
 			// Get the sensor information
 			RangeSensorInformation info = device.getInformation();
 			if (info != null) {
-				
+
 				sModel = info.product;
 				sSerial = info.serial_number;
-				
+
 				System.out.println("Sensor model:" + info.product);
-				System.out.println("Sensor serial number:" + info.serial_number);
+				System.out
+						.println("Sensor serial number:" + info.serial_number);
 			} else {
 				System.out.println("Sensor error:" + device.what());
 			}
@@ -258,7 +265,6 @@ public class Distance_scanner implements Runnable {
 				disconnect(); // disconnecting !!!VERY IMPORTANT!!! to
 								// disconnect => else not able reconnecting
 
-				System.exit(0);
 			} else {
 				if (readData) {
 					if (writeData() == 255) {
@@ -269,7 +275,7 @@ public class Distance_scanner implements Runnable {
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				System.exit(0);
+				return;
 			}
 		}
 	}
@@ -287,15 +293,27 @@ public class Distance_scanner implements Runnable {
 
 		Vector<SData> dataVector = sFH.readObject(); // reading an SimFile
 
+		String usedSimFile = alternativeSimFile;
+
 		while (true) { // Looping until interrupted =>
 						// recorded File starts from
 			// Beginning after its over
+
+			if (!alternativeSimFile.equals(usedSimFile)) {
+				sFH = new SimFileHandler(alternativeSimFile);
+				dataVector = sFH.readObject();
+				usedSimFile = alternativeSimFile;
+
+				simChanged = false;
+			} else if (simChanged) {
+				simChanged = false;
+			}
 
 			int sDSize = dataVector.size();
 
 			for (int i = 0; i < sDSize; i++) {
 
-				if (!t.isInterrupted()) { // exiting at interrupt
+				if (!t.isInterrupted() && !simChanged) { // exiting at interrupt
 
 					while (!playRecord) {
 						try {
@@ -345,6 +363,13 @@ public class Distance_scanner implements Runnable {
 
 					SynchronListHandler.setPointList(sD.pVector);
 
+					if (reconnectAttempt) {
+						usingSimFile = false;
+						reconnectAttempt = false;
+						instantSimulation = false;
+						return;
+					}
+
 					try {
 						Thread.sleep(sD.freq * slomo); // sleeping timestamp in
 														// millis (timestamp in
@@ -353,7 +378,7 @@ public class Distance_scanner implements Runnable {
 					} catch (InterruptedException e) {
 						return;
 					}
-				} else {
+				} else if (t.isInterrupted()) {
 					return;
 				}
 			}
@@ -375,10 +400,6 @@ public class Distance_scanner implements Runnable {
 		}
 
 		return nearest;
-	}
-
-	public Vector<Cluster> getClusterVector() {
-		return clusterVector;
 	}
 
 	public boolean isUsingSimFile() {
@@ -407,7 +428,6 @@ public class Distance_scanner implements Runnable {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				stopRecording();
 			}
 		};
@@ -422,7 +442,6 @@ public class Distance_scanner implements Runnable {
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -440,6 +459,9 @@ public class Distance_scanner implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
+			if (!isConnected) { // When not connected then do it
+				connect();
+			}
 			if (!usingSimFile) {
 				getDistances();
 			}
@@ -453,9 +475,6 @@ public class Distance_scanner implements Runnable {
 	 * Starting the thread
 	 */
 	public void start() {
-		if (!isConnected) { // When not connected then do it
-			connect();
-		}
 		if (t == null) { // If Thread already exists dont start it again
 			t = new Thread(this, "Scanner_Thread"); // create new Thread
 			t.start(); // start the new Thread
@@ -472,6 +491,21 @@ public class Distance_scanner implements Runnable {
 	 */
 	public void interrupt() {
 		t.interrupt();
+	}
+
+	/*
+	 * Resets the Settings
+	 */
+	public static void resetSettings() {
+		usingSimFile = false;
+		playRecord = true;
+		nextFrame = false;
+		lastFrame = false;
+		sliderValue = -1.0f;
+		slomo = (long) 1.0;
+		readData = true;
+		simChanged = false;
+		reconnectAttempt = false;
 	}
 
 }

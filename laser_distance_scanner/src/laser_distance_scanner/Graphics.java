@@ -50,17 +50,9 @@ public class Graphics {
 
 	private boolean drawPoints = true;
 
-	private boolean drawLines = true;
-
-	private boolean drawDbscan = false;
-
 	private int toChange = 0;
 
 	private float zoom = 1;
-
-	private boolean clusterColors = false;
-
-	// private dbscan dbscn = new dbscan(10, 5); // DBSCAN clustering
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
@@ -69,10 +61,6 @@ public class Graphics {
 														// Distance_scanner
 
 		scn.start();
-
-		// clusterList.addAll(scn.getClusterVector());
-
-		// dbscn.cluster(SynchronListHandler.getPointVector());
 
 		try {
 			init();
@@ -202,46 +190,6 @@ public class Graphics {
 					}
 				}
 
-				if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
-					if (drawDbscan) {
-						drawDbscan = false;
-						System.out.println("drawDbscan OF");
-					} else {
-						drawDbscan = true;
-						System.out.println("drawDbscan ON");
-					}
-				}
-
-				if (key == GLFW_KEY_3 && action == GLFW_RELEASE) {
-					if (drawLines) {
-						drawLines = false;
-						System.out.println("drawLines OF");
-					} else {
-						drawLines = true;
-						System.out.println("drawLines ON");
-					}
-
-				}
-
-				if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
-					if (clusterColors) {
-						clusterColors = false;
-						System.out.println("clusterColors OFF");
-					} else {
-						clusterColors = true;
-						System.out.println("clusterColors ON");
-					}
-				}
-
-				if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
-					if (drawLines) {
-						drawLines = false;
-						System.out.println("drawLines OF");
-					} else {
-						drawLines = true;
-						System.out.println("drawLines ON");
-					}
-				}
 				if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
 					if (Settings.isGraymap_state()) {
 						Settings.setGraymap_state(false);
@@ -364,12 +312,17 @@ public class Graphics {
 			CopyOnWriteArrayList<SimpleCluster> simC = new CopyOnWriteArrayList<SimpleCluster>();
 			simC.addAll(SynchronListHandler.getSimpleCluster());
 
+			glBegin(GL_POINTS);
+			
 			for (Point p: poi){
-				glBegin(GL_POINTS);
+				
 				glColor4f(0.0f,1.0f,0.0f,0.5f);
 				glVertex2f((float)p.x,(float)p.y);
-				glEnd();
+				
 			}
+			
+			glEnd();
+			
 			for (SimpleCluster sC : simC) {
 				try{
 				Point mid = new Point(0,0);
@@ -388,8 +341,8 @@ public class Graphics {
 				//glBegin(GL_POINTS);
 				//glVertex2f(((float) mid.x), ((float) mid.y));
 				//glEnd();
-				//drawCross(poi.get(sC.getFirstElement()).x,poi.get(sC.getFirstElement()).y);
-				//drawCross(poi.get(sC.getLastElement()).x,poi.get(sC.getLastElement()).y);
+				drawCross(poi.get(sC.getFirstElement()).x,poi.get(sC.getFirstElement()).y);
+				drawCross(poi.get(sC.getLastElement()).x,poi.get(sC.getLastElement()).y);
 				
 				//drawCross(mid.x, mid.y);
 				glColor4f(1.0f,0.0f,0.0f,0.5f);
@@ -406,75 +359,6 @@ public class Graphics {
 				}
 				
 			}
-
-			
-			/*
-			 * CopyOnWriteArrayList<SimpleCluster> simC = new
-			 * CopyOnWriteArrayList<SimpleCluster>();
-			 * simC.addAll(SynchronListHandler.getSimpleCluster());
-			 * 
-			 * for(int i=0; i<SynchronListHandler.getPointVector().size(); i++){
-			 * glColor4f(1.0f, 1.0f, 1.0f, 1.0f); Point p =
-			 * SynchronListHandler.getPointVector().get(i);
-			 * 
-			 * for(SimpleCluster sC : simC){ if(i>=sC.getFirstElement() &&
-			 * i<=sC.getLastElement()){ setColor(sC.getID()); } }
-			 * 
-			 * float x = ((float) p.x); float y = ((float) p.y); glVertex2f(x,
-			 * y); }
-			 */
-			/*
-			 * for float x = ((float) p.x); float y = ((float) p.y);
-			 * glVertex2f(x, y);(Point p : SynchronListHandler.getPointVector())
-			 * {
-			 * 
-			 * }
-			 */
-			glEnd();
-
-		}
-		if (drawDbscan) {
-			/*
-			 * int rec = 0;
-			 * 
-			 * for (clusterLineStrip cLS :
-			 * SynchronListHandler.getClusterLines()) { if(cLS.recognised){
-			 * rec++; setColor(cLS.getClusterId());
-			 * 
-			 * glBegin(GL_LINE_STRIP);
-			 * 
-			 * for (Point p : cLS.getLineStripPoints()) { glVertex2f((float)
-			 * p.x, (float) p.y); } glEnd(); } }
-			 */
-		}
-		if (drawLines) {
-
-			// irgendwas anderes glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-			/*
-			 * glBegin(GL_POINTS);
-			 * 
-			 * CopyOnWriteArrayList<Cluster> cpCluster = new
-			 * CopyOnWriteArrayList<Cluster>();
-			 * 
-			 * cpCluster.addAll(SynchronListHandler.getClusterVector());
-			 * 
-			 * for (Cluster c : cpCluster) { float x = ((float)
-			 * c.getCenter().x); float y = ((float) c.getCenter().y);
-			 * glVertex2f(x, y); // wenn m�glich noch rechteck mit den cluster
-			 * // // ecken zeichnen(c.getMinCorner() (min x // // und // min y)
-			 * c.getMaxCorner() (max x // und max // y)) } glEnd(); }
-			 * glColor4f(0.0f, 0.0f, 1.0f, 0.8f); // last value is //
-			 * opacity(transparenz): // lower = // // more opacity glEnd();
-			 * glBegin(GL_QUADS); for (Cluster c : cpCluster) { if
-			 * (clusterColors) { //setColor(c.getID()); } glVertex2f(((float)
-			 * c.getMinCorner().getX()), ((float) c .getMinCorner().getY()));
-			 * glVertex2f(((float) c.getMaxCorner().getX()), ((float) c
-			 * .getMinCorner().getY())); glVertex2f(((float)
-			 * c.getMaxCorner().getX()), ((float) c .getMaxCorner().getY()));
-			 * glVertex2f(((float) c.getMinCorner().getX()), ((float) c
-			 * .getMaxCorner().getY())); } glEnd();
-			 */
-
 		}
 	}
 	

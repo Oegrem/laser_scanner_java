@@ -15,6 +15,7 @@ import java.awt.Point;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javafx.scene.paint.Color;
 import laser_distance_scanner.SynchronListHandler;
 
 public class Graphics {
@@ -38,11 +39,21 @@ public class Graphics {
 
 	private boolean leftButtonPressed = false;
 
-	private float xMove = 1;
+	private static float xMove = 1;
 
-	private float yMove = 1;
+	private static float yMove = 1;
 
-	private float zoom = 1;
+	private static float zoom = 1;
+
+	public static boolean drawPoints = true;
+
+	public static Color pointColor = new Color(1, 0, 0, 1);
+
+	public static boolean drawClusters = true;
+
+	public static Color clusterColor = new Color(1, 0, 0, 1);
+
+	private static boolean showGraphics = true;
 
 	// The window handle
 	private long window;
@@ -51,7 +62,6 @@ public class Graphics {
 
 	public static CopyOnWriteArrayList<SimpleCluster> sP = new CopyOnWriteArrayList<SimpleCluster>();
 
-	
 	public void run() {
 		System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
 
@@ -90,49 +100,57 @@ public class Graphics {
 		int HEIGHT = 700;
 
 		// Create the window
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner", NULL, NULL);
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Laser Distance Scanner",
+				NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Setup a key callback. It will be called every time a key is pressed,
 		// repeated or released.
 
-		glfwSetScrollCallback(window, scrollCallBack = new GLFWScrollCallback() {
+		glfwSetScrollCallback(window,
+				scrollCallBack = new GLFWScrollCallback() {
 
-			@Override
-			public void invoke(long window, double xoffset, double yoffset) {
-				zoom += yoffset / 5;
-			}
-		});
+					@Override
+					public void invoke(long window, double xoffset,
+							double yoffset) {
+						zoom += yoffset / 5;
+					}
+				});
 
-		glfwSetMouseButtonCallback(window, mouseButtonCallBack = new GLFWMouseButtonCallback() {
+		glfwSetMouseButtonCallback(window,
+				mouseButtonCallBack = new GLFWMouseButtonCallback() {
 
-			@Override
-			public void invoke(long window, int button, int action, int mods) {
-				if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-					leftButtonPressed = true;
-				}
+					@Override
+					public void invoke(long window, int button, int action,
+							int mods) {
+						if (button == GLFW_MOUSE_BUTTON_LEFT
+								&& action == GLFW_PRESS) {
+							leftButtonPressed = true;
+						}
 
-				if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-					leftButtonPressed = false;
-				}
-			}
+						if (button == GLFW_MOUSE_BUTTON_LEFT
+								&& action == GLFW_RELEASE) {
+							leftButtonPressed = false;
+						}
+					}
 
-		});
+				});
 
-		glfwSetCursorPosCallback(window, cursorPosCallBack = new GLFWCursorPosCallback() {
-			@Override
-			public void invoke(long window, double xpos, double ypos) {
-				if (leftButtonPressed) {
+		glfwSetCursorPosCallback(window,
+				cursorPosCallBack = new GLFWCursorPosCallback() {
+					@Override
+					public void invoke(long window, double xpos, double ypos) {
+						if (leftButtonPressed) {
 
-					xMove += (float) (xpos - xold) * 10;
-					yMove += (float) (yold - ypos) * 10;
+							xMove += (float) (xpos - xold) * 10;
+							yMove += (float) (yold - ypos) * 10;
 
-				}
-				xold = xpos;
-				yold = ypos;
-			}
-		});
+						}
+						xold = xpos;
+						yold = ypos;
+					}
+				});
 
 		// Get the resolution of the primary monitor
 		/*
@@ -151,60 +169,90 @@ public class Graphics {
 	}
 
 	private synchronized void drawSensorPixel() {
-		float r, g, b;
-		r = (float) ClientC.grColor.getRed();
-		g = (float) ClientC.grColor.getGreen();
-		b = (float) ClientC.grColor.getBlue();
 
-		glColor4f(r, g, b, 1.0f);
-		glBegin(GL_POINTS);
+		if (drawPoints) {
 
-		for (int i=0; i<cp.size(); i++) {
-			
-			Point p = cp.get(i);
-			
-			for(SimpleCluster sC : sP){
-				if(i>=sC.getFirstElement() && i<=sC.getLastElement()){
-					setColor(sC.getID());
+			float r, g, b, a;
+			r = (float) pointColor.getRed();
+			g = (float) pointColor.getGreen();
+			b = (float) pointColor.getBlue();
+			a = (float) clusterColor.getOpacity();
+
+			glColor4f(r, g, b, a);
+			glBegin(GL_POINTS);
+
+			try {
+				for (int i = 0; i < cp.size(); i++) {
+
+					Point p = cp.get(i);
+
+					glVertex2f((float) p.x, (float) p.y);
+
 				}
+
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("Point Array Out of Bounds");
 			}
 
-			glVertex2f((float) p.x, (float) p.y);
+			glEnd();
 
 		}
-		glEnd();
+		if (drawClusters) {
+
+			float r, g, b, a;
+			r = (float) clusterColor.getRed();
+			g = (float) clusterColor.getGreen();
+			b = (float) clusterColor.getBlue();
+			a = (float) clusterColor.getOpacity();
+
+			glColor4f(r, g, b, a);
+
+			for (SimpleCluster sC : sP) {
+				try {
+					Point mid = new Point(0, 0);
+					int z = 0;
+					for (int i = sC.getFirstElement(); i <= sC.getLastElement()
+							&& i < cp.size(); i++) {
+						mid.x += cp.get(i).x;
+						mid.y += cp.get(i).y;
+						z++;
+					}
+					if (z == 0)
+						continue;
+					mid.x /= z;
+					mid.y /= z;
+
+					glBegin(GL_POLYGON);
+
+					glVertex2f(cp.get(sC.getFirstElement()).x,
+							cp.get(sC.getFirstElement()).y);
+					glVertex2f(mid.x, mid.y);
+					glVertex2f(cp.get(sC.getLastElement()).x,
+							cp.get(sC.getLastElement()).y);
+
+					glVertex2f(mid.x * (float) 1.5, mid.y * (float) 1.5);
+					glEnd();
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			}
+		}
+
 	}
 
-	private void setColor(int i) {
-		switch (i % 9) {
-		case 0:
-			glColor3f(0.5f, 0.5f, 1.0f);
-			break;
-		case 1:
-			glColor3f(1.0f, 0.0f, 0.0f);
-			break;
-		case 2:
-			glColor3f(0.0f, 1.0f, 0.0f);
-			break;
-		case 3:
-			glColor3f(0.0f, 0.0f, 1.0f);
-			break;
-		case 4:
-			glColor3f(1.0f, 1.0f, 0.0f);
-			break;
-		case 5:
-			glColor3f(1.0f, 0.0f, 1.0f);
-			break;
-		case 6:
-			glColor3f(0.0f, 1.0f, 1.0f);
-			break;
-		case 7:
-			glColor3f(0.5f, 0.5f, 0.5f);
-			break;
-		case 8:
-			glColor3f(1.0f, 0.5f, 0.5f);
-			break;
-		}
+	public static void resetGraphics() {
+		xMove = 1;
+		yMove = 1;
+		zoom = 1;
+		drawPoints = true;
+		pointColor = new Color(1, 0, 0, 1);
+		drawClusters = true;
+		clusterColor = new Color(1, 0, 0, 1);
+	}
+
+	public static void closeGraphics() {
+		showGraphics = false;
+		return;
 	}
 
 	private void loop() {
@@ -232,7 +280,7 @@ public class Graphics {
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
-		while (glfwWindowShouldClose(window) == GL_FALSE) {
+		while (glfwWindowShouldClose(window) == GL_FALSE && showGraphics) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
 																// framebuffer
 
@@ -266,7 +314,7 @@ public class Graphics {
 			// invoked during this call.
 			glfwPollEvents();
 		}
-		System.exit(0);
+		return;
 	}
 
 }

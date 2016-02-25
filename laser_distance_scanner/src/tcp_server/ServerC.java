@@ -27,12 +27,6 @@ public class ServerC extends Thread {
 	}
 
 	public synchronized void run() {		
-		Distance_scanner scn = Distance_scanner.getDistanceScanner("walk");
-
-		scn.start();
-		
-		scn.readData = false;
-		
 		while (true) {
 			try {
 				System.out.println("Waiting for client on port "
@@ -47,7 +41,7 @@ public class ServerC extends Thread {
 				new Thread(new ConnectionThread(clientSocket)).start();
 				
 				connCount++;
-				if(connCount==1){
+				if(connCount>0 && !Distance_scanner.getDistanceScanner().readData){
 					Distance_scanner.getDistanceScanner().readData = true;
 				}
 				
@@ -64,11 +58,15 @@ public class ServerC extends Thread {
 	public static void main(String[] args) {
 		if(args.length >0){
 			if(args[0].equals("-s")){
+				Distance_scanner.setSimFile("walk");
+
 				Distance_scanner.setInstantSimulation(true);
 			}
 		}
 		
+		Distance_scanner.getDistanceScanner().start();
 		
+		Distance_scanner.getDistanceScanner().readData = false;
 		
 		try {
 			Thread t = new ServerC();

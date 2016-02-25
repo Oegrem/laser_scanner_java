@@ -1,6 +1,9 @@
 package tcp_client;
 
 import java.net.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -24,23 +27,23 @@ public class ClientC extends Thread {
 	
 	public static boolean isSimul = false;
 	
+	public static String dataMode = "";
+	
 	public static String sModel = "";
 	
 	public static String sSerial = "";
 
 	public static int request = 1;
 
-	public static float slider = -1;
-
-	public static Color grColor = new Color(1, 0, 0, 1);
-	
-	public static String label = "";
+	public static Object data = 0;
 
 	private String serverName = "141.69.97.178";
 
 	private int port = 9988;
 	
 	public static String logString = "";
+	
+	public static Vector<String> modes = new Vector<String>();
 
 	public ClientC(String _name, int _port) {
 		serverName = _name;
@@ -69,9 +72,6 @@ public class ClientC extends Thread {
 
 			CopyOnWriteArrayList<SimpleCluster> simpC = new CopyOnWriteArrayList<SimpleCluster>();
 
-			
-			Object data = null;
-
 			while (true) {
 				try {
 
@@ -95,29 +95,26 @@ public class ClientC extends Thread {
 							case "SSerial":
 								sSerial = ent.getValue();
 								break;
+							default:
+								modes.add(ent.getValue());
+								break;
 							}
 						}
+						
 						if(!(sModel.equals("")&&sSerial.equals(""))){
-						logString+="Sensor Model:"+sModel+"\n"+"Sensor Serial:"+sSerial+"\n";
+						addLog("Sensor Model:"+sModel);
+						addLog("Sensor Serial:"+sSerial);
 						}
 						
 						break;
 					case 1:
-		//				CopyOnWriteArrayList<Point> c = new CopyOnWriteArrayList<Point>();
-						
-		//				CopyOnWriteArrayList<SimpleCluster> sC = new CopyOnWriteArrayList<SimpleCluster>();
-						
-		//				Vector<Object> oV = new Vector<Object>();
-						
-		//				oV.addAll((Vector<Object>) ti.data);
-						
-		//				c.addAll((CopyOnWriteArrayList<Point>) oV.get(0));
-						
-		//				sC.addAll((CopyOnWriteArrayList<SimpleCluster>) oV.get(1));
-						
 						CopyOnWriteArrayList<Point> c = new CopyOnWriteArrayList<Point>();
 						
-						c.addAll((CopyOnWriteArrayList<Point>) ti.data);
+						CopyOnWriteArrayList<SimpleCluster> sC = new CopyOnWriteArrayList<SimpleCluster>();
+
+						c.addAll((CopyOnWriteArrayList<Point>)((Vector<Object>) ti.data).get(0));
+
+						sC.addAll((CopyOnWriteArrayList<SimpleCluster>)((Vector<Object>) ti.data).get(1));
 						
 						if (cpy != c) {
 							Graphics.cp.clear();
@@ -125,33 +122,23 @@ public class ClientC extends Thread {
 							cpy = c;
 						}
 						
-	//					if (simpC != sC) {
-	//						Graphics.sP.clear();
-	//						Graphics.sP.addAll(sC);
-	//						simpC = sC;
-	//					}
+						if (simpC != sC) {
+							Graphics.sP.clear();
+							Graphics.sP.addAll(sC);
+							simpC = sC;
+						}
 
 						break;
 					case 2:
-						Vector<String> vS = new Vector<String>();
-						vS.addAll((Vector<String>) ti.data);
-						System.out.println(vS.get(1));
-						label = vS.get(1);
+						dataMode = (String) ti.data;
 						break;
 					default:
 						break;
 					}
 
-					switch (request) {
-					case 4:
-						data = slider;
-						slider = -1;
-						break;
-					}
-
 					to = new TransmissionObject(request, data);
-					data = null;
 					request = 1;
+					data = 0;
 
 					out.writeObject(to);
 
@@ -165,18 +152,21 @@ public class ClientC extends Thread {
 					client.close();
 				} catch (EOFException e){
 					System.out.println("Disconnected from Server");
+					client.close();
+					return;
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			
-			logString += e.getMessage()+"\n";
+			addLog(e.getMessage());
 		}
 	}
-
-	public static void main(String[] args) {
-
-		UserInterface.main(args);
-
+	
+	public static void addLog(String newLog){
+		DateFormat df = new SimpleDateFormat("HH:mm:ss");
+		Calendar calobj = Calendar.getInstance();
+				
+		logString += df.format(calobj.getTime())+":"+newLog + "\n";
 	}
 }

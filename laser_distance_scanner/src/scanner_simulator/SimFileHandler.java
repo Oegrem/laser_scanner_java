@@ -1,6 +1,7 @@
 package scanner_simulator;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,15 @@ import java.util.Vector;
 public class SimFileHandler {
 	private String fileName; // Filename for writing and reading
 
+	public static File[] getSims(){
+		Vector<String> vS = new Vector<String>();
+		
+		File folder = new File("../");
+		File[] listOfFiles = folder.listFiles();
+	
+		return listOfFiles;
+	}
+	
 	public SimFileHandler(String _fileName) {
 		fileName = _fileName;
 	}
